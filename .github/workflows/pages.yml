@@ -1,4 +1,4 @@
-name: Deploy site to GitHub Pages
+name: Build and deploy site
 
 on:
   push:
@@ -8,6 +8,22 @@ on:
       - "demo/**"
       - "apps/web/**"
       - "scripts/build-site.mjs"
+      - "scripts/check-site.mjs"
+      - "16-科研Skill生态调研与动态流程编排.md"
+      - "17-基于Skill契约的上层微服务架构.md"
+      - "18-GitHub Pages部署与多智能体Skill设计.md"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "demo/**"
+      - "apps/web/**"
+      - "scripts/build-site.mjs"
+      - "scripts/check-site.mjs"
+      - "16-科研Skill生态调研与动态流程编排.md"
+      - "17-基于Skill契约的上层微服务架构.md"
+      - "18-GitHub Pages部署与多智能体Skill设计.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -17,12 +33,13 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,17 +61,24 @@ jobs:
       - name: Build static site
         run: node scripts/build-site.mjs
 
+      - name: Check static artifact
+        run: node scripts/check-site.mjs
+
       - name: Configure Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

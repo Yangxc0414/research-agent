@@ -50,6 +50,11 @@ python -m http.server 8000 --directory site
 
 Push to `main`; `.github/workflows/pages.yml` builds and uploads `site/` to GitHub Pages.
 
+- `pull_request` runs the same build and `scripts/check-site.mjs` but does **not** deploy;
+- `push` to `main` builds, checks the static artifact, uploads `site/`, then deploys;
+- jobs have timeouts and separate concurrency groups for PR vs main;
+- `scripts/check-site.mjs` verifies required Pages files, app asset references, and the static-runtime guard.
+
 Repository Settings → Pages → Source must be set to **GitHub Actions**.
 
 ## Verification
