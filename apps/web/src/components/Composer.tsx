@@ -36,15 +36,20 @@ function suggestionsFor(task: ResearchTask): string[] {
   }
   if (task.mode === "writing") {
     const signed = task.evidence.some((item) => item.kind === "claim" && item.status === "signed");
-    return signed ? ["生成写作槽位", "检查证据边界", "查看证据链"] : ["生成写作槽位", "去补证据", "查看证据链"];
+    return signed
+      ? ["运行审阅包", "生成写作槽位", "查看证据链"]
+      : ["运行审阅包", "去补证据", "查看证据链"];
   }
   if (task.mode === "experiment") {
-    if (task.evaluation.hiddenAccessCount > 0) return ["查看评估隔离", "查看 EA", "查看证据链"];
+    const signed = task.evidence.some((item) => item.kind === "claim" && item.status === "signed");
+    if (task.evaluation.hiddenAccessCount > 0) return ["运行审阅包", "查看评估隔离", "查看证据链"];
+    if (task.run && signed) return ["运行审阅包", "生成写作槽位", "查看证据链"];
+    if (task.run) return ["运行审阅包", "签署 claim", "查看证据链"];
     if (task.protocolFrozen) return ["运行 3 seeds", "查看 EA", "查看证据链"];
     if (task.protocol) return ["冻结协议", "查看证据链"];
     return ["送入实验设计", "查看证据链"];
   }
-  if (task.coverage.spans > 0) return ["扩展检索", "把 gap 变成假设", "查看证据链"];
+  if (task.coverage.spans > 0) return ["运行审阅包", "把 gap 变成假设", "查看证据链"];
   return ["开始检索", "查看证据链"];
 }
 
@@ -121,6 +126,9 @@ export function Composer() {
       case "开始检索":
       case "扩展检索":
         actions.runResearch();
+        break;
+      case "运行审阅包":
+        void actions.runReviewPack();
         break;
       case "把 gap 变成假设":
       case "送入实验设计":

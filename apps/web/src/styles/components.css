@@ -2810,6 +2810,79 @@
   line-height: 1.55;
 }
 
+
+/* Review pack: several advisory reviewers, one compact receipt */
+.review-pack-card {
+  padding: 8px 9px 7px;
+  border-left: 2px solid rgba(15, 138, 158, 0.42);
+  background: linear-gradient(90deg, rgba(15, 138, 158, 0.045), rgba(255, 255, 255, 0.82));
+}
+
+.review-pack-summary {
+  margin: 5px 0 4px;
+  color: var(--text);
+  font-size: calc(9.2px * var(--font-scale, 1));
+  line-height: 1.5;
+}
+
+.review-pack-findings {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-pack-findings li {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: start;
+  gap: 7px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.review-pack-findings li:last-child {
+  border-bottom: 0;
+}
+
+.review-pack-status {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(7.2px * var(--font-scale, 1));
+  letter-spacing: 0.04em;
+}
+
+.review-pack-findings li[data-status="pass"] .review-pack-status {
+  color: var(--teal);
+}
+
+.review-pack-findings li[data-status="warn"] .review-pack-status {
+  color: var(--amber);
+}
+
+.review-pack-findings li[data-status="blocked"] .review-pack-status {
+  color: var(--coral);
+}
+
+.review-pack-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.review-pack-copy b {
+  color: var(--text);
+  font-size: calc(8.8px * var(--font-scale, 1));
+  font-weight: 600;
+}
+
+.review-pack-copy small {
+  color: var(--muted);
+  font-size: calc(8.2px * var(--font-scale, 1));
+  line-height: 1.45;
+}
+
 /* Inline skill load card: loaded per turn, not a global switch */
 .skill-use-card {
   padding: 7px 9px 6px;

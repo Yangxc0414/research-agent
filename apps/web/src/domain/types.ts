@@ -65,6 +65,24 @@ export interface Workspace {
 }
 
 export type SkillSource = "builtin" | "custom" | "imported";
+
+export interface ReviewFinding {
+  id: string;
+  reviewer: string;
+  check: string;
+  label: string;
+  status: "pass" | "warn" | "deferred" | "blocked";
+  summary: string;
+}
+
+export interface ReviewPackResult {
+  id: string;
+  generatedAt: string;
+  reviewers: number;
+  findings: ReviewFinding[];
+  summary: string;
+  note: string;
+}
 export type SkillActivation = "auto" | "manual" | "off";
 
 export interface Skill {
@@ -367,6 +385,7 @@ export type Card =
       }>;
       note: string;
     }
+  | ({ type: "review-pack" } & ReviewPackResult)
   | {
       type: "skill-use";
       skillId: string;
@@ -442,6 +461,7 @@ export interface ResearchTask {
   evolution: EvolutionState;
   auto: AutoState;
   autoStages: AutoStage[];
+  reviewPack?: ReviewPackResult;
   messages: Message[];
 }
 

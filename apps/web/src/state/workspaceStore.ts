@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { folderStorage } from "../adapters/folderStorage";
 import { isSnapshot, normalizeSkill, staticAdapter } from "../adapters/staticAdapter";
+import { loadCustomAgents } from "../adapters/runtimeApi";
 import { ACCESS_META, AUTO_STAGE_CATALOG, DEFAULT_PREFERENCES, builtinSkills, clampModel } from "../domain/catalog";
 import { DEFAULT_SHORTCUTS } from "../domain/shortcuts";
 import { hypothesisConvergence, literatureCoverage } from "../domain/researchBrief";
 import { skillDraftFromChat } from "../domain/skillAuthoring";
 import { routeSkill, skillForStage, type SkillRoute } from "../domain/skillRouting";
+import { buildReviewPack, type ReviewAgent } from "../domain/reviewPack";
 import {
   createConversationTask,
   createSeedWorkspace,
@@ -135,6 +137,7 @@ interface WorkspaceActions {
   setSkillActivation: (id: string, activation: SkillActivation) => void;
   deleteSkill: (id: string) => void;
   invokeSkill: (id: string, note?: string) => void;
+  runReviewPack: () => Promise<void>;
   confirmPermission: () => void;
   cancelPermission: () => void;
   startAuto: () => void;
@@ -1585,6 +1588,9 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             case "research":
               get().actions.runResearch();
               return;
+            case "review":
+              void get().actions.runReviewPack();
+              return;
             case "experiment":
               get().actions.designExperiment();
               return;
@@ -1650,7 +1656,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
                   ...item.messages,
                   message(
                     "agent",
-                    "可用指令：/research 检索、/experiment 设计、/freeze 冻结、/run 运行、/writing 写作槽位、/sign 签署、/start 全自动、/pause /resume /step /stop 控制、/evidence、/eval、/evolution、/lineage、/skills、/agents、/files、/memory、/new、/model、/plugins、/export、/settings、/help；输入 /技能 id 可直接调用 Skill。也可以说“帮我创建一个技能……”或 /skill-creator 生成草稿，确认后再保存。运行中输入普通文本会变成指导，在下一个阶段边界生效。"
+                    "可用指令：/research 检索、/review 运行审阅包、/experiment 设计、/freeze 冻结、/run 运行、/writing 写作槽位、/sign 签署、/start 全自动、/pause /resume /step /stop 控制、/evidence、/eval、/evolution、/lineage、/skills、/agents、/files、/memory、/new、/model、/plugins、/export、/settings、/help；输入 /技能 id 可直接调用 Skill。也可以说“帮我创建一个技能……”或 /skill-creator 生成草稿，确认后再保存。运行中输入普通文本会变成指导，在下一个阶段边界生效。"
                   )
                 ]
               }));
@@ -1857,6 +1863,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         }
         if (task.evaluation.hiddenAccessCount > 0) {
           notify("held-out 已消耗；同一任务不能重新评估。请新建任务或新协议");
+          return;
+        }
+        if (task.evidence.some((item) => item.kind === "claim" && item.status === "signed")) {
+          notify("已有已签 claim；重跑会覆盖签名。请新建任务或新协议");
           return;
         }
         if (!task.protocolFrozen) {
@@ -2180,6 +2190,38 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         set((current) => ({ ui: { ...current.ui, skillsOpen: false } }));
         notify(`Skill 已调用：${skill.name}`);
       },
+      runReviewPack: async () => {
+        const task = currentTask();
+        if (!task) return;
+        if (task.auto.running) {
+          notify("全自动运行中：先暂停并停止再运行审阅包");
+          return;
+        }
+        let agents: ReviewAgent[] = [];
+        try {
+          const snapshot = await loadCustomAgents();
+          agents = snapshot.data.agents
+            .filter((agent) => agent.enabled)
+            .map((agent) => ({ name: agent.name, checks: agent.checks }));
+        } catch {
+          agents = [];
+        }
+        const latest = get().tasks.find((item) => item.id === task.id);
+        if (!latest) return;
+        const pack = buildReviewPack(latest, agents);
+        mutateTask(latest.id, (item) => ({
+          ...item,
+          reviewPack: pack,
+          messages: [
+            ...item.messages,
+            message("agent", "**审阅包完成** · advisory only", {
+              type: "review-pack",
+              ...pack
+            })
+          ]
+        }));
+        notify(`审阅包完成：${pack.summary}`);
+      },
       confirmPermission: () => {
         const request = get().ui.permissionRequest;
         if (!request) return;
@@ -2240,6 +2282,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         }
         if (task.evaluation.hiddenAccessCount > 0) {
           notify("held-out 已消耗；同一任务不能再次启动改进运行");
+          return;
+        }
+        if (task.evidence.some((item) => item.kind === "claim" && item.status === "signed")) {
+          notify("已有已签 claim；启动全自动会重置证据。请新建任务或新协议");
           return;
         }
         if (denyReadOnly(task, "启动全自动")) return;
@@ -2311,6 +2357,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         if (!task.auto.running) {
           if (task.evaluation.hiddenAccessCount > 0) {
             notify("held-out 已消耗；同一任务不能再次启动改进运行");
+            return;
+          }
+          if (task.evidence.some((item) => item.kind === "claim" && item.status === "signed")) {
+            notify("已有已签 claim；单步不会重置证据。请新建任务或新协议");
             return;
           }
           if (denyReadOnly(task, "单步执行全自动")) return;

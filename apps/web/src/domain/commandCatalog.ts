@@ -75,6 +75,14 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     available: (task) => !isRunning(task)
   },
   {
+    id: "review",
+    name: "运行审阅包",
+    description: "让已启用的审阅角色检查当前证据，只读 advisory",
+    hint: "不写 Claim/EA/gate",
+    group: "work",
+    available: (task) => !isRunning(task)
+  },
+  {
     id: "experiment",
     name: "实验设计",
     description: "从 gap 进入 S4 协议草案",
@@ -218,6 +226,7 @@ export const SLASH_COMMANDS: SlashCommand[] = [
 const DEFAULT_SLASH_COMMAND_IDS = [
   "start",
   "research",
+  "review",
   "freeze",
   "run",
   "sign",

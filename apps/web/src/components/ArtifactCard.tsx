@@ -271,6 +271,30 @@ export function ArtifactCard({ card }: { card: Card }) {
     );
   }
 
+  if (card.type === "review-pack") {
+    return (
+      <article className="artifact review-pack-card">
+        <CardHead label="REVIEW PACK" meta={`${card.reviewers} reviewers · advisory`} />
+        <p className="review-pack-summary">{card.summary}</p>
+        <ul className="review-pack-findings">
+          {card.findings.map((item) => (
+            <li key={item.id} data-status={item.status}>
+              <span className="review-pack-status">{item.status.toUpperCase()}</span>
+              <span className="review-pack-copy">
+                <b>{item.label}</b>
+                <small>{item.reviewer} · {item.summary}</small>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="artifact-note">{card.note}</p>
+        <Actions>
+          <ActionButton onClick={() => actions.setContextTab("evidence")}>查看证据链</ActionButton>
+        </Actions>
+      </article>
+    );
+  }
+
   if (card.type === "skill-use") {
     return (
       <article className="artifact skill-use-card">

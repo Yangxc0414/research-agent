@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-10-25T05:12:43.505Z",
+  "built_at": "2026-10-25T05:34:35.166Z",
   "demo_sha256_16": "0658f279c87bc5da",
   "docs": [
     "README.md",
@@ -12,5 +12,13 @@
     "digest.json",
     "queries.json"
   ],
-  "innovation_data": []
+  "innovation_data": [
+    "demo.json",
+    "specs.json",
+    "figure.svg",
+    "figure.scene.json",
+    "figure.manifest.json",
+    "paper.json",
+    "grant.json"
+  ]
 }
