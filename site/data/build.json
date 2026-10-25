@@ -1,0 +1,16 @@
+{
+  "built_at": "2026-10-25T05:12:43.505Z",
+  "demo_sha256_16": "0658f279c87bc5da",
+  "docs": [
+    "README.md",
+    "16-科研Skill生态调研.md",
+    "17-上层微服务架构.md",
+    "18-GitHub Pages部署与多智能体Skill设计.md"
+  ],
+  "data_files": [
+    "build.json",
+    "digest.json",
+    "queries.json"
+  ],
+  "innovation_data": []
+}

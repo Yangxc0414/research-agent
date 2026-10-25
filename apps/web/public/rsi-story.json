@@ -1,0 +1,646 @@
+{
+  "schema_version": "rsi-story-0.1",
+  "generated_at": "2026-10-24T14:53:58+00:00",
+  "read_only": true,
+  "summary": {
+    "headline": "S5:seed-budget-2 通过 public/hidden/near-OOD/regression，租约 LEASE-be5d21dc84 已消费；sealed holdout confirmed（mean Δ=0.005663, cost Δ=-12.0）。仍无 capability claim。",
+    "episodes": 3,
+    "pending": 0,
+    "approved": 1,
+    "rejected": 2,
+    "active_leases": 1,
+    "confirmed": 1,
+    "regressed": 0,
+    "capability_claims": 0,
+    "calibration": "tracked"
+  },
+  "selected_episode_id": "EP-162dceefd6",
+  "timeline": [
+    {
+      "id": "observe",
+      "label": "观察",
+      "state": "done",
+      "detail": "S5 seed-budget trial on chemlab protocol"
+    },
+    {
+      "id": "candidate",
+      "label": "候选",
+      "state": "done",
+      "detail": "S5:seed-budget-2 · {\"seeds\": 2}"
+    },
+    {
+      "id": "dry-run",
+      "label": "Dry-run",
+      "state": "passed",
+      "detail": "research_agent\\web\\data\\rsi-chemlab-v2\\dry-run-seeds2.json"
+    },
+    {
+      "id": "public",
+      "label": "Public",
+      "state": "passed",
+      "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+    },
+    {
+      "id": "hidden",
+      "label": "Hidden",
+      "state": "passed",
+      "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+    },
+    {
+      "id": "near_ood",
+      "label": "Near-OOD",
+      "state": "passed",
+      "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+    },
+    {
+      "id": "regression",
+      "label": "Regression",
+      "state": "passed",
+      "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+    },
+    {
+      "id": "human",
+      "label": "人工准入",
+      "state": "approved",
+      "detail": "operator approval for ChemLab seed-budget protocol validation; harness-only, no capability claim"
+    },
+    {
+      "id": "lease",
+      "label": "租约",
+      "state": "active",
+      "detail": "LEASE-be5d21dc84 · S5/demo/chemlab · TTL 30 days"
+    },
+    {
+      "id": "consume",
+      "label": "消费 / trace",
+      "state": "recorded",
+      "detail": "actuals: {\"hidden_mean_delta\": -0.009454403292887215, \"hidden_min_delta\": 0.04019878800348187, \"hidden_cost_delta\": -6}"
+    },
+    {
+      "id": "confirmation",
+      "label": "Sealed 复核",
+      "state": "confirmed",
+      "detail": "S5 sealed confirmation recorded as audit only"
+    }
+  ],
+  "episodes": [
+    {
+      "episode_id": "EP-65e4938bc9",
+      "candidate_id": "S5:seed-budget-4",
+      "kind": "process",
+      "target": "experiment.run.seeds",
+      "patch": "{\"seeds\": 4}",
+      "rationale": "reduce seed budget while preserving chemlab protocol R2",
+      "predicted_effect": "lower run cost with non-inferior mean R2",
+      "predicted_metrics": {
+        "hidden_mean_delta": 0.0,
+        "hidden_cost_delta": -2.0
+      },
+      "scope": "S5/demo/chemlab",
+      "parent_id": "",
+      "created_at": "2026-10-24T04:24:54+00:00",
+      "decision": "rejected",
+      "reason": "S5 finalist budget exhausted; gates not read",
+      "simulation": false,
+      "claim_eligible": false,
+      "notes": [
+        "S5 seed-budget trial on chemlab protocol",
+        "evaluation receipts attached; awaiting human admission"
+      ],
+      "actuals": {},
+      "public_eval": {
+        "split": "public",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.18729476362378306,
+          "min_score": 0.10186602876772732,
+          "cost": 8,
+          "failed_runs": 0,
+          "mean_r2": 0.18729476362378306,
+          "min_r2": 0.10186602876772732
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "hidden_eval": {
+        "split": "hidden",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "near_ood_eval": {
+        "split": "near_ood",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "regression_eval": {
+        "split": "regression",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "lease": null,
+      "confirmation": null,
+      "gates": [
+        {
+          "id": "dry-run",
+          "label": "Dry-run",
+          "state": "passed",
+          "detail": "research_agent\\web\\data\\rsi-chemlab-v2\\dry-run-seeds4.json"
+        },
+        {
+          "id": "public",
+          "label": "Public",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.18729476362378306,
+            "min_score": 0.10186602876772732,
+            "cost": 8,
+            "failed_runs": 0,
+            "mean_r2": 0.18729476362378306,
+            "min_r2": 0.10186602876772732
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "hidden",
+          "label": "Hidden",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "near_ood",
+          "label": "Near-OOD",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "regression",
+          "label": "Regression",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "human",
+          "label": "Human admission",
+          "state": "rejected",
+          "detail": "S5 finalist budget exhausted; gates not read"
+        },
+        {
+          "id": "lease",
+          "label": "Lease",
+          "state": "missing",
+          "detail": "未授予"
+        },
+        {
+          "id": "consume",
+          "label": "Consume / trace",
+          "state": "not_recorded",
+          "detail": "尚无消费记录"
+        },
+        {
+          "id": "confirmation",
+          "label": "Sealed confirmation",
+          "state": "pending",
+          "detail": "尚未记录租约后复核"
+        }
+      ],
+      "stage": "S5"
+    },
+    {
+      "episode_id": "EP-71a147434c",
+      "candidate_id": "S5:seed-budget-3",
+      "kind": "process",
+      "target": "experiment.run.seeds",
+      "patch": "{\"seeds\": 3}",
+      "rationale": "reduce seed budget while preserving chemlab protocol R2",
+      "predicted_effect": "lower run cost with non-inferior mean R2",
+      "predicted_metrics": {
+        "hidden_mean_delta": 0.0,
+        "hidden_cost_delta": -4.0
+      },
+      "scope": "S5/demo/chemlab",
+      "parent_id": "",
+      "created_at": "2026-10-24T04:24:54+00:00",
+      "decision": "rejected",
+      "reason": "S5 public prefilter: R2 loss or failed run",
+      "simulation": false,
+      "claim_eligible": false,
+      "notes": [
+        "S5 seed-budget trial on chemlab protocol",
+        "evaluation receipts attached; awaiting human admission"
+      ],
+      "actuals": {},
+      "public_eval": {
+        "split": "public",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.16857663569735057,
+          "min_score": 0.10186602876772732,
+          "cost": 6,
+          "failed_runs": 0,
+          "mean_r2": 0.16857663569735057,
+          "min_r2": 0.10186602876772732
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "hidden_eval": {
+        "split": "hidden",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "near_ood_eval": {
+        "split": "near_ood",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "regression_eval": {
+        "split": "regression",
+        "status": "missing",
+        "metrics": {},
+        "n": 0
+      },
+      "lease": null,
+      "confirmation": null,
+      "gates": [
+        {
+          "id": "dry-run",
+          "label": "Dry-run",
+          "state": "passed",
+          "detail": "research_agent\\web\\data\\rsi-chemlab-v2\\dry-run-seeds3.json"
+        },
+        {
+          "id": "public",
+          "label": "Public",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.16857663569735057,
+            "min_score": 0.10186602876772732,
+            "cost": 6,
+            "failed_runs": 0,
+            "mean_r2": 0.16857663569735057,
+            "min_r2": 0.10186602876772732
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "hidden",
+          "label": "Hidden",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "near_ood",
+          "label": "Near-OOD",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "regression",
+          "label": "Regression",
+          "state": "missing",
+          "metrics": {},
+          "detail": ""
+        },
+        {
+          "id": "human",
+          "label": "Human admission",
+          "state": "rejected",
+          "detail": "S5 public prefilter: R2 loss or failed run"
+        },
+        {
+          "id": "lease",
+          "label": "Lease",
+          "state": "missing",
+          "detail": "未授予"
+        },
+        {
+          "id": "consume",
+          "label": "Consume / trace",
+          "state": "not_recorded",
+          "detail": "尚无消费记录"
+        },
+        {
+          "id": "confirmation",
+          "label": "Sealed confirmation",
+          "state": "pending",
+          "detail": "尚未记录租约后复核"
+        }
+      ],
+      "stage": "S5"
+    },
+    {
+      "episode_id": "EP-162dceefd6",
+      "candidate_id": "S5:seed-budget-2",
+      "kind": "process",
+      "target": "experiment.run.seeds",
+      "patch": "{\"seeds\": 2}",
+      "rationale": "reduce seed budget while preserving chemlab protocol R2",
+      "predicted_effect": "lower run cost with non-inferior mean R2",
+      "predicted_metrics": {
+        "hidden_mean_delta": 0.0,
+        "hidden_cost_delta": -6.0
+      },
+      "scope": "S5/demo/chemlab",
+      "parent_id": "",
+      "created_at": "2026-10-24T04:24:54+00:00",
+      "decision": "approved",
+      "reason": "operator approval for ChemLab seed-budget protocol validation; harness-only, no capability claim",
+      "simulation": false,
+      "claim_eligible": false,
+      "notes": [
+        "S5 seed-budget trial on chemlab protocol",
+        "evaluation receipts attached; awaiting human admission",
+        "evaluation receipts attached; awaiting human admission",
+        "S5 prediction audit",
+        "human admission recorded; active lease issued"
+      ],
+      "actuals": {
+        "hidden_mean_delta": -0.009454403292887215,
+        "hidden_min_delta": 0.04019878800348187,
+        "hidden_cost_delta": -6
+      },
+      "public_eval": {
+        "split": "public",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.19380911901681883,
+          "min_score": 0.15009272569727683,
+          "cost": 4,
+          "failed_runs": 0,
+          "mean_r2": 0.19380911901681883,
+          "min_r2": 0.15009272569727683
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "hidden_eval": {
+        "split": "hidden",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.17101806345631326,
+          "min_score": 0.09648957095560995,
+          "cost": 4,
+          "failed_runs": 0,
+          "mean_r2": 0.17101806345631326,
+          "min_r2": 0.09648957095560995
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "near_ood_eval": {
+        "split": "near_ood",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.18207219357623203,
+          "min_score": 0.08886769250120397,
+          "cost": 4,
+          "failed_runs": 0,
+          "mean_r2": 0.18207219357623203,
+          "min_r2": 0.08886769250120397
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "regression_eval": {
+        "split": "regression",
+        "status": "passed",
+        "metrics": {
+          "mean_score": 0.16703993352963734,
+          "min_score": 0.06911077041865332,
+          "cost": 4,
+          "failed_runs": 0,
+          "mean_r2": 0.16703993352963734,
+          "min_r2": 0.06911077041865332
+        },
+        "n": 2,
+        "simulation": false,
+        "claim_eligible": false,
+        "note": "S5 seed-budget protocol-validation metric; not a research capability claim"
+      },
+      "lease": {
+        "candidate_id": "S5:seed-budget-2",
+        "scope": "S5/demo/chemlab",
+        "ttl_days": 30,
+        "created_at": "2026-10-24T04:25:12+00:00",
+        "status": "active",
+        "lease_id": "LEASE-be5d21dc84",
+        "revoked_reason": "",
+        "effective_status": "active"
+      },
+      "confirmation": {
+        "episode_id": "EP-162dceefd6",
+        "candidate_id": "S5:seed-budget-2",
+        "status": "confirmed",
+        "passed": true,
+        "scope": "S5/demo/chemlab",
+        "split": "holdout",
+        "delta": {
+          "mean_score": 0.0056633227711356815,
+          "min_score": 0.009664228252210139,
+          "cost": -12,
+          "failed_runs": 0
+        },
+        "artifact_sha256": "761d217a5d33f82698e4349d7408869361565092476b748f59c66c714d8ac328",
+        "recorded_at": "2026-10-24T04:33:09+00:00",
+        "note": "S5 sealed confirmation recorded as audit only"
+      },
+      "gates": [
+        {
+          "id": "dry-run",
+          "label": "Dry-run",
+          "state": "passed",
+          "detail": "research_agent\\web\\data\\rsi-chemlab-v2\\dry-run-seeds2.json"
+        },
+        {
+          "id": "public",
+          "label": "Public",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.19380911901681883,
+            "min_score": 0.15009272569727683,
+            "cost": 4,
+            "failed_runs": 0,
+            "mean_r2": 0.19380911901681883,
+            "min_r2": 0.15009272569727683
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "hidden",
+          "label": "Hidden",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.17101806345631326,
+            "min_score": 0.09648957095560995,
+            "cost": 4,
+            "failed_runs": 0,
+            "mean_r2": 0.17101806345631326,
+            "min_r2": 0.09648957095560995
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "near_ood",
+          "label": "Near-OOD",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.18207219357623203,
+            "min_score": 0.08886769250120397,
+            "cost": 4,
+            "failed_runs": 0,
+            "mean_r2": 0.18207219357623203,
+            "min_r2": 0.08886769250120397
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "regression",
+          "label": "Regression",
+          "state": "passed",
+          "metrics": {
+            "mean_score": 0.16703993352963734,
+            "min_score": 0.06911077041865332,
+            "cost": 4,
+            "failed_runs": 0,
+            "mean_r2": 0.16703993352963734,
+            "min_r2": 0.06911077041865332
+          },
+          "detail": "S5 seed-budget protocol-validation metric; not a research capability claim"
+        },
+        {
+          "id": "human",
+          "label": "Human admission",
+          "state": "approved",
+          "detail": "operator approval for ChemLab seed-budget protocol validation; harness-only, no capability claim"
+        },
+        {
+          "id": "lease",
+          "label": "Lease",
+          "state": "active",
+          "detail": "LEASE-be5d21dc84 · S5/demo/chemlab · TTL 30 days"
+        },
+        {
+          "id": "consume",
+          "label": "Consume / trace",
+          "state": "recorded",
+          "detail": "actuals: {\"hidden_mean_delta\": -0.009454403292887215, \"hidden_min_delta\": 0.04019878800348187, \"hidden_cost_delta\": -6}"
+        },
+        {
+          "id": "confirmation",
+          "label": "Sealed confirmation",
+          "state": "confirmed",
+          "detail": "S5 sealed confirmation recorded as audit only"
+        }
+      ],
+      "stage": "S5"
+    }
+  ],
+  "stage_process": [
+    {
+      "stage": "S5",
+      "targets": [
+        "experiment.run.seeds",
+        "experiment.run.seeds",
+        "experiment.run.seeds"
+      ],
+      "candidates": [
+        "S5:seed-budget-4",
+        "S5:seed-budget-3",
+        "S5:seed-budget-2"
+      ],
+      "status": "confirmed",
+      "evidence": "sealed confirmation",
+      "detail": "{\"seeds\": 2}"
+    }
+  ],
+  "tracking": {
+    "status": "tracked",
+    "episodes_with_actuals": 1,
+    "compared_episodes": 1,
+    "coverage": 1.0,
+    "metrics": {
+      "hidden_cost_delta": {
+        "n": 1.0,
+        "mae": 0.0,
+        "bias": 0.0,
+        "direction_agreement": 1.0
+      },
+      "hidden_mean_delta": {
+        "n": 1.0,
+        "mae": 0.009454,
+        "bias": -0.009454,
+        "direction_agreement": 0.0
+      }
+    },
+    "episodes": [
+      {
+        "episode_id": "EP-162dceefd6",
+        "candidate_id": "S5:seed-budget-2",
+        "decision": "approved",
+        "metrics": {
+          "hidden_cost_delta": {
+            "predicted": -6.0,
+            "actual": -6.0,
+            "error": 0.0,
+            "direction_ok": true
+          },
+          "hidden_mean_delta": {
+            "predicted": 0.0,
+            "actual": -0.009454403292887215,
+            "error": -0.009454,
+            "direction_ok": false
+          }
+        }
+      }
+    ]
+  },
+  "warnings": [
+    "approved harness-only episode; no capability claim is allowed",
+    "negative results retained; do not retry without new evidence"
+  ],
+  "next_questions": [
+    "拒绝项是否形成可复用的负结果，而不是重复尝试？",
+    "下一轮是否能在近域迁移与成本约束下复现该增益？"
+  ],
+  "confirmations": [
+    {
+      "episode_id": "EP-162dceefd6",
+      "candidate_id": "S5:seed-budget-2",
+      "status": "confirmed",
+      "passed": true,
+      "scope": "S5/demo/chemlab",
+      "split": "holdout",
+      "delta": {
+        "mean_score": 0.0056633227711356815,
+        "min_score": 0.009664228252210139,
+        "cost": -12,
+        "failed_runs": 0
+      },
+      "artifact_sha256": "761d217a5d33f82698e4349d7408869361565092476b748f59c66c714d8ac328",
+      "recorded_at": "2026-10-24T04:33:09+00:00",
+      "note": "S5 sealed confirmation recorded as audit only"
+    }
+  ],
+  "boundary": "Audit reconstruction only: a confirmed harness change is not a capability claim; human admission and claim signatures remain separate.",
+  "ledger_path": "research_agent/web/data/rsi-chemlab-v2/ledger.json"
+}

@@ -1,0 +1,412 @@
+{
+  "schema_version": "workspace-0.1",
+  "source": "modules/*/SPEC.md",
+  "generated_at": "2026-10-24T18:01:18+00:00",
+  "count": 13,
+  "agents": [
+    {
+      "id": "literature",
+      "name": "文献调研",
+      "stage": "S1",
+      "version": "0.3.1",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "QueryPlan",
+        "SourceHit",
+        "Span",
+        "CoverageReceipt",
+        "LiteratureBrief",
+        "Gap"
+      ],
+      "tools": [
+        "retriever.search",
+        "parser.spans",
+        "retriever.openalex",
+        "model.glm-5.3-flash"
+      ],
+      "gates": [
+        "Q0"
+      ],
+      "invariants": [
+        "没有全文不得生成 Span",
+        "不创建 Claim",
+        "fixture 必须显式标注",
+        "摘要不能当全文证据",
+        "真实语料必须 CC-BY 且带 provenance；harness-only 不写 capability claim",
+        "OpenAlex 为只读公共 API：礼貌池 mailto、限流与重试；摘要只作 SourceHit 线索（full_text=false），OA 全文链接供人获取，不自动抓取",
+        "GLM-5.3-Flash 仅生成检索子查询：key 走环境变量，无 key/调用失败回退规则模板；输出只是查询串，不创建 Claim、不改证据边界",
+        "覆盖不足必须显式进入 gap / brief.saturation；不能用摘要-only 或重复来源伪造“足够覆盖”",
+        "LiteratureBrief 只做结构化覆盖摘要与摘录，不新增 claim，不把 excerpt 当结论"
+      ],
+      "spec": "modules/literature/SPEC.md"
+    },
+    {
+      "id": "idea",
+      "name": "假设收敛",
+      "stage": "S2–S3",
+      "version": "0.2.0",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "IdeaCard",
+        "IdeaBrief",
+        "IdeaShortlist"
+      ],
+      "tools": [
+        "idea.frame"
+      ],
+      "gates": [
+        "G1"
+      ],
+      "invariants": [
+        "候选不是 Claim",
+        "必须带否证条件",
+        "不能自动通过 G1",
+        "聚类只生成候选框架，不评 novelty、不自动收敛短名单",
+        "低证据支持、无跨来源候选、lens 单一必须进入 IdeaBrief.gaps / warning"
+      ],
+      "spec": "modules/idea/SPEC.md"
+    },
+    {
+      "id": "experiment",
+      "name": "实验设计",
+      "stage": "S4",
+      "version": "0.1.1",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "DesignCard",
+        "ProtocolDraft",
+        "PreRegistrationChecklist"
+      ],
+      "tools": [
+        "design.validate"
+      ],
+      "gates": [
+        "G2"
+      ],
+      "invariants": [
+        "不执行 run",
+        "不创建 Claim",
+        "主指标与停止条件需人工冻结"
+      ],
+      "spec": "modules/experiment/SPEC.md"
+    },
+    {
+      "id": "run",
+      "name": "S5 执行与证据",
+      "stage": "S5",
+      "version": "0.2.2",
+      "status": "draft",
+      "owner": "research-agent",
+      "outputs": [
+        "RunCapsule",
+        "EvidenceArtifact",
+        "ClaimRecord"
+      ],
+      "tools": [
+        "run.execute",
+        "run.claim"
+      ],
+      "gates": [
+        "G2"
+      ],
+      "invariants": [
+        "没有冻结 protocol 不执行",
+        "不伪造指标；每次 run 固定 seed 并可复算",
+        "RunCapsule 与 EA 不可原地修改",
+        "不自动创建 Claim；必须有人签理由",
+        "iris/breast_cancer/chemlab 仅用于协议验证，不是论文科学证据"
+      ],
+      "spec": "modules/run/SPEC.md"
+    },
+    {
+      "id": "figure",
+      "name": "科研绘图",
+      "stage": "S6",
+      "version": "0.1.2",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "FigureScene",
+        "SVG",
+        "FigureManifest"
+      ],
+      "tools": [
+        "astradraw.render",
+        "svg.audit"
+      ],
+      "gates": [
+        "G3"
+      ],
+      "invariants": [
+        "示意图与数据图分开；数据图必须绑 RunCapsule/EA",
+        "SVG 不引外部资源/脚本",
+        "必须记录 scene/svg/hash"
+      ],
+      "spec": "modules/figure/SPEC.md"
+    },
+    {
+      "id": "paper",
+      "name": "论文写作",
+      "stage": "S8–S12",
+      "version": "0.1.5",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "PaperContract",
+        "SectionSlots",
+        "DraftScaffold"
+      ],
+      "tools": [
+        "writing.profile",
+        "claim.slot"
+      ],
+      "gates": [
+        "G3",
+        "Q1"
+      ],
+      "invariants": [
+        "不创建 Claim",
+        "结果槽必须 pending_evidence 直到 EA/Claim/Figure",
+        "示意图不能绑定为结果图；数据图必须引用 manifest"
+      ],
+      "spec": "modules/paper/SPEC.md"
+    },
+    {
+      "id": "grant",
+      "name": "基金申报",
+      "stage": "S8–S12（基金轨）",
+      "version": "0.1.0",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "GrantPlan",
+        "ComplianceChecklist",
+        "EvidenceMap"
+      ],
+      "tools": [
+        "grant.scheme"
+      ],
+      "gates": [
+        "G4"
+      ],
+      "invariants": [
+        "不生成科学观点",
+        "不写预算数字",
+        "不自动提交",
+        "官方模板优先"
+      ],
+      "spec": "modules/grant/SPEC.md"
+    },
+    {
+      "id": "bibliography",
+      "name": "参考文献核验",
+      "stage": "S13",
+      "version": "0.1.0",
+      "status": "draft",
+      "owner": "research-agent",
+      "outputs": [
+        "BibliographyCard"
+      ],
+      "tools": [
+        "bibliography.verify"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "invariants": [
+        "必须有 DOI/唯一标识与元数据快照哈希",
+        "只做元数据核验，不做同行评审",
+        "不伪造条目或引用"
+      ],
+      "spec": "modules/bibliography/SPEC.md"
+    },
+    {
+      "id": "closure",
+      "name": "闭合与导出",
+      "stage": "S13–S16",
+      "version": "0.2.0",
+      "status": "draft",
+      "owner": "research-agent",
+      "outputs": [
+        "ClosureReport",
+        "Signature",
+        "ExportManifest"
+      ],
+      "tools": [
+        "closure.check",
+        "closure.sign"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "invariants": [
+        "没有 Claim/EA 不能闭合",
+        "结果槽未绑定不能导出",
+        "未签署不能导出",
+        "不自动投稿、不生成评审意见"
+      ],
+      "spec": "modules/closure/SPEC.md"
+    },
+    {
+      "id": "lineage",
+      "name": "证据沿袭与变更影响",
+      "stage": "S13–S16",
+      "version": "0.1.0",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "LineageManifest",
+        "ChangeImpact"
+      ],
+      "tools": [
+        "lineage.build",
+        "lineage.verify",
+        "lineage.impact"
+      ],
+      "gates": [
+        "G5"
+      ],
+      "invariants": [
+        "不创建 Claim/EA/Verdict，不自动重跑或重签",
+        "节点哈希来自文件或 capsule 内容哈希；不能凭空生成支持关系",
+        "上游节点变化必须沿依赖边传播为 stale",
+        "signature 失效时 export_allowed=false",
+        "S1 span 到 claim 的边在现有契约中尚不存在；不得伪造成已连通的语义链"
+      ],
+      "spec": "modules/lineage/SPEC.md"
+    },
+    {
+      "id": "rsi",
+      "name": "受治理的递归改进",
+      "stage": "META",
+      "version": "0.2.1",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "StepLedger",
+        "AdmissionRecord",
+        "Lease",
+        "RSIReport",
+        "ConfirmationRecord",
+        "RSIStory",
+        "EvolutionPolicyState"
+      ],
+      "tools": [
+        "rsi.ledger",
+        "rsi.policy",
+        "rsi.trace"
+      ],
+      "gates": [
+        "H0",
+        "H1"
+      ],
+      "invariants": [
+        "候选不能修改 claim/evidence/gate/rubric/export/signature",
+        "没有 dry-run 不能准入",
+        "没有 public+hidden 不能准入",
+        "没有人签不能 active",
+        "撤销必须保留并传播",
+        "过期 lease 不得生效；不同预算的 active lease 冲突必须拒绝执行",
+        "预测与实际写入 ledger；数值预测只用于过程校准，不得当作能力证据；coverage gap 不能作为降低预算的理由",
+        "候选按 public 排序，最多两个 finalist 依次 gate；hidden 不参与排序或提案",
+        "harness-only 或 simulated 证据不得写入 capability claim",
+        "lease scope 必须与执行器 scope 匹配；跨 benchmark 不得自动生效",
+        "同一 benchmark 的 target+patch 不得重复 propose；拒绝项无新证据不得重试",
+        "候选集必须预注册；hidden 不用于扩展候选或选择 retriever",
+        "active real harness lease 必须由 pipeline run --use-lease 消费；无 lease 或冲突时 fail closed",
+        "模型提案是不可信输入；schema 归一化不得绕过 scope/gate，且必须保留提案 id/rationale",
+        "proposal batch 审计必须保留逐条拒绝原因，不能只报接受率",
+        "schema-repair 只允许回灌格式/策略错误并重试；不得跳过 gate，不得把修复次数当能力增益",
+        "real sealed confirmation 只复核、不回流准入；回归由人处理",
+        "sealed confirmation 必须使用未参与选择/准入的 held-out task pack",
+        "S5 evaluator 只改 run seed budget；iris/breast_cancer/chemlab 指标不是论文证据",
+        "ChemLab seed-budget confirmation 必须使用与 admission 测试集不重叠的 42 条派生 held-out 反应；不得复用固定 22 化合物测试集冒充复核",
+        "active S5 seed lease 必须由 run execute --use-lease 消费；无 lease 时 fail closed",
+        "S5 sealed confirmation 必须使用 held-out protocol instances；used_for_admission=false",
+        "S5 选择是 dataset-specific；不得当作通用 harness 结论",
+        "rsi trace 必须 fail closed：lease 未生效、capsule seeds/dataset 不匹配、存在 capability claim 或 confirmation 回流准入时不得报 traceable",
+        "confirmation 记录只作审计，不得回流准入或生成 capability claim；regressed 必须保留并交人处理；重复同一 artifact 不得重复记账",
+        "confirmation/trace 必须 fail closed：status/passed 不一致、scope 不匹配、delta 非有限数值、confirmation 与 ledger hash 不一致时不得通过",
+        "自进化策略只控制新候选与记忆调序：master off 时不得新增 propose/自动研究循环候选；不得追溯撤销已有 lease/confirmation",
+        "策略只允许切换 literature.memory_order / literature.query_planner / orchestrator.facet_budget；claim/evidence/gate/rubric/held-out/closure/signature/export 不在可切换集合内"
+      ],
+      "spec": "modules/rsi/SPEC.md"
+    },
+    {
+      "id": "skills",
+      "name": "科研技能目录",
+      "stage": "META",
+      "version": "0.1.1",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "SkillManifest",
+        "SkillRegistrySnapshot",
+        "SkillRiskReport"
+      ],
+      "tools": [
+        "skills.scan",
+        "skills.validate",
+        "skills.list"
+      ],
+      "gates": [],
+      "invariants": [
+        "只做目录与校验，不执行 scripts、不调用外部工具",
+        "导入技能是不可信 instructions；默认停用，人工检查后再启用",
+        "allowed-tools 只是声明，不是权限授予；执行能力始终是 not_available",
+        "name 与 description 必填；缺少任一字段的文件跳过并报告原因",
+        "单文件大小、Skill 数量与 instructions 长度有上限；不把超大文件静默截断后当完整技能",
+        "技能目录/说明不进入 SourceHit、Span、Claim、EA、gate、closure 或 signature",
+        "浏览器导入与 runtime/CLI 目录是两条入口；浏览器不能直接读取绝对主目录路径"
+      ],
+      "spec": "modules/skills/SPEC.md"
+    },
+    {
+      "id": "orchestrator",
+      "name": "多智能体编排",
+      "stage": "S1–S3",
+      "version": "0.2.1",
+      "status": "pilot",
+      "owner": "research-agent",
+      "outputs": [
+        "CollaborationPlan",
+        "ScoutTask",
+        "ScoutReport",
+        "MergedEvidenceView",
+        "IdeaCard",
+        "CustomAgent",
+        "AdvisoryNote",
+        "SkillCandidate",
+        "EvolutionPolicy"
+      ],
+      "tools": [
+        "literature.facet_subset",
+        "literature.memory.advise",
+        "idea.cluster",
+        "rsi.propose"
+      ],
+      "gates": [
+        "Q0",
+        "G1"
+      ],
+      "invariants": [
+        "只并行相互独立的检索面向；人工门之间保持串行",
+        "每个 scout 只能读自己获得授权的 facet_subset，不能重写问题或越过预算",
+        "fan-in 只合并 SourceHit/Span/Coverage/Brief，按 source_id/span_id 去重",
+        "不创建 Claim/EA，不代替人工通过 G1/G2/S5b/G5",
+        "文献记忆只记录覆盖/产出/缺口等过程量，不保存摘要、span 文本或 claim 文本",
+        "记忆只能调整下一轮面向顺序与预算；不能把记忆内容当证据",
+        "由记忆派生的 SkillCandidate 永远 pending_human；必须走 dry-run、public/hidden/regression 与人工准入",
+        "自定义子智能体只能是 advisory：只能选择白名单 checks，不写 Claim/EA、不通过门禁、不执行任意代码",
+        "自进化策略关闭时忽略记忆调序并抑制新的候选；已有 lease/confirmation 不被追溯撤销",
+        "自进化策略只允许切换 literature.memory_order / literature.query_planner / orchestrator.facet_budget；Claim/EA/gate/rubric/held-out/closure/signature/export 不可切换",
+        "fixture 输出必须透传 fixture_mode；不得把模拟覆盖写成真实结果"
+      ],
+      "spec": "modules/orchestrator/SPEC.md"
+    }
+  ],
+  "boundary": "read-only spec projection; it does not execute agents or change their status"
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "id": "literature",
+    "name": "文献调研",
+    "stage": "S1",
+    "version": "0.1.6",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "question",
+      "max_sources",
+      "source_scope"
+    ],
+    "outputs": [
+      "QueryPlan",
+      "SourceHit",
+      "Span",
+      "CoverageReceipt",
+      "Gap"
+    ],
+    "tools": [
+      "retriever.search",
+      "parser.spans"
+    ],
+    "gates": [
+      "Q0"
+    ],
+    "invariants": [
+      "没有全文不得生成 Span",
+      "不创建 Claim",
+      "fixture 必须显式标注",
+      "摘要不能当全文证据",
+      "真实语料必须 CC-BY 且带 provenance；harness-only 不写 capability claim"
+    ]
+  },
+  {
+    "id": "idea",
+    "name": "假设收敛",
+    "stage": "S2–S3",
+    "version": "0.1.0",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "topic",
+      "spans"
+    ],
+    "outputs": [
+      "IdeaCard",
+      "IdeaShortlist"
+    ],
+    "tools": [
+      "idea.frame"
+    ],
+    "gates": [
+      "G1"
+    ],
+    "invariants": [
+      "候选不是 Claim",
+      "必须带否证条件",
+      "不能自动通过 G1"
+    ]
+  },
+  {
+    "id": "experiment",
+    "name": "实验设计",
+    "stage": "S4",
+    "version": "0.1.1",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "question",
+      "hypothesis",
+      "baseline",
+      "primary_metric",
+      "controls",
+      "seeds",
+      "budget"
+    ],
+    "outputs": [
+      "DesignCard",
+      "ProtocolDraft",
+      "PreRegistrationChecklist"
+    ],
+    "tools": [
+      "design.validate"
+    ],
+    "gates": [
+      "G2"
+    ],
+    "invariants": [
+      "不执行 run",
+      "不创建 Claim",
+      "主指标与停止条件需人工冻结"
+    ]
+  },
+  {
+    "id": "figure",
+    "name": "科研绘图",
+    "stage": "S6",
+    "version": "0.1.2",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "title",
+      "description",
+      "nodes",
+      "edges",
+      "evidence_refs"
+    ],
+    "outputs": [
+      "FigureScene",
+      "SVG",
+      "FigureManifest"
+    ],
+    "tools": [
+      "astradraw.render",
+      "svg.audit"
+    ],
+    "gates": [
+      "G3"
+    ],
+    "invariants": [
+      "示意图与数据图分开；数据图必须绑 RunCapsule/EA",
+      "SVG 不引外部资源/脚本",
+      "必须记录 scene/svg/hash"
+    ]
+  },
+  {
+    "id": "paper",
+    "name": "论文写作",
+    "stage": "S8–S12",
+    "version": "0.1.5",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "topic",
+      "language",
+      "venue_type",
+      "evidence_refs",
+      "figure_refs"
+    ],
+    "outputs": [
+      "PaperContract",
+      "SectionSlots",
+      "DraftScaffold"
+    ],
+    "tools": [
+      "writing.profile",
+      "claim.slot"
+    ],
+    "gates": [
+      "G3",
+      "Q1"
+    ],
+    "invariants": [
+      "不创建 Claim",
+      "结果槽必须 pending_evidence 直到 EA/Claim/Figure",
+      "示意图不能绑定为结果图；数据图必须引用 manifest"
+    ]
+  },
+  {
+    "id": "grant",
+    "name": "基金申报",
+    "stage": "S8–S12（基金轨）",
+    "version": "0.1.0",
+    "status": "pilot",
+    "owner": "research-agent",
+    "inputs": [
+      "topic",
+      "scheme",
+      "evidence_refs"
+    ],
+    "outputs": [
+      "GrantPlan",
+      "ComplianceChecklist",
+      "EvidenceMap"
+    ],
+    "tools": [
+      "grant.scheme"
+    ],
+    "gates": [
+      "G4"
+    ],
+    "invariants": [
+      "不生成科学观点",
+      "不写预算数字",
+      "不自动提交",
+      "官方模板优先"
+    ]
+  },
+  {
+    "id": "run",
+    "name": "S5 执行与证据",
+    "stage": "S5",
+    "version": "0.2.0",
+    "status": "draft",
+    "owner": "research-agent",
+    "inputs": [
+      "RunRequest",
+      "Protocol"
+    ],
+    "outputs": [
+      "RunCapsule",
+      "EvidenceArtifact",
+      "ClaimRecord"
+    ],
+    "tools": [
+      "run.execute",
+      "run.claim"
+    ],
+    "gates": [
+      "G2"
+    ],
+    "invariants": [
+      "没有冻结 protocol 不执行",
+      "不伪造指标；每次 run 固定 seed 并可复算",
+      "RunCapsule 与 EA 不可原地修改",
+      "不自动创建 Claim；必须有人签理由",
+      "iris 仅用于协议验证，不是论文科学证据"
+    ]
+  }
+]

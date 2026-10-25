@@ -1,0 +1,30 @@
+{
+  "name": "research-agent-workspace",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Research Agent conversation workspace — deployable static-first web app",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "typecheck": "tsc --noEmit",
+    "build": "vite build",
+    "build:site": "vite build --mode static --outDir ../../site/app --emptyOutDir",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "check": "npm run typecheck && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}

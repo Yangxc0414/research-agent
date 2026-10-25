@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Research Agent — 可核验的科研智能体</title>
+<meta name="description" content="Research Agent：把检索、复现、写作、核验接成一条可核验的证据链。公开工作台支持 OpenAlex 真实检索、证据卡、门禁与案例回放；LLM 与实验执行留在本地运行时。" />
+<meta name="keywords" content="科研智能体,证据链,科研自动化,RWMT,证据运营,Research Agent" />
+<meta name="author" content="YXC" />
+<meta name="color-scheme" content="light" />
+<script>document.documentElement.classList.add("js");setTimeout(function(){if(document.body){document.body.classList.add("ready");var b=document.getElementById("boot-cover");if(b){b.remove();}}},2500);</script>
+<meta name="theme-color" content="#f8fbff" />
+<link rel="canonical" href="https://yangxc0414.github.io/research-agent/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Research Agent" />
+<meta property="og:title" content="Research Agent — 可核验的科研智能体" />
+<meta property="og:description" content="把科研自动化，做成一条可核验的证据链。真实 OpenAlex 检索、证据卡、导出门禁与变更回放。" />
+<meta property="og:url" content="https://yangxc0414.github.io/research-agent/" />
+<meta property="og:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Research Agent — 可核验的科研智能体" />
+<meta name="twitter:description" content="把科研自动化，做成一条可核验的证据链。" />
+<meta name="twitter:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="stylesheet" href="./assets/base.css" />
+<link rel="stylesheet" href="./assets/theme.css" />
+<link rel="stylesheet" href="./assets/custom.css" />
+<noscript><style>.frame-loading,.app-loader,.boot-cover{display:none!important}</style></noscript>
+</head>
+<body class="app">
+<div class="boot-cover" id="boot-cover" aria-hidden="true">
+  <div class="boot-brand">RESEARCH AGENT <span>EVIDENCE OPERATIONS</span></div>
+  <div class="boot-line"><i></i></div>
+  <small>initializing evidence workspace · SIM</small>
+</div>
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<a class="skip-link" href="#main">跳到内容</a>
+
+<header class="appbar">
+  <a class="brand" href="#demo" data-view="demo" data-mode="console" aria-label="Research Agent 首页">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="27" height="27" fill="none">
+        <circle cx="16" cy="16" r="12.5" stroke="currentColor" stroke-width="1.4"></circle>
+        <circle cx="16" cy="16" r="7" stroke="currentColor" stroke-width="1.4" opacity=".55"></circle>
+        <circle cx="16" cy="16" r="2.2" fill="currentColor"></circle>
+        <path d="M16 3.5v5M16 23.5v5M3.5 16h5M23.5 16h5" stroke="currentColor" stroke-width="1.4"></path>
+      </svg>
+    </span>
+    <span class="brand-text">RESEARCH AGENT</span>
+  </a>
+  <div class="appbar-context">
+    <span class="kicker">EVIDENCE OPERATIONS</span>
+    <b id="app-view-title">接入项目</b>
+  </div>
+  <div class="appbar-actions">
+    <a class="nav-cta" href="./app/" style="border-color:rgba(37,99,235,.42);background:var(--accent-dim);">Agent 工作台 ↗</a>
+    <a class="nav-cta innovation-link" href="./innovation/">创新演示 ↗</a>
+    <span class="ghost-link live-chip"><i class="dot dot-live"></i>LIVE PUBLIC</span>
+    <button class="present-btn" id="present-btn" type="button" title="演示模式：隐藏外壳并自动进入一屏聚焦"><span aria-hidden="true">▶</span> 演示模式</button>
+    <a class="nav-cta" id="app-full-link" href="./demo/#console" target="_blank" rel="noopener">全屏打开 ↗</a>
+  </div>
+</header>
+<div class="app-loader" id="app-loader" aria-hidden="true"><i></i></div>
+
+<div class="present-brand" id="present-brand"><span>RESEARCH AGENT</span><b>LIVE RUN · SIM</b></div>
+<button class="present-exit" id="present-exit" type="button">退出演示 <kbd>Esc</kbd></button>
+<div class="app-layout">
+  <aside class="app-sidebar" aria-label="工作区导航">
+    <div class="side-group">
+      <span>工作区</span>
+      <a class="side-item" href="./app/" style="border-color:rgba(37,99,235,.22);background:var(--accent-dim);"><em>GO</em><b>Agent 工作台</b><small>可部署工作台 · 对话 / 证据 / 自进化</small></a>
+      <button type="button" class="side-item is-active" data-view="intake"><em>00</em><b>接入项目</b><small>仓库 / 文件夹 / URL</small></button>
+      <button type="button" class="side-item" data-view="demo" data-mode="console"><em>01</em><b>研究运行</b><small>9 阶段 · 对象流 · 指令流</small></button>
+      <button type="button" class="side-item" data-view="demo" data-mode="workbench"><em>02</em><b>证据工作台</b><small>7 视图 · 体检 / 变更 / 签署</small></button>
+      <button type="button" class="side-item" data-view="demo" data-mode="evolution"><em>03</em><b>自进化</b><small>EV1–EV4 · 租约 · 过程反馈</small></button>
+      <a class="side-item" href="./models/" title="OpenAI / Anthropic / 兼容端点与思考参数"><em>05</em><b>模型接入</b><small>高级子页面 · Provider / Profile</small></a>
+    </div>
+    <div class="side-group">
+      <span>系统</span>
+      <button type="button" class="side-item" data-view="functions"><em>13</em><b>功能地图</b><small>输入 / 产物 / 状态</small></button>
+      <button type="button" class="side-item" data-view="chain"><em>06</em><b>证据链</b><small>claim → span / EA → sign</small></button>
+      <button type="button" class="side-item" data-view="case"><em>SIM</em><b>变更回放</b><small>ChangeSet / 三类处置</small></button>
+      <button type="button" class="side-item" data-view="agents"><em>1+4</em><b>多智能体</b><small>typed handoff</small></button>
+      <button type="button" class="side-item" data-view="skills"><em>04</em><b>技能运行时</b><small>manifest / 租约 / 撤销</small></button>
+    </div>
+    <div class="side-group">
+      <span>资源</span>
+      <button type="button" class="side-item" data-view="lab"><em>LIVE</em><b>真实检索</b><small>OpenAlex 公共元数据</small></button>
+      <button type="button" class="side-item" data-view="deploy"><em>03</em><b>部署</b><small>Pages / Actions / Runtime</small></button>
+      <button type="button" class="side-item" data-view="docs"><em>19</em><b>文档</b><small>设计与限制</small></button>
+      <a class="side-item" href="./live/"><em>LIVE</em><b>本地运行时</b><small>真实 pipeline · API</small></a>
+      <a class="side-item" href="./innovation/"><em>NEW</em><b>创新演示</b><small>5 幕 · 静态 / 无 API</small></a>
+    </div>
+    <div class="side-foot"><span class="live">SIM</span><small>Research Agent · 2026-10-23</small></div>
+  </aside>
+  <main class="app-main" id="main">
+  <section class="section view" id="functions">
+    <div class="section-head">
+      <div>
+        <p class="index">02 / FUNCTION MAP</p>
+        <h2>一条链上的十三件事。</h2>
+      </div>
+      <p class="section-note">从任务接入到记忆准入，每个功能都写清输入、产物与当前状态。状态只看实现，不看愿景。</p>
+    </div>
+    <div class="function-legend" aria-label="功能状态图例">
+      <span><i class="dot dot-live"></i>LIVE PUBLIC 公开检索</span>
+      <span><i class="dot dot-sim"></i>SIM / 未运行</span>
+      <span><i class="dot dot-design"></i>设计 / 未实现</span>
+    </div>
+    <div class="function-list">
+      <article class="function-row">
+        <span class="fn-id">F01</span>
+        <div class="fn-main"><h3>任务接入与编译</h3><p>输出类型、材料、预算与硬门 → 最小能力子图；P0 冻结任务边界。</p></div>
+        <span class="fn-io">brief / 材料 / 预算 → WorkflowRun</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F02</span>
+        <div class="fn-main"><h3>文献检索与阅读</h3><p>query、日期、来源与覆盖回执；span 可定位；DOI 存在不等于 claim 被支持。</p></div>
+        <span class="fn-io">QuerySpec → SourceHit / Span / CoverageReceipt</span>
+        <span class="badge live">LIVE PUBLIC</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F03</span>
+        <div class="fn-main"><h3>Idea 收敛与查新</h3><p>gap 卡、候选假设、kill criteria；先查新再排序，避免把“没人做过”当贡献。</p></div>
+        <span class="fn-io">gap / 候选假设 → 排序假设 + novelty 记录</span>
+        <span class="badge design">设计</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F04</span>
+        <div class="fn-main"><h3>设计冻结</h3><p>protocol、TaskSpec、rubric 与基线在一次运行前冻结；运行中改模板必须新建 revision。</p></div>
+        <span class="fn-io">protocol / rubric / baseline → 冻结版本</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F05</span>
+        <div class="fn-main"><h3>复现执行</h3><p>Work 与 Judge 分离；干净重跑；失败也产出可审计的 RunCapsule 与成本。</p></div>
+        <span class="fn-io">TaskSpec / 环境 → RunCapsule / Verdict / EA</span>
+        <span class="badge design">设计</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F06</span>
+        <div class="fn-main"><h3>Claim 与证据</h3><p>文献 claim 只认 span，结果 claim 只认 scored verdict + EA；Evidence 是唯一写者。</p></div>
+        <span class="fn-io">span / EA → claim / 债务 / 语义审计</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F07</span>
+        <div class="fn-main"><h3>写作与图表</h3><p>句子有槽位；图注、单位与数据源绑定；Builder 只能引用 claim，不能造事实。</p></div>
+        <span class="fn-io">claim / 槽位 / 体裁 → 草稿 / 句槽 / 图</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F08</span>
+        <div class="fn-main"><h3>核验与导出</h3><p>结构闭合是阻断轴，论证完整性是建议轴；Closure 检查硬门，作者/PI 签署后导出。</p></div>
+        <span class="fn-io">闭包报告 / 双轴审计 → 签署 / ExportManifest</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F09</span>
+        <div class="fn-main"><h3>变更维护</h3><p>ChangeSet 计算影响闭包，沿 claim → 句 → 图传播；处置只有重跑、重写、复核。</p></div>
+        <span class="fn-io">ChangeSet → ImpactClosure / 三类处置</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F10</span>
+        <div class="fn-main"><h3>技能运行时</h3><p>manifest、权限、dry-run、租约与撤销传播；技能只产出 artifact，不直接写 claim。</p></div>
+        <span class="fn-io">SkillManifest → pilot / active / revoked + artifact</span>
+        <span class="badge sim">SIM</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F11</span>
+        <div class="fn-main"><h3>多智能体编排</h3><p>Conductor 分派，Scout/Builder/Executor+Judge/Auditor 各自守边界；交接用 typed handoff。</p></div>
+        <span class="fn-io">typed handoff → 角色分派 / 独立判定</span>
+        <span class="badge design">设计</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F12</span>
+        <div class="fn-main"><h3>记忆与过程反馈</h3><p>P8 只产候选；EV1–EV4 四问 + 租约才写入长期记忆；过程协议只改同阶段跑法。</p></div>
+        <span class="fn-io">候选 / 过程指标 → EV1–EV4 + 租约</span>
+        <span class="badge sim">未运行</span>
+      </article>
+      <article class="function-row">
+        <span class="fn-id">F13</span>
+        <div class="fn-main"><h3>审计与成本</h3><p>跨服务命令、AI 使用、技能租约与人工签核进入 append-only 审计；成本按 run 记账。</p></div>
+        <span class="fn-io">events / AI usage / tokens → audit pack / 成本账本</span>
+        <span class="badge design">设计</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="section view is-active" id="intake">
+    <div class="section-head">
+      <div>
+        <p class="index">00 / INTAKE</p>
+        <h2>从一个已有项目开始。</h2>
+      </div>
+      <p class="section-note">读结构、找缺口、生成候选方向；确认后再进入 Auto Research。只读文件名与大小，不上传、不执行。</p>
+    </div>
+    <div class="intake-flow" aria-label="接入流程">
+      <div class="intake-step is-active"><span>01</span><b>选择来源</b><em>文件夹 / 公开 URL</em></div>
+      <i class="flow-line" aria-hidden="true"></i>
+      <div class="intake-step"><span>02</span><b>声明目标</b><em>这次想改进什么</em></div>
+      <i class="flow-line" aria-hidden="true"></i>
+      <div class="intake-step"><span>03</span><b>只读体检</b><em>结构 / 复现信号</em></div>
+      <i class="flow-line" aria-hidden="true"></i>
+      <div class="intake-step"><span>04</span><b>进入运行</b><em>SIM · 研究计划</em></div>
+    </div>
+    <div class="intake-grid">
+      <div class="panel intake-source">
+        <div class="panel-head intake-panel-head">
+          <div><span class="panel-kicker">01 / SOURCE</span><b>项目从哪里来</b></div>
+          <span class="ro-chip"><i></i>READ ONLY</span>
+        </div>
+        <div class="intake-tabs" role="tablist" aria-label="项目来源">
+          <button type="button" class="intake-tab is-active" role="tab" aria-selected="true" data-intake-mode="folder">本地文件夹</button>
+          <button type="button" class="intake-tab" role="tab" aria-selected="false" data-intake-mode="url">公开仓库 URL</button>
+        </div>
+        <div class="intake-pane" data-intake-pane="folder">
+          <input id="repo-folder" type="file" webkitdirectory directory multiple hidden />
+          <button type="button" class="dropzone" id="pick-folder">
+            <span class="dropzone-icon" aria-hidden="true">
+              <svg viewBox="0 0 28 28" width="26" height="26" fill="none">
+                <path d="M3.5 8.5v12A2.5 2.5 0 0 0 6 23h16a2.5 2.5 0 0 0 2.5-2.5v-9A2.5 2.5 0 0 0 22 9h-7l-2-3H6a2.5 2.5 0 0 0-2.5 2.5Z" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M5 15h18" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.5 2.5"/>
+                <circle cx="14" cy="15" r="2.3" fill="currentColor" opacity=".18"/>
+              </svg>
+            </span>
+            <span class="dropzone-text">
+              <b>选择项目文件夹</b>
+              <span>读取文件名、目录与大小；不打开内容、不上传。</span>
+            </span>
+            <span class="dropzone-cta">浏览 →</span>
+            <span class="dropzone-meta" id="folder-note"><i></i>尚未选择项目</span>
+          </button>
+        </div>
+        <div class="intake-pane" data-intake-pane="url" hidden>
+          <label class="field">
+            <span>公开仓库 URL</span>
+            <input id="repo-url" type="url" placeholder="https://github.com/owner/repo" autocomplete="off" spellcheck="false" />
+          </label>
+          <button type="button" class="btn btn-ghost btn-block intake-url-btn" id="read-url">读取公开元数据 <span>↗</span></button>
+          <p class="fineprint">GitHub API · 仅元数据；不克隆、不读文件树、不执行代码。</p>
+        </div>
+        <div class="intake-or"><span>或者</span><button type="button" class="intake-sample" id="load-sample"><b>载入示例仓库</b><em>demo-lab/evidence-runner</em><span>↗</span></button></div>
+        <div class="intake-goal">
+          <div class="intake-label"><label for="intake-goal">02 / 这次想改进什么</label><span id="goal-count">0 / 160</span></div>
+          <textarea id="intake-goal" rows="3" maxlength="160">提升可复现性与实验设计：补一键复现入口、评测口径与对照矩阵。</textarea>
+          <div class="preset-row" aria-label="研究目标示例">
+            <button type="button" class="preset" data-goal="提升可复现性：补一键复现入口、锁文件与运行说明。">可复现性</button>
+            <button type="button" class="preset" data-goal="完善实验设计：补对照矩阵、消融与数据切分检查。">实验设计</button>
+            <button type="button" class="preset" data-goal="寻找可发表的改进点：从结构缺口生成可证伪假设。">改进点</button>
+          </div>
+        </div>
+        <div class="intake-submit">
+          <button type="button" class="btn btn-primary btn-block intake-go-btn" id="intake-scan"><span class="btn-label">开始体检</span><span class="btn-arrow">→</span></button>
+          <p class="status-line" id="intake-status" role="status"><i class="dot dot-sim"></i>选择文件夹、读取公开仓库，或载入示例。</p>
+        </div>
+        <div class="intake-boundary">
+          <span><i>✓</i>不上传</span><span><i>✓</i>不执行</span><span><i>✓</i>可追溯</span>
+          <span class="intake-boundary-note">A3 · 机器起草，人作判断</span>
+        </div>
+      </div>
+      <div class="panel intake-report" id="intake-report">
+        <div class="intake-preview" id="intake-preview">
+          <div class="ip-head"><span class="panel-kicker">REPORT PREVIEW</span><span class="badge sim">AWAITING SOURCE</span></div>
+          <div class="ip-hero">
+            <div><h3>体检会产出什么</h3><p>只读扫描文件名与结构，得到三类可核对信号；再由你决定是否带入研究运行。</p></div>
+            <div class="ip-score-ghost" aria-hidden="true"><span>—</span><small>READINESS</small></div>
+          </div>
+          <div class="ip-grid">
+            <div class="ip-card">
+              <span class="ip-k">01 / STRUCTURE</span><b>结构统计</b>
+              <ul><li>文件数 / 体积</li><li>语言与目录</li><li>notebook / 数据</li></ul>
+              <div class="ip-ghost" aria-hidden="true"><i style="--w:82%"></i><i style="--w:58%"></i><i style="--w:70%"></i></div>
+            </div>
+            <div class="ip-card">
+              <span class="ip-k">02 / REPRODUCIBILITY</span><b>可复现性信号</b>
+              <ul><li>测试 / 环境锁</li><li>README / 许可证</li><li>CI / 数据入口</li></ul>
+              <div class="ip-ghost" aria-hidden="true"><i style="--w:44%"></i><i style="--w:74%"></i><i style="--w:52%"></i></div>
+            </div>
+            <div class="ip-card">
+              <span class="ip-k">03 / DIRECTIONS</span><b>候选研究方向</b>
+              <ul><li>可证伪假设</li><li>主指标与基线</li><li>首个复现实验</li></ul>
+              <div class="ip-ghost" aria-hidden="true"><i style="--w:66%"></i><i style="--w:48%"></i><i style="--w:76%"></i></div>
+            </div>
+          </div>
+          <div class="ip-scanner" aria-hidden="true">
+            <span class="ip-scan-line"></span>
+            <div class="ip-scan-copy"><span>WAITING FOR SOURCE</span><span>只读 · 不上传 · 不执行</span></div>
+          </div>
+          <div class="ip-foot"><span>体检结果不是效果结论；缺口只用于生成可检验的研究问题。</span><span>LOCAL / SIGNALS</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="demo">
+    <div class="studio-head" id="studio-head">
+      <div class="studio-head-copy">
+        <p class="index">03 / DEMO STUDIO</p>
+        <h2><span id="studio-title">研究运行</span><span class="studio-title-en" id="studio-title-en">RUN CONSOLE</span></h2>
+        <p class="studio-lede" id="studio-lede">逐阶段展开的一次可检查运行：对象流、指令流、失败分支、判决与导出共用同一套证据对象。</p>
+      </div>
+      <div class="studio-head-side">
+        <div class="studio-facts" id="studio-facts">
+          <span><b>9</b>阶段</span><span><b>4</b>场景</span><span><b>SIM</b>非实测</span>
+        </div>
+        <span class="studio-state"><i></i><span id="studio-state-label">AUTO PLAY · SIM</span></span>
+      </div>
+    </div>
+    <div class="demo-studio" id="demo-studio" data-mode="console">
+      <div class="demo-top">
+        <div class="demo-lenses" role="tablist" aria-label="演示视角">
+          <button type="button" class="demo-lens is-active" data-demo-mode="console">研究运行 <span>9 阶段</span></button>
+          <button type="button" class="demo-lens" data-demo-mode="workbench">证据工作台 <span>7 视图</span></button>
+          <button type="button" class="demo-lens" data-demo-mode="evolution">自进化 <span>4 问</span></button>
+        </div>
+        <span class="demo-kicker"><i></i>INTERACTIVE DEMO</span>
+        <span class="demo-mode-meta" id="demo-mode-meta">SIM · 4 场景 · 9 阶段 · 自动播放一次</span>
+      </div>
+      <details class="studio-skill" id="studio-skill">
+        <summary>
+          <span class="sk-tag">SKILL RUNTIME</span>
+          <span class="sk-line">技能不是第 10 个阶段，而是阶段槽位加载的过程包</span>
+          <span class="sk-toggle">展开</span>
+        </summary>
+        <div class="sk-body">
+          <div><span>LOAD</span><b>manifest + signature</b><em>P0 槽位加载，项目级作用域</em></div>
+          <div><span>TEST</span><b>dry-run 3/3</b><em>pilot → active 才可执行</em></div>
+          <div><span>CONTRACT</span><b>证据契约 + 租约</b><em>产物合格才可进入 claim</em></div>
+          <div><span>REVOKE</span><b>依赖闭包复核</b><em>自进化镜头可看 SK-0014</em></div>
+        </div>
+      </details>
+      <div class="workbench-subbar" id="workbench-subbar" hidden>
+        <div class="workbench-tabs" role="tablist" aria-label="工作台视图">
+          <button type="button" class="wb-jump is-active" data-embed-view="manuscript">体检 <i>01</i></button>
+          <button type="button" class="wb-jump" data-embed-view="impact">变更 <i>02</i></button>
+          <button type="button" class="wb-jump" data-embed-view="closure">签署 <i>03</i></button>
+          <button type="button" class="wb-jump" data-embed-view="retrieval">检索 <i>04</i></button>
+          <button type="button" class="wb-jump" data-embed-view="repro">复现 <i>05</i></button>
+          <button type="button" class="wb-jump" data-embed-view="skills">技能 <i>06</i></button>
+          <button type="button" class="wb-jump" data-embed-view="flow">流程 <i>07</i></button>
+        </div>
+      </div>
+      <div class="workbench-frame">
+        <div class="frame-bar">
+          <span class="frame-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="fb-crumb mono" id="demo-frame-label">research-agent / console · embed</span>
+          <span class="fb-state"><i></i>SIM</span>
+        </div>
+        <iframe id="demo-iframe" title="Research Agent 互动演示" src="./demo/index.html?embed=console" loading="eager"></iframe>
+        <div class="frame-loading is-on" id="frame-loading" aria-hidden="true">
+          <span>mounting research context · SIM</span>
+          <i></i>
+        </div>
+      </div>
+      <div class="studio-foot">
+        <p class="fineprint" id="demo-note">研究运行在进入视口后自动播放一次 SIM 流程；每阶段按子步骤展开对象流、阶段卡、指令与日志，未到的内容保持淡出。</p>
+        <span class="studio-kbd"><kbd>Space</kbd> 运行 / 暂停 <kbd>←</kbd><kbd>→</kbd> 翻卡片</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="chain">
+    <div class="section-head">
+      <div>
+        <p class="index">04 / EVIDENCE CHAIN</p>
+        <h2>一句话，凭什么存在。</h2>
+      </div>
+      <p class="section-note">六个对象，六个所有权。任何一段都不能由下游“顺手补上”。</p>
+    </div>
+    <ol class="chain-list">
+      <li>
+        <span class="chain-index">01</span>
+        <div><h3>Query → SourceHit / Span</h3><p>检索不是“搜到就行”，要留下 query、日期、来源、覆盖回执与可定位的 span。</p></div>
+        <span class="chain-owner">Knowledge</span>
+      </li>
+      <li>
+        <span class="chain-index">02</span>
+        <div><h3>Run → RunCapsule + EA</h3><p>结果 claim 只认独立重跑；Work 与 Judge 分离，失败也留下可审计的运行胶囊。</p></div>
+        <span class="chain-owner">Execution</span>
+      </li>
+      <li>
+        <span class="chain-index">03</span>
+        <div><h3>Claim → Evidence</h3><p>Evidence 是 claim 的唯一写者；技能与执行只能交 artifact，不能直接写 claim。</p></div>
+        <span class="chain-owner">Evidence</span>
+      </li>
+      <li>
+        <span class="chain-index">04</span>
+        <div><h3>Sentence → Slot</h3><p>每句话有槽位；没有绑定的句子可以留在草稿里，但不能进入导出。</p></div>
+        <span class="chain-owner">Manuscript</span>
+      </li>
+      <li>
+        <span class="chain-index">05</span>
+        <div><h3>Gate → Closure / Export</h3><p>未解析槽位、stale、冲突、无 EA → ExportBlocked；没有任何旁路。</p></div>
+        <span class="chain-owner">Closure</span>
+      </li>
+      <li>
+        <span class="chain-index">06</span>
+        <div><h3>Sign → Author / PI</h3><p>AI 使用、未解决项与限制随包导出；作者/PI 保留最终责任。</p></div>
+        <span class="chain-owner">Human</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section lab-section view" id="lab">
+    <div class="section-head">
+      <div>
+        <p class="index">05 / LIVE PUBLIC</p>
+        <h2>先检索，再谈写作。</h2>
+      </div>
+      <p class="section-note">浏览器直连 OpenAlex 公共元数据；不调用 LLM，不抓取 <span class="nowrap">知网/万方/维普</span>。</p>
+    </div>
+    <p class="section-lede">下面不是预录动画：浏览器会直接请求 OpenAlex 的公开元数据，完成检索、去重、有效性检查与覆盖回执。它不下研究结论，只展示“来源如何进入证据链”。</p>
+
+    <div class="lab-grid">
+      <form class="panel lab-controls" id="lab-form" novalidate>
+        <div class="panel-head"><span class="panel-kicker">01 / QUERY</span><span class="mono">title_and_abstract.search</span></div>
+        <label class="field">
+          <span>研究主题（英文，OpenAlex 索引）</span>
+          <input id="lab-query" type="text" value="perovskite solar cell stability" autocomplete="off" spellcheck="false" />
+        </label>
+        <div class="preset-row" aria-label="示例检索式">
+          <button type="button" class="preset" data-query="perovskite solar cell stability">钙钛矿稳定性</button>
+          <button type="button" class="preset" data-query="solid-state battery interface">固态电池界面</button>
+          <button type="button" class="preset" data-query="protein structure prediction">蛋白结构预测</button>
+        </div>
+        <div class="field-row">
+          <label class="field">
+            <span>起始年份</span>
+            <select id="lab-year">
+              <option value="2020" selected>2020</option>
+              <option value="2018">2018</option>
+              <option value="2015">2015</option>
+              <option value="0">不限</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>返回条数</span>
+            <select id="lab-limit">
+              <option value="6" selected>6</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="lab-run">运行检索 <span aria-hidden="true">→</span></button>
+        <button class="btn btn-quiet btn-block" type="button" id="lab-offline">加载离线快照</button>
+        <p class="status-line" id="lab-status" role="status">等待运行。默认使用 OpenAlex 公共 API；若网络不可用，可加载 2026-10-23 的离线快照。</p>
+        <ol class="log" id="lab-log" aria-label="检索日志">
+          <li><time>--:--</time><span>尚未运行</span></li>
+        </ol>
+      </form>
+
+      <div class="panel lab-results-panel">
+        <div class="panel-head"><span class="panel-kicker">02 / RESULTS</span><span class="count" id="lab-count">0 条</span></div>
+        <div id="lab-results" class="results" aria-live="polite">
+          <div class="empty">
+            <span class="empty-mark" aria-hidden="true">⌕</span>
+            <b>还没有结果</b>
+            <p>运行检索后，这里显示真实的论文标题、年份、期刊、作者、DOI 与被引数。勾选 1–3 篇进入证据登记。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lab-lower">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">03 / COVERAGE</span><span class="badge cached">CACHED / LIVE</span></div>
+        <div id="coverage-card" class="coverage">
+          <div class="empty small"><b>尚未生成</b><p>覆盖回执记录 query、检索时间、来源、记录数、去重数、纳入/排除数与过滤条件。</p></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">04 / GATE</span><span class="badge warn">人工在环</span></div>
+        <div id="evidence-list" class="evidence-list">
+          <div class="empty small"><b>未选择证据</b><p>从左侧勾选论文后，这里生成候选证据卡；状态永远是 <code>unverified</code>，直到人工核对。</p></div>
+        </div>
+        <label class="field claim-field">
+          <span>你的 claim（必须由人写；本页不自动生成结论）</span>
+          <textarea id="lab-claim" rows="3" placeholder="例：ISOS 共识指出，钙钛矿稳定性报告缺少统一的实验条件与参数，导致复现与比较困难。"></textarea>
+        </label>
+        <div class="lab-actions">
+          <button class="btn btn-primary" type="button" id="lab-check">检查导出</button>
+          <button class="btn btn-ghost" type="button" id="lab-attest" disabled>我已核对摘要与来源</button>
+          <button class="btn btn-quiet" type="button" id="lab-reset">清空</button>
+        </div>
+        <div id="lab-gate" class="gate" aria-live="polite">
+          <div class="gate-row"><span>至少 1 条候选证据</span><b class="gate-wait">待检查</b></div>
+          <div class="gate-row"><span>claim 已由人撰写</span><b class="gate-wait">待检查</b></div>
+          <div class="gate-row"><span>摘要已人工核对</span><b class="gate-wait">待检查</b></div>
+          <div class="gate-row"><span>全文 locator 已核对</span><b class="gate-warn">本页不支持</b></div>
+          <div class="gate-result" id="lab-gate-result">导出状态：<b>未检查</b></div>
+        </div>
+        <p class="fineprint">本页只做公开元数据检索、去重、有效性检查与证据登记；不做全文核验、不生成研究结论、不调用 LLM、不抓取知网/万方/维普。导出永远需要作者/PI 签署。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="case">
+    <div class="section-head">
+      <div>
+        <p class="index">06 / CHANGE PROPAGATION</p>
+        <h2>一个结果失效，哪些东西必须跟着变？</h2>
+      </div>
+      <p class="section-note">CACHED · SIM trace。点击事件查看 artifact、处置方式与导出状态；不是实测结果。</p>
+    </div>
+    <div class="case-grid">
+      <ol class="case-steps" id="case-steps">
+        <li><button type="button" class="case-step is-active" data-step="0"><span>01</span><b>Run 2 未过门槛</b><small>P4 复现</small></button></li>
+        <li><button type="button" class="case-step" data-step="1"><span>02</span><b>结果 claim 失效</b><small>CLM-07 · stale</small></button></li>
+        <li><button type="button" class="case-step" data-step="2"><span>03</span><b>结果句槽阻断</b><small>S-12 · blocked</small></button></li>
+        <li><button type="button" class="case-step" data-step="3"><span>04</span><b>图 3 依赖失效</b><small>FIG-03 · stale</small></button></li>
+        <li><button type="button" class="case-step" data-step="4"><span>05</span><b>影响闭包与处置</b><small>CS-009 · 3 项</small></button></li>
+        <li><button type="button" class="case-step" data-step="5"><span>06</span><b>导出被阻断</b><small>EXP-02 · ExportBlocked</small></button></li>
+      </ol>
+      <div class="case-detail panel" id="case-detail" aria-live="polite">
+        <div class="case-detail-top"><span class="badge danger">FAILED</span><span class="mono">RUN-014</span></div>
+        <h3>Run 2 未过门槛</h3>
+        <p>复现运行的判定未达到冻结协议中的门槛。系统不创建 <code>result_claim</code>，而是把失败原因与证据缺口登记到影响队列。</p>
+        <dl class="kv">
+          <div><dt>artifact</dt><dd>RUN-014 · Verdict: fail</dd></div>
+          <div><dt>证据缺口</dt><dd>缺少 EA(source=rerun)；基线未复现</dd></div>
+          <div><dt>处置</dt><dd>回到 P3 修订协议，或降级为探索性结果</dd></div>
+          <div><dt>导出</dt><dd><b class="text-danger">Blocked</b></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="agents">
+    <div class="section-head">
+      <div>
+        <p class="index">07 / MULTI-AGENT</p>
+        <h2>不是角色扮演，是类型化交接。</h2>
+      </div>
+      <p class="section-note">1 个 Conductor + 4 类职责 + Human signer。下面这组角色与协议是设计；站点只演示拓扑与契约，不运行这些 Agent。</p>
+    </div>
+
+    <div class="agent-layout">
+      <div class="agent-map panel">
+        <svg viewBox="0 0 860 470" role="img" aria-label="多智能体协作拓扑">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"></path>
+            </marker>
+            <marker id="arrow-strong" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"></path>
+            </marker>
+          </defs>
+          <g class="agent-node" data-agent="conductor" tabindex="0" role="button" aria-label="Conductor 编排者">
+            <rect x="330" y="24" width="200" height="58" rx="2"></rect>
+            <text x="430" y="49" text-anchor="middle" class="n-title">Conductor</text>
+            <text x="430" y="68" text-anchor="middle" class="n-sub">编译 · 选技能 · 记状态</text>
+          </g>
+          <g class="agent-node" data-agent="scout" tabindex="0" role="button" aria-label="Scout 检索与阅读">
+            <rect x="54" y="146" width="180" height="58" rx="2"></rect>
+            <text x="144" y="171" text-anchor="middle" class="n-title">Scout</text>
+            <text x="144" y="190" text-anchor="middle" class="n-sub">检索 · span · 覆盖回执</text>
+          </g>
+          <g class="agent-node" data-agent="builder" tabindex="0" role="button" aria-label="Builder 设计与写作">
+            <rect x="340" y="146" width="180" height="58" rx="2"></rect>
+            <text x="430" y="171" text-anchor="middle" class="n-title">Builder</text>
+            <text x="430" y="190" text-anchor="middle" class="n-sub">协议 · 草稿 · 图表</text>
+          </g>
+          <g class="agent-node" data-agent="executor" tabindex="0" role="button" aria-label="Executor 复现执行">
+            <rect x="626" y="146" width="180" height="58" rx="2"></rect>
+            <text x="716" y="171" text-anchor="middle" class="n-title">Executor</text>
+            <text x="716" y="190" text-anchor="middle" class="n-sub">Work · RunCapsule · 成本</text>
+          </g>
+          <g class="agent-node" data-agent="judge" tabindex="0" role="button" aria-label="Judge 独立判定">
+            <rect x="626" y="276" width="180" height="58" rx="2"></rect>
+            <text x="716" y="301" text-anchor="middle" class="n-title">Judge</text>
+            <text x="716" y="320" text-anchor="middle" class="n-sub">Verdict · EA · 不读隐藏答案</text>
+          </g>
+          <g class="agent-node" data-agent="auditor" tabindex="0" role="button" aria-label="Auditor 独立审计">
+            <rect x="54" y="276" width="180" height="58" rx="2"></rect>
+            <text x="144" y="301" text-anchor="middle" class="n-title">Auditor</text>
+            <text x="144" y="320" text-anchor="middle" class="n-sub">只读 · 可阻断 · 不改稿</text>
+          </g>
+          <g class="agent-node evidence-node" data-agent="evidence" tabindex="0" role="button" aria-label="Evidence 证据账本">
+            <rect x="330" y="276" width="200" height="66" rx="2"></rect>
+            <text x="430" y="303" text-anchor="middle" class="n-title">Evidence</text>
+            <text x="430" y="322" text-anchor="middle" class="n-sub">claim 唯一写者 · 债务</text>
+          </g>
+          <g class="agent-node human-node" data-agent="human" tabindex="0" role="button" aria-label="Human signer 作者或 PI">
+            <rect x="330" y="394" width="200" height="58" rx="2"></rect>
+            <text x="430" y="419" text-anchor="middle" class="n-title">Human signer</text>
+            <text x="430" y="438" text-anchor="middle" class="n-sub">作者 / PI · 责任</text>
+          </g>
+
+          <path class="agent-edge" d="M 360 82 L 170 144" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 430 82 L 430 144" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 500 82 L 690 144" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 234 175 C 286 208, 286 276, 322 300" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 430 204 L 430 268" marker-end="url(#arrow-strong)"></path>
+          <path class="agent-edge" d="M 690 204 L 690 268" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 626 300 L 538 300" marker-end="url(#arrow)"></path>
+          <path class="agent-edge" d="M 330 310 L 236 310" marker-end="url(#arrow)"></path>
+          <path class="agent-edge strong" d="M 430 342 L 430 392" marker-end="url(#arrow-strong)"></path>
+          <path class="agent-edge dashed" d="M 234 310 C 280 372, 300 420, 326 420" marker-end="url(#arrow)"></path>
+          <text x="560" y="118" class="edge-label">分派</text>
+          <text x="448" y="246" class="edge-label">提交候选</text>
+          <text x="250" y="296" class="edge-label">审计</text>
+          <text x="446" y="370" class="edge-label">签署 / 拒绝</text>
+        </svg>
+        <div class="map-legend"><span><i class="dot dot-live"></i>可并行</span><span><i class="dot dot-design"></i>强顺序</span><span><i class="dot dot-warn"></i>可阻断</span></div>
+      </div>
+
+      <aside class="agent-detail panel" id="agent-detail" aria-live="polite">
+        <div class="agent-detail-head"><span class="badge design" id="agent-badge">CONDUCTOR</span><span class="mono" id="agent-code">role:conductor</span></div>
+        <h3 id="agent-name">Conductor · 编排者</h3>
+        <p id="agent-desc">编译任务、选择技能、分配工作、记录状态。它掌握“这次做哪些能力”，但不写 claim、不改稿、不代替 Judge。</p>
+        <dl class="kv">
+          <div><dt>输入</dt><dd id="agent-in">任务 brief、能力图、预算</dd></div>
+          <div><dt>输出</dt><dd id="agent-out">WorkflowRun、分派、状态事件</dd></div>
+          <div><dt>禁止</dt><dd id="agent-no">写 claim、改稿件、代替 Judge</dd></div>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="role-grid">
+      <button type="button" class="role-card is-active" data-agent="conductor"><span>编排</span><b>Conductor</b><small>不写 claim</small></button>
+      <button type="button" class="role-card" data-agent="scout"><span>检索</span><b>Scout</b><small>不写 claim</small></button>
+      <button type="button" class="role-card" data-agent="builder"><span>写作</span><b>Builder</b><small>不造事实</small></button>
+      <button type="button" class="role-card" data-agent="executor"><span>执行</span><b>Executor</b><small>不改判据</small></button>
+      <button type="button" class="role-card" data-agent="judge"><span>判定</span><b>Judge</b><small>不被 Work 修改</small></button>
+      <button type="button" class="role-card" data-agent="auditor"><span>审计</span><b>Auditor</b><small>不改稿</small></button>
+      <button type="button" class="role-card" data-agent="human"><span>签核</span><b>Human</b><small>最终责任</small></button>
+    </div>
+
+    <div class="handoff-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">TYPED HANDOFF</span><span class="mono">JSON</span></div>
+        <pre class="code"><code>{
+  "handoff_id": "H-20261023-0007",
+  "run_id": "RUN-0311",
+  "from_role": "scout",
+  "to_role": "conductor",
+  "skill": "SK-01@1.1",
+  "intent": "retrieve_and_screen",
+  "outputs": ["ART-SPAN-118", "ART-COV-014"],
+  "evidence_status": "unverified",
+  "budget": { "tokens": 12000, "usd": 0.08 },
+  "stop_condition": "included >= 8 or sources_exhausted",
+  "trace_id": "TR-9f2c..."
+}</code></pre>
+      </div>
+      <div class="panel rules">
+        <div class="panel-head"><span class="panel-kicker">RULES</span><span class="badge design">协议</span></div>
+        <ol>
+          <li><b>只传引用，不传长文。</b>下游读 artifact store，不读上一轮对话；避免“传话游戏”。</li>
+          <li><b>一对象一写者。</b>Scout 不写 claim，Builder 不写 EA，Auditor 不改稿；职责越界比模型能力不足更常见。</li>
+          <li><b>证据门禁在 Agent 之外。</b>审计独立于生成；claim 只由 Evidence 创建；导出只由 Closure 执行。</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="skills">
+    <div class="section-head">
+      <div>
+        <p class="index">08 / SKILL RUNTIME</p>
+        <h2>Skill 是过程包，不是 Agent。</h2>
+      </div>
+      <p class="section-note">SIM · manifest 演示。技能可被不同角色调用，但权限按调用角色收窄；只产出 artifact，不直接写 claim。</p>
+    </div>
+    <div class="skill-grid" id="skill-grid">
+      <button type="button" class="skill-card is-active" data-skill="SK-01">
+        <div class="skill-top"><span class="skill-id">SK-01</span><span class="badge sim">pilot</span></div>
+        <h3>检索式生成</h3>
+        <p>把研究问题拆成 query、日期、来源与排除规则；输出检索式与召回估计。</p>
+        <div class="skill-meta"><span>read:project</span><span>net:academic</span></div>
+        <div class="skill-foot"><span>dry-run 3/3</span><span>QUERY-SPEC</span></div>
+      </button>
+      <button type="button" class="skill-card" data-skill="SK-02">
+        <div class="skill-top"><span class="skill-id">SK-02</span><span class="badge sim">idle</span></div>
+        <h3>统计结果复现</h3>
+        <p>按冻结脚本与数据重跑；只交 RunCapsule 与 EA，不解释实验设计。</p>
+        <div class="skill-meta"><span>read:run</span><span>exec:docker</span></div>
+        <div class="skill-foot"><span>dry-run 1/2</span><span>RUN-CAPSULE</span></div>
+      </button>
+      <button type="button" class="skill-card" data-skill="SK-03">
+        <div class="skill-top"><span class="skill-id">SK-03</span><span class="badge sim">idle</span></div>
+        <h3>中文核刊结果段</h3>
+        <p>只绑定 confirmed run + EA；检查槽位与 claim 对应，不新增 claim。</p>
+        <div class="skill-meta"><span>read:claims</span><span>write:draft</span></div>
+        <div class="skill-foot"><span>dry-run 2/2</span><span>MS-S12-draft</span></div>
+      </button>
+      <button type="button" class="skill-card" data-skill="SK-04">
+        <div class="skill-top"><span class="skill-id">SK-04</span><span class="badge sim">idle</span></div>
+        <h3>图表一致性检查</h3>
+        <p>检查图注、坐标、单位与 claim 是否一致；输出差异清单，不改图。</p>
+        <div class="skill-meta"><span>read:figure</span><span>read:claims</span></div>
+        <div class="skill-foot"><span>dry-run 2/2</span><span>FIG-AUDIT</span></div>
+      </button>
+    </div>
+
+    <div class="skill-lower">
+      <aside class="panel skill-detail" id="skill-detail" aria-live="polite">
+        <div class="panel-head"><b id="skill-detail-title">SK-01 · 检索式生成</b><span class="badge sim" id="skill-state">pilot</span></div>
+        <dl class="kv">
+          <div><dt>version</dt><dd id="sk-version">v1.2</dd></div>
+          <div><dt>scope</dt><dd id="sk-scope">通用检索 · 中文核刊 / 申请书</dd></div>
+          <div><dt>allowed-tools</dt><dd id="sk-tools">Read / WebSearch</dd></div>
+          <div><dt>permissions</dt><dd id="sk-perms">read:project, net:academic</dd></div>
+          <div><dt>evidence contract</dt><dd id="sk-evidence">输出必须带 query、date、source、coverage；不得写 claim</dd></div>
+          <div><dt>verification scope</dt><dd id="sk-verify">不验证数据库覆盖；只生成检索式与召回估计</dd></div>
+          <div><dt>dry-run</dt><dd id="sk-test">3/3</dd></div>
+          <div><dt>artifact</dt><dd id="sk-artifact">QUERY-SPEC</dd></div>
+        </dl>
+        <div class="lifecycle" aria-label="技能生命周期">
+          <span>register</span><i></i><span>pilot</span><i></i><span>active</span><i></i><span>revoked</span>
+        </div>
+        <div class="lab-actions">
+          <button class="btn btn-primary" type="button" id="skill-load">加载为 pilot</button>
+          <button class="btn btn-ghost" type="button" id="skill-run">运行</button>
+          <button class="btn btn-quiet" type="button" id="skill-revoke">撤销</button>
+        </div>
+        <p class="fineprint" id="skill-note">当前为 SIM：状态变化只展示租约与撤销传播的交互，不代表真实技能执行。</p>
+      </aside>
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">EVENTS</span><span class="mono">skill log</span></div>
+        <ol class="log tall" id="skill-log">
+          <li><time>T+00:00</time><span>SK-01 manifest 校验通过，dry-run 3/3</span></li>
+          <li><time>T+00:01</time><span>进入 pilot；仅对当前项目开放</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section view" id="deploy">
+    <div class="section-head">
+      <div>
+        <p class="index">09 / DEPLOYMENT</p>
+        <h2>静态展示、定时预计算、实时运行时，分开。</h2>
+      </div>
+      <p class="section-note">GitHub Pages 只能托管静态资源；它不能保护 API key，也不能跑 Docker、数据库或长时间实验。</p>
+    </div>
+
+    <div class="plane-grid">
+      <article class="plane-card">
+        <div class="plane-head"><span class="plane-k">A</span><span class="badge live">静态</span></div>
+        <h3>展示平面</h3>
+        <p>GitHub Pages：项目主页、真实公共检索、证据卡、案例回放、技能目录、完整工作台。</p>
+        <ul><li>HTML / CSS / JS / SVG</li><li>OpenAlex / Crossref 直连</li><li>SIM / CACHED / LIVE PUBLIC</li></ul>
+        <code>site/</code>
+      </article>
+      <div class="plane-arrow" aria-hidden="true">→</div>
+      <article class="plane-card">
+        <div class="plane-head"><span class="plane-k">B</span><span class="badge cached">定时</span></div>
+        <h3>预计算平面</h3>
+        <p>GitHub Actions：定时检索公开文献，去重、排序、写 digest.json，提交后触发 Pages 重建。</p>
+        <ul><li>schedule / workflow_dispatch</li><li>Secrets 只给 Actions</li><li>输出带时间与来源</li></ul>
+        <code>.github/workflows/</code>
+      </article>
+      <div class="plane-arrow" aria-hidden="true">→</div>
+      <article class="plane-card">
+        <div class="plane-head"><span class="plane-k">C</span><span class="badge warn">按需</span></div>
+        <h3>实时平面</h3>
+        <p>本地 FastAPI 或边缘 Worker：LLM、沙箱、Docker、数据库、真实导出。密钥只在服务端。</p>
+        <ul><li>/health /retrieve /draft /run</li><li>CORS 白名单 + token</li><li>断线降级到 CACHED</li></ul>
+        <code>runtime/</code>
+      </article>
+    </div>
+
+    <div class="digest-panel panel" id="digest-panel">
+      <div class="panel-head"><span class="panel-kicker">ACTIONS / DIGEST</span><span class="badge cached">CACHED</span></div>
+      <div id="digest-body" class="digest-body">
+        <span class="digest-empty">尚未生成 digest.json。启用 <code>refresh-digest.yml</code> 后，这里会出现带时间戳的公开检索结果；没有运行时不伪造数据。</span>
+      </div>
+    </div>
+
+    <div class="deploy-grid">
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">MATRIX</span><span class="mono">what runs where</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>能力</th><th>Pages</th><th>Actions</th><th>本地 / 边缘</th></tr></thead>
+            <tbody>
+              <tr><td>静态页面与交互</td><td class="yes">可以</td><td>构建</td><td class="yes">可以</td></tr>
+              <tr><td>公开 API 实时检索</td><td class="yes">可以</td><td>可以</td><td class="yes">可以</td></tr>
+              <tr><td>API key / 私有模型</td><td class="no">不可</td><td class="yes">Secrets</td><td class="yes">可以</td></tr>
+              <tr><td>Docker / 沙箱 / 长任务</td><td class="no">不可</td><td class="warn">不适合交互</td><td class="yes">可以</td></tr>
+              <tr><td>数据库 / 登录 / 权限</td><td class="no">不可</td><td class="no">不常驻</td><td class="yes">可以</td></tr>
+              <tr><td>私有稿件 / 未发表数据</td><td class="warn">不建议</td><td class="warn">谨慎</td><td class="yes">可以</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span class="panel-kicker">STEPS</span><span class="badge design">约 10 分钟</span></div>
+        <ol class="deploy-steps">
+          <li><b>建仓库。</b>把项目推到 GitHub，仓库名设为 <code>research-agent</code>，默认分支 <code>main</code>。</li>
+          <li><b>开 Pages。</b>Settings → Pages → Source 选 <code>GitHub Actions</code>。</li>
+          <li><b>跑构建。</b>推送 <code>site/</code> 或手动触发 <code>Deploy site to GitHub Pages</code>。</li>
+          <li><b>可选实时。</b>启动本地/边缘运行时（规划中，本仓库未包含），按 <code>?api=</code> 契约接入；当前站点只实现 LIVE PUBLIC 与 CACHED。</li>
+        </ol>
+        <p class="deploy-url">目标地址：<code>https://yangxc0414.github.io/research-agent/</code></p>
+        <pre class="code small"><code># 本地预览
+node scripts/build-site.mjs
+npx serve site
+
+# 或者
+python -m http.server 8000 --directory site</code></pre>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>不要把 API key 放进 GitHub Pages。</b>
+      <p>任何写进 JS 的 key 都等于公开。需要 LLM、沙箱或私有数据时，启动本地/边缘运行时；Pages 只通过健康检查连接，并在断线时明确降级。</p>
+    </div>
+  </section>
+
+  <section class="section view" id="docs">
+    <div class="section-head">
+      <div>
+        <p class="index">10 / DOCS</p>
+        <h2>设计、部署与反思都在仓库里。</h2>
+      </div>
+      <p class="section-note">19 份文档。站点只呈现摘要；原始 Markdown 以副本形式放在 <code>site/docs/</code>。</p>
+    </div>
+    <div class="doc-grid">
+      <a class="doc-card" href="./docs/17-上层微服务架构.md"><span>17</span><b>上层微服务架构</b><small>服务 ≠ 模块 ≠ 插件；五个端口；三 deployable MVP</small></a>
+      <a class="doc-card" href="./docs/18-GitHub Pages部署与多智能体Skill设计.md"><span>18</span><b>Pages 部署与多智能体 Skill</b><small>三平面、前端 IA、1+4+人 拓扑、交接契约</small></a>
+      <a class="doc-card" href="./docs/16-科研Skill生态调研.md"><span>16</span><b>科研 Skill 生态调研</b><small>高 star skill 的渐进加载、固定 recipe 与缺口</small></a>
+      <a class="doc-card" href="./docs/README.md"><span>00</span><b>项目总览</b><small>19 份文档的阅读路径、证据等级与限制</small></a>
+    </div>
+    <div class="limits">
+      <h3>边界与不可宣称</h3>
+      <ul>
+        <li>站点不运行完整科研智能体；实时检索只调用公开元数据 API，不证明 claim 成立。</li>
+        <li>完整工作台与变更回放是 <b>SIM</b>；技能状态是 <b>SIM</b>；C1–C4 / E7–E8 未运行。</li>
+        <li>不提供 ghostwriting、伪造数据/引用、规避 AIGC 检测、自动投稿或假同行评审。</li>
+        <li>不抓取知网/万方/维普；不使用未授权全文；公开站点只展示公开元数据与人工批准案例。</li>
+        <li>AI 生成内容是草稿；科学决策、实验安全、署名与最终责任由作者/PI 保留。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+</div>
+
+
+<script src="./assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+  "schema_version": "workspace-0.1",
+  "generated_at": "2026-10-24T18:01:18+00:00",
+  "count": 21,
+  "commands": [
+    {
+      "id": "pipeline.run",
+      "group": "核心流水线",
+      "label": "运行 S1→S12 纵切",
+      "syntax": "python -m research_agent pipeline run --topic \"...\" --language zh --venue zh_core_journal",
+      "description": "离线 fixture 纵切；不会自动创建 claim。",
+      "safety": "local_write"
+    },
+    {
+      "id": "literature.run",
+      "group": "文献调研",
+      "label": "运行 S1 检索与覆盖审计",
+      "syntax": "python -m research_agent literature run --question \"...\" [--source openalex --planner glm]",
+      "description": "默认 fixture；OpenAlex/GLM 需要显式开启，摘要-only 不生成 span。",
+      "safety": "network_opt_in"
+    },
+    {
+      "id": "literature.memory",
+      "group": "文献调研",
+      "label": "查看文献覆盖记忆",
+      "syntax": "python -m research_agent literature memory show|advise",
+      "description": "只记录面向覆盖/产出与缺口，不保存摘要或 span 文本，不进入证据链。",
+      "safety": "read_only"
+    },
+    {
+      "id": "orchestrate.plan",
+      "group": "多智能体编排",
+      "label": "生成协作计划",
+      "syntax": "python -m research_agent orchestrate plan --topic \"...\" --source fixture",
+      "description": "只读：角色、并行 scout、typed handoff 与人工门；不执行检索。",
+      "safety": "read_only"
+    },
+    {
+      "id": "orchestrate.run",
+      "group": "多智能体编排",
+      "label": "运行 S1 scout fan-out + S2 fan-in",
+      "syntax": "python -m research_agent orchestrate run --topic \"...\" --source fixture",
+      "description": "本地写入 scouting/idea 产物；停在 G1 前，不创建 Claim 或准入技能。",
+      "safety": "local_write"
+    },
+    {
+      "id": "agent.manage",
+      "group": "多智能体编排",
+      "label": "注册自定义 advisory 子智能体",
+      "syntax": "python -m research_agent agent add --name \"...\" --role reviewer --purpose \"...\" --check coverage",
+      "description": "只允许白名单确定性 checks；输出 advisory note，不写 Claim/EA、不通过门禁。",
+      "safety": "local_write"
+    },
+    {
+      "id": "skill.scan",
+      "group": "科研技能",
+      "label": "扫描本地 SKILL.md",
+      "syntax": "python -m research_agent skill scan --path ~/.claude/skills",
+      "description": "解析 name/description/allowed-tools，标记 untrusted/scripts；只登记目录，不执行 scripts。",
+      "safety": "local_write"
+    },
+    {
+      "id": "skill.list",
+      "group": "科研技能",
+      "label": "查看技能目录与风险标记",
+      "syntax": "python -m research_agent skill list",
+      "description": "只读注册表；execution=not_available，不把 allowed-tools 当成权限。",
+      "safety": "read_only"
+    },
+    {
+      "id": "rsi.policy",
+      "group": "受治理 RSI",
+      "label": "查看/切换自进化策略",
+      "syntax": "python -m research_agent rsi policy show|set [--enabled|--disabled] [--scope id=on|off]",
+      "description": "只切换 memory_order/query_planner/facet_budget；Claim/EA/gate 等保持 locked。",
+      "safety": "local_write"
+    },
+    {
+      "id": "run.execute",
+      "group": "实验与运行",
+      "label": "执行 S5 本地 run",
+      "syntax": "python -m research_agent run execute --dataset chemlab --seeds 2",
+      "description": "生成本地 RunCapsule 与 EA；不会自动签署 claim。",
+      "safety": "local_write"
+    },
+    {
+      "id": "run.claim",
+      "group": "人工门",
+      "label": "人工签署 claim",
+      "syntax": "python -m research_agent run claim --capsule ... --ea ... --statement \"...\" --human-reason \"...\"",
+      "description": "必须由作者/PI 显式给出理由；浏览器不提供签核端点。",
+      "safety": "human_gate"
+    },
+    {
+      "id": "closure.check",
+      "group": "闭合与导出",
+      "label": "检查证据闭合",
+      "syntax": "python -m research_agent closure check --demo ... --claim ...",
+      "description": "结构闭合检查；不等于同行评审或语义支持。",
+      "safety": "read_only"
+    },
+    {
+      "id": "closure.sign",
+      "group": "人工门",
+      "label": "签署闭合包并锁定导出",
+      "syntax": "python -m research_agent closure sign --report ... --human-reason \"...\"",
+      "description": "人工签名与导出清单；过期报告会被拒绝。",
+      "safety": "human_gate"
+    },
+    {
+      "id": "lineage.build",
+      "group": "证据沿袭",
+      "label": "构建内容寻址依赖图",
+      "syntax": "python -m research_agent lineage build --bundle ...",
+      "description": "记录 claim/slot/figure/closure/signature 的依赖。",
+      "safety": "local_write"
+    },
+    {
+      "id": "lineage.impact",
+      "group": "证据沿袭",
+      "label": "检查变更传播",
+      "syntax": "python -m research_agent lineage impact --baseline ... --bundle ... --fail-on-stale",
+      "description": "数据集或 Claim 变化后锁定过期导出。",
+      "safety": "read_only"
+    },
+    {
+      "id": "rsi.status",
+      "group": "受治理 RSI",
+      "label": "查看 RSI 账本与租约",
+      "syntax": "python -m research_agent rsi status",
+      "description": "只读；准入与撤销仍在人工流程。",
+      "safety": "read_only"
+    },
+    {
+      "id": "rsi.trace",
+      "group": "受治理 RSI",
+      "label": "校验 lease→run→confirmation",
+      "syntax": "python -m research_agent rsi trace --ledger ... --capsule ...",
+      "description": "只读审计，不回流准入。",
+      "safety": "read_only"
+    },
+    {
+      "id": "workspace.agents",
+      "group": "工作区",
+      "label": "导出模块注册表",
+      "syntax": "python -m research_agent workspace export --output-dir apps/web/public",
+      "description": "生成设置页使用的 SPEC 快照与命令目录。",
+      "safety": "local_write"
+    },
+    {
+      "id": "workspace.memory",
+      "group": "工作区",
+      "label": "管理本地记忆",
+      "syntax": "python -m research_agent workspace memory list|add|delete",
+      "description": "用户自管的工作记忆，不是证据、不进 Claim。",
+      "safety": "local_write"
+    },
+    {
+      "id": "workspace.archive",
+      "group": "工作区",
+      "label": "管理本地归档",
+      "syntax": "python -m research_agent workspace archive list|add|delete",
+      "description": "保存任务 JSON 快照；不改变证据状态。",
+      "safety": "local_write"
+    },
+    {
+      "id": "spec.show",
+      "group": "规格",
+      "label": "查看模块规格",
+      "syntax": "python -m research_agent spec show literature",
+      "description": "读取 SPEC 契约；规格是代码的源。",
+      "safety": "read_only"
+    }
+  ],
+  "boundary": "descriptive catalog only; the UI does not execute shell commands"
+}
