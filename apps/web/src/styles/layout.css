@@ -2820,7 +2820,7 @@
   color: rgba(37, 99, 235, 0.36);
   font-family: "Bodoni MT", "Didot", "Playfair Display", Georgia, serif;
   font-size: clamp(12px, 1.5vw, 19px);
-  letter-spacing: 0.46em;
+  letter-spacing: 0.34em;
   text-transform: uppercase;
 }
 

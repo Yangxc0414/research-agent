@@ -109,7 +109,7 @@ export function WelcomeHome() {
   return (
     <main className="welcome">
       <div className="welcome-watermark" aria-hidden="true">
-        <span>WELLSRING</span>
+        <span>RESEARCH</span>
         <em>AGENT</em>
       </div>
       <div className="welcome-inner">
@@ -120,9 +120,9 @@ export function WelcomeHome() {
             <path d="M154 40 270 190M198 40 310 190" stroke="currentColor" strokeWidth="0.7" opacity="0.4" />
             <circle cx="282" cy="36" r="3" fill="currentColor" opacity="0.55" />
           </svg>
-          <span className="welcome-art-monogram">WA</span>
-          <span className="welcome-art-word">WELLSRING</span>
-          <span className="welcome-art-sub">AGENT · RESEARCH WORKSPACE</span>
+          <span className="welcome-art-monogram">RA</span>
+          <span className="welcome-art-word">RESEARCH AGENT</span>
+          <span className="welcome-art-sub">EVIDENCE WORKSPACE</span>
         </div>
 
         <div className="welcome-head">

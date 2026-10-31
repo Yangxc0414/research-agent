@@ -956,7 +956,7 @@
   border: 1px dashed var(--line);
   background: rgba(255, 255, 255, 0.55);
   color: var(--faint);
-  font-size: calc(9.2px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   line-height: 1.55;
   text-align: center;
 }
@@ -1315,12 +1315,12 @@
 .history-row span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .history-row p {
   color: var(--muted);
-  font-size: calc(7.5px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   line-height: 1.5;
 }
 
@@ -4377,7 +4377,7 @@
 .stage-check-copy b {
   display: block;
   color: var(--text);
-  font-size: calc(8.2px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.35;
 }
@@ -4386,7 +4386,7 @@
   display: block;
   overflow: hidden;
   color: var(--faint);
-  font-size: calc(7px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   line-height: 1.35;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4396,7 +4396,7 @@
   flex: none;
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.4px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   font-style: normal;
   white-space: nowrap;
 }
@@ -4417,7 +4417,7 @@
   gap: 8px;
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 0.06em;
 }
@@ -4443,19 +4443,19 @@
   background: rgba(255, 255, 255, 0.74);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.6px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .auto-plan-grid b {
   color: var(--text);
-  font-size: calc(7.4px * var(--font-scale, 1));
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
 }
 
 .auto-plan-card p {
   margin: 0;
   color: var(--faint);
-  font-size: calc(6.8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -4469,7 +4469,7 @@
 .rsi-headline {
   margin: 0;
   color: var(--text);
-  font-size: calc(9.2px * var(--font-scale, 1));
+  font-size: calc(11.5px * var(--font-scale, 1));
   line-height: 1.55;
 }
 
@@ -4481,20 +4481,20 @@
 
 .rsi-kpis span {
   display: grid;
-  gap: 1px;
-  padding: 4px 5px;
+  gap: 2px;
+  padding: 5px 6px;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.72);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.6px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 0.03em;
 }
 
 .rsi-kpis b {
   color: var(--text);
-  font-size: calc(11px * var(--font-scale, 1));
+  font-size: calc(12.5px * var(--font-scale, 1));
   font-weight: 500;
 }
 
@@ -4503,25 +4503,25 @@
   overflow: hidden;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .rsi-timeline {
   display: grid;
-  gap: 1px;
+  gap: 3px;
 }
 
 .rsi-step {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 5px;
+  padding: 4px 6px;
   border: 1px solid transparent;
   border-radius: 4px;
   color: var(--muted);
-  font-size: calc(8px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
 }
 
 .rsi-step i {
@@ -4536,7 +4536,7 @@
   margin-left: auto;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 400;
 }
 
@@ -4578,15 +4578,15 @@
 
 .rsi-gates {
   display: grid;
-  gap: 2px;
+  gap: 3px;
 }
 
 .rsi-gate {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
   align-items: center;
   gap: 5px;
-  padding: 3px 4px;
+  padding: 4px 6px;
   border: 1px solid var(--line);
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.7);
@@ -4594,26 +4594,26 @@
 
 .rsi-gate b {
   color: var(--text);
-  font-size: calc(7.8px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   font-weight: 500;
 }
 
 .rsi-gate > span:last-child {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .rsi-state {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1px 3px;
+  padding: 2px 4px;
   border: 1px solid var(--line);
   border-radius: 4px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.4px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -4656,7 +4656,7 @@
   overflow: hidden;
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4665,14 +4665,14 @@
 .rsi-metric span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.6px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .rsi-note {
   margin: 4px 0 0;
   color: var(--faint);
-  font-size: calc(7px * var(--font-scale, 1));
-  line-height: 1.45;
+  font-size: calc(10.5px * var(--font-scale, 1));
+  line-height: 1.5;
 }
 
 .rsi-stage {
@@ -4694,19 +4694,19 @@
 .rsi-stage-head b {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(7px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
 }
 
 .rsi-stage code {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   overflow-wrap: anywhere;
 }
 
 .rsi-stage small {
   color: var(--faint);
-  font-size: calc(6.4px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .rsi-chip-row {
@@ -4716,13 +4716,13 @@
 }
 
 .rsi-chip-row span {
-  padding: 1px 3px;
+  padding: 2px 4px;
   border: 1px solid var(--line);
   border-radius: 3px;
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.6px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .rsi-negative {
@@ -4742,14 +4742,14 @@
 .rsi-negative b {
   color: var(--coral);
   font-family: var(--mono);
-  font-size: calc(6.4px * var(--font-scale, 1));
+  font-size: calc(10.5px * var(--font-scale, 1));
   font-weight: 500;
 }
 
 .rsi-negative span {
   color: var(--muted);
-  font-size: calc(6.8px * var(--font-scale, 1));
-  line-height: 1.4;
+  font-size: calc(10.5px * var(--font-scale, 1));
+  line-height: 1.45;
 }
 
 .rsi-audit {
@@ -4763,8 +4763,8 @@
   border-left: 2px solid var(--amber);
   background: var(--amber-dim);
   color: var(--amber);
-  font-size: calc(6.8px * var(--font-scale, 1));
-  line-height: 1.4;
+  font-size: calc(10.5px * var(--font-scale, 1));
+  line-height: 1.45;
 }
 
 .rsi-audit p.is-question {
