@@ -320,7 +320,7 @@ function seedPerovskite(): ResearchTask {
     autoStages: freshStages().map((stage, index) => (index === 0 ? { ...stage, status: "done" } : stage)),
     messages: [
       system("STATIC WORKSPACE · 示例状态；不调用模型、不执行真实实验、不产生真实 claim。"),
-      agent("项目已接入。我会先把问题拆成可检索的子问题，再决定是否值得进入实验。", planCard(
+      agent("我会先做一轮宽检索，再决定这个问题值不值得进入实验。\n\n**我对问题的拆解**：你关心的是钝化层能否延长湿热环境下的器件寿命——这里面藏着三个可检索的子问题：钝化层降低缺陷密度的直接证据、湿热条件下 T80 的配对对照数据、以及疏水性等其他机制的解释力。\n\n检索策略如下，先宽后窄；确认或修改后我再执行。", planCard(
         ["界面钝化 湿热稳定性", "perovskite passivation damp heat", "passivation layer defect density"],
         "2020–2026 · 中英双语 · 只读公开摘要/全文",
         "6 sources · span-only",
@@ -328,11 +328,11 @@ function seedPerovskite(): ResearchTask {
       )),
       user("先调研界面钝化与长期稳定性的证据，重点看湿热稳定性。"),
       agent(
-        "**检索完成** · 4 sources\n\n| # | 来源 | 全文 | span |\n| --- | --- | --- | --- |\n| 01 | Huang et al. · 2024 · Joule | 是 | 6 |\n| 02 | Wang et al. · 2023 · ACS Energy Lett. | 是 | 4 |\n| 03 | Chen et al. · 2025 · Adv. Mater. | 是 | 2 |\n| 04 | Liu et al. · 2022 · Sol. RRL | 摘要-only | 0 |\n\n- 12 个可定位 span · 2 个 coverage gap\n- 覆盖饱和度 partial；缺口集中在湿热循环后的配对对照\n\n> 摘要-only 只作线索，不进入 claim。",
+        "**检索完成** · 4 sources\n\n| # | 来源 | 全文 | span |\n| --- | --- | --- | --- |\n| 01 | Huang et al. · 2024 · Joule | 是 | 6 |\n| 02 | Wang et al. · 2023 · ACS Energy Lett. | 是 | 4 |\n| 03 | Chen et al. · 2025 · Adv. Mater. | 是 | 2 |\n| 04 | Liu et al. · 2022 · Sol. RRL | 摘要-only | 0 |\n\n- 12 个可定位 span · 2 个 coverage gap\n\n**初步观察**：三篇全文都支持“钝化层抑制界面缺陷”，但只有 Huang 2024 与 Chen 2025 报告了湿热老化数据；Liu 2022 只有摘要，无法定位原文，只能作为线索保留。方法学与评测口径两个面向还没扫到，饱和度停在 partial。\n\n> 摘要-only 只作线索，不进入 claim。",
         sourcesCard()
       ),
       agent(
-        "### 关键 gap\n湿热循环后的配对定量对照缺失。\n\n- 足以支撑一个可否证的假设\n- 还不够支撑 claim\n\n> 候选不是 claim；需要 G1 人工收敛。",
+        "### 关键 gap\n\n把四篇来源并排读完，缺的不是“钝化有没有用”，而是一个更具体的东西：**湿热循环后的配对定量对照缺失**。现有来源只报告初始 PCE 与 T80 终值，没有钝化层/未钝化层在湿热循环前后的配对比较——也就是说，没有文献直接回答“寿命增益里有多少来自钝化层”。\n\n这足以支撑一个可否证的假设，但还不够支撑 claim：\n\n- **H1（缺陷密度路径）**：双分子钝化层降低界面缺陷密度 → 延长湿热条件下的 T80。有 SPAN-014 / SPAN-021 的机理证据\n- **H2（疏水性路径）**：钝化层表面的疏水性才是主因。SPAN-009 只给了间接关联\n\n两个候选我都保留了；选哪个进实验、还是设计成对照同时检验，属于 G1 人工收敛——这一步只能由你决定。",
         ideaCard()
       )
     ]
@@ -377,7 +377,7 @@ function seedArchives(): ResearchTask {
       system("STATIC WORKSPACE · 示例状态；不调用模型、不执行真实实验。"),
       user("自改进 agent 到底怎么使用 archive？我想先做一轮文献调研。"),
       agent(
-        "我会先区分三类 archive，再判断哪些机制有可核验证据：\n\n- 代码版本 archive\n- 轨迹 / 反思 archive\n- 评测结果 archive\n\n> 先形成 span，再谈复用机制。",
+        "我会先把 archive 拆成三类，再逐类判断哪些机制有可核验的证据、哪些只是叙事：\n\n| 类型 | 代表机制 | 证据现状 |\n| --- | --- | --- |\n| 代码版本 archive | stepping stones / 版本回滚 | 机制描述多，受控对照少 |\n| 轨迹 / 反思 archive | 经验复用、失败轨迹学习 | 正在形成 benchmark |\n| 评测结果 archive | 分数继承、防过拟合 | 争议最大 |\n\n> 先形成 span，再谈复用机制；这个顺序不能反过来。",
         planCard(
           ["self-improving agent archive", "Darwin Gödel Machine stepping stones", "agent memory reuse lineage"],
           "2024–2026 · arXiv / 会议",
@@ -430,12 +430,12 @@ function seedThesisTask(
       system("STATIC WORKSPACE · 示例任务；不调用模型、不执行真实实验。"),
       agent(
         mode === "writing"
-          ? `任务已创建：${name}。写作从槽位开始；没有已签 claim 之前，结果与摘要槽位保持 locked。`
-          : `任务已创建：${name}。这是毕业设计工作区里的静态示例；可以从调研开始，也可以直接设计实验。`
+          ? "任务已创建：${name}。这个工作流从槽位开始：论文骨架先立起来，但每一个需要结论的槽位都处于 locked，输入只能来自已签 claim 与 EA。\n\n我先把已签 claim、冻结协议与图 manifest 的绑定关系列出来；正文不会先于证据填数。"
+          : "任务已创建：${name}。这是毕业设计工作区里的静态示例，可以从调研开始，也可以直接设计实验。\n\n建议的进入方式：先用一轮检索确定证据边界，再决定是否值得开实验——顺序反过来通常更费预算。"
       ),
       mode === "writing"
         ? agent(
-            "先把已签 claim、冻结协议与图 manifest 绑定到槽位；正文不得先于证据填数。",
+            "写作从槽位开始。已签 claim、冻结协议与图 manifest 各自对应一类槽位：\n\n- **Methods** 绑冻结协议：主指标、对照与 seeds 在 G2 后锁定\n- **Results / Figure / Abstract** 绑已签 claim 与 EA：它们是全文里最容易被审稿人抓住的部分\n- **Limitations** 必须由作者亲笔——这一条没有替代品\n\n> 正文不得先于证据填数；这不是流程洁癖，是最低限度的可审计性。",
             writingCard()
           )
         : agent(
@@ -501,20 +501,20 @@ export function createTask(input: {
   } else if (mode === "experiment") {
     messages.push(
       agent(
-        "本任务从实验设计开始：S1/S2 已标为 skipped，G1 仍未收敛；结果槽保持 pending，直到 EA 与人签 claim。",
+        "本任务从实验设计开始：S1/S2 已标为 skipped——这是一个诚实的标注，因为跳过的阶段没有证据产出，后面的结论只能建立在实验本身的对照上。\n\n协议草案在下面；它只在你人工冻结（G2）之后生效。结果槽保持 pending，直到 EA 封存并由你签署 claim。",
         protocolCard()
       )
     );
   } else if (mode === "writing") {
     messages.push(
       agent(
-        "写作从槽位开始：没有已签 claim，结果与摘要槽位保持 locked；可以先去补齐证据，或检查已有边界。",
+        "写作从槽位开始：没有已签 claim，结果与摘要槽位保持 locked。先写结论再找证据，是审稿人最容易识破的失败模式。\n\n可以先回到调研或实验补齐证据，也可以让我检查已有证据的边界。",
         writingCard()
       )
     );
   } else {
     messages.push(
-      agent("全自动会从 S1 跑到人工门。你可以随时暂停、单步或停止；claim 不会被自动签署。")
+      agent("全自动会从 S1 一路跑到人工门：检索留下 span，设计只出草案，EA 封存后停下等你签 claim。\n\n运行中随时输入文字就是指导，会在下一个阶段边界生效；暂停、单步、停止随时可用。它不会替你签署任何结论。")
     );
   }
 
@@ -604,7 +604,7 @@ export function createConversationTask(input: {
       user(text),
       ...(contextNote ? [contextNote] : []),
       agent(
-        "已收到问题。先把它拆成可检索的子问题：\n\n- 明确研究对象与时间范围\n- 生成中英检索式\n- 先登记 span，再判断 gap\n\n> 摘要-only 不生成 span，也不进入 claim。",
+        "已收到问题。先把它拆成可检索的子问题：\n\n- **对象与范围**：明确研究对象、时间窗与纳入标准——范围收得太早会漏掉关键反例\n- **检索式**：中英各一组，综述 / 方法 / 评测三个入口都扫\n- **证据出口**：先登记 span，再判断 gap；没有全文的来源只作线索\n\n检索计划在下面，可以直接开跑，也可以先改关键词。",
         planCard(
           [topic, `${topic} review`, "英文对应检索式"],
           "近五年 · 中英双语 · 公开摘要/全文",

@@ -677,7 +677,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
       note: "4 篇来源中只有 2 篇报告 T80。"
     });
     messages.push(
-      message("agent", "**S1 · 检索完成**\n\n- 3 条全文 / 1 条摘要-only\n- 12 个可定位 span\n- 2 个 coverage gap\n\n> 摘要-only 只作线索，不生成 span。", sourcesCard())
+      message("agent", "**S1 · 检索完成**\n\n- 3 条全文 / 1 条摘要-only，覆盖 2022–2025 主线文献\n- 12 个可定位 span；2 个 coverage gap 已登记\n- 方法学与评测口径两个面向覆盖偏薄，饱和度停在 partial\n\n> 摘要-only 只作线索，不生成 span。", sourcesCard())
     );
   } else if (index === 1) {
     gates = gate(gates, "G1", "pass", "演示策略自动收敛；生产环境需人签");
@@ -690,7 +690,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
       refs: ["SPAN-014", "SPAN-021"]
     });
     messages.push(
-      message("agent", "### G1 · 假设收敛\n\n- 保留 H1：双分子钝化层 → 延长 T80\n- 搁置 H2：疏水性主因\n\n> 候选仍不是 claim；生产环境必须人签。", ideaCard())
+      message("agent", "### G1 · 假设收敛\n\n两个候选的取舍理由：\n\n- **保留 H1**（双分子钝化层 → 延长 T80）：有缺陷密度测量的直接 span 支撑，且能设计出对照实验\n- **搁置 H2**（疏水性主因）：SPAN-009 只有间接关联，先验证 H1 再回头检验更省预算\n\n> 候选仍不是 claim；生产环境必须人签。", ideaCard())
     );
   } else if (index === 2) {
     protocol = { ...DEFAULT_PROTOCOL, controls: [...DEFAULT_PROTOCOL.controls] };
@@ -973,7 +973,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     messages: [
       ...task.messages,
       message("system", `受治理全自动 · cycle ${task.auto.cycle + 1} · 将在 S5b claim 人工门暂停。`),
-      message("agent", "我会连续执行 S1→META。你可以随时输入指导，指导会在下一个阶段边界生效；claim 与导出不会自动签署。")
+      message("agent", "我会按 S1 → META 连续推进，每一步的产物都写进右侧 stage trace：检索留下 span，设计只出草案，EA 封存后停在 claim 人工门等你签署。\n\n运行中随时输入文字就是指导，会在下一个阶段边界生效；暂停、单步、停止随时可用。claim 与导出不会自动签署。")
     ]
   });
 
@@ -1848,8 +1848,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           ),
           messages: [
             ...task.messages,
-            message("agent", "**扩展检索完成（SIM）**\n\n- 3 条全文 / 1 条摘要-only\n- 12 个可定位 span\n- 新增 2 条 gap", sourcesCard()),
-            message("agent", "### 证据边界\n\n- 证据足够支撑假设\n- 还不足以支撑 claim\n\n> 可以选一个候选进入 S4，但不能跳过人工门。", ideaCard())
+            message("agent", "**扩展检索完成（SIM）**\n\n- 3 条全文 / 1 条摘要-only；12 个可定位 span\n- 新增 2 条 gap：评测口径不统一、长期循环数据缺失\n\n并排读完后的判断：钝化有效这件事证据充分，缺的是“增益里有多少来自钝化层”的配对对照。", sourcesCard()),
+            message("agent", "### 证据边界\n\n现在的证据状态：**足以支撑假设，还不足以支撑 claim**。\n\n- 缺口集中在长期循环数据与统一评测口径\n\n> 可以选一个候选进入 S4，但 G1 收敛必须由你完成——这一步没有委托路径。", ideaCard())
           ]
         }, "literature-brief", "检索完成，按需复核来源、全文与 span。"));
         notify("检索完成（SIM）：12 spans / 2 gaps");
@@ -1883,7 +1883,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             ...task.messages,
             message(
               "agent",
-              "**H1 已送入 S4 设计**\n\n- 主指标：T80 / 初始 PCE\n- 对照：未钝化 / 单分子钝化\n- seeds：3\n\n> 下一步是人工冻结协议，而不是直接运行。",
+              "**H1 已送入 S4 设计**\n\n设计草案围绕“可否证”展开：\n\n- **主指标**：T80 / 初始 PCE——T80 直接对应你的问题；PCE 用来排除“用效率换寿命”的假改进\n- **对照**：未钝化 / 单分子钝化——把“加层有效”与“加法本身有效”分开\n- **seeds：3**——当前预算内可复现的最小配置\n\n> 下一步是人工冻结协议，而不是直接运行。",
               protocolCard()
             )
           ]
@@ -1982,7 +1982,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           messages: [
             ...item.messages,
             message("agent", "**RUN-014 完成**\n\n| seed | T80 (h) |\n| --- | --- |\n| 1 | 404 |\n| 2 | 415 |\n| 3 | 417 |\n| **mean** | **412** |\n\n- 3 seeds · EA-7c41 已封存；基线 286 h 来自复现\n- 数值来自本地 fixture，不冒充真实材料实验", runCard()),
-            message("agent", "现在停在 claim 人工门。\n\n- 未签 claim 之前，写作与导出保持 pending\n- 系统不会自动生成结论", claimGateCard("needs_human"))
+            message("agent", "现在停在 **claim 人工门**。\n\n- EA-7c41 已封存：mean 412 h，比复现基线 286 h 高约 44%\n- 效应量看起来明显，但 3 个种子不足以排除随机性——签署前建议看一眼 EA 里的逐种子分布\n- 未签 claim 之前，写作与导出保持 pending\n\n> 系统不会自动生成结论；签署只能由作者完成。", claimGateCard("needs_human"))
           ]
         }, "evidence-audit", "EA 已封存，按需检查 span→claim→EA 边界。"));
         notify("EA 已封存（SIM）；claim 等待人工签署");
@@ -2008,7 +2008,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           ),
           messages: [
             ...item.messages,
-            message("agent", "claim 已由作者在静态预览中模拟签署；签名进入证据层，不会被 RSI 候选改写。closure 仍未通过，导出保持锁定。", claimGateCard("pass"))
+            message("agent", "claim 已由作者在静态预览中模拟签署。签署后它进入证据层的不可回写区：RSI 候选、写作槽位与导出模板都只能引用，不能改写。\n\n- closure 仍未通过：citation.related 还有 2 条待补，导出保持锁定\n- 下一步是补齐引用，跑 closure.check", claimGateCard("pass"))
           ]
         }, "evidence-audit", "claim 已签，按需检查 closure 与导出边界。"));
         notify("claim 已模拟签署；可继续全自动");
@@ -2034,8 +2034,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
               message(
                 "agent",
                 claimSigned
-                  ? `已按当前证据刷新写作槽位：${bound}/6 已绑定；引用仍待 closure，导出保持锁定。`
-                  : "已生成写作槽位：结果、主图与摘要保持 locked，因为还没有已签 claim。可以先回到调研或实验补齐证据。",
+                  ? `已按当前证据刷新写作槽位：${bound}/6 已绑定。已绑定的槽位只接受 EA 引用；引用仍待 closure，导出保持锁定。`
+                  : "已生成写作槽位。当前状态：结果、主图与摘要三个槽位保持 **locked**——它们的输入只能来自已签 claim 与 EA，而这正是还没有的东西。\n\n可以先回到调研或实验补齐证据；写作不会替你先编一个结论。",
                 card
               )
             ]
@@ -2276,7 +2276,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           reviewPack: pack,
           messages: [
             ...item.messages,
-            message("agent", "**审阅包完成** · advisory only", {
+            message("agent", "**审阅包完成** · advisory only\n\n三个审阅视角的确定性检查跑完了：覆盖、引用与假设各出了一条发现，都在卡片里。这是参考意见，不替代人工评审。", {
               type: "review-pack",
               ...pack
             })
@@ -2474,7 +2474,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           },
           messages: [
             ...item.messages,
-            message("agent", "已生成一个静态自进化候选（SIM）。它只改检索预算，不触碰 claim、gate 与导出。", {
+            message("agent", "已生成一个静态自进化候选（SIM）。我只给了它一个可写面：S1 检索预算 6→3，依据是连续两轮 gap 数为 0、覆盖率饱和，宽检索的边际收益在下降。\n\nclaim、gate、导出与签名是它的不可写面——提案再合理也碰不到。", {
               type: "evolution",
               candidate
             })
@@ -2509,7 +2509,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             },
             messages: [
               ...item.messages,
-              message("agent", "候选已准入（SIM）：只授权 literature.query_planner 的 2 次运行。租约到期后自动回收；不可写 claim/EA。", {
+              message("agent", "候选已准入（SIM）。租约只授权 `literature.query_planner` 的 2 次运行：\n\n- 生效范围：S1 检索预算 6→3\n- 到期自动回收，trace 留档\n- 不可写面不变：claim / EA / gate / signature", {
                 type: "evolution",
                 candidate: updated
               })
@@ -2612,7 +2612,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           toolCalls: [call, ...item.toolCalls],
           messages: [
             ...item.messages,
-            message("agent", "准备调用 GitHub MCP 的只读 search_repositories；工具结果进入会话前需要你逐次批准。", {
+            message("agent", "准备调用 GitHub MCP 的只读 `search_repositories`。这一步会查询公开仓库元数据；工具调用进入会话前需要你逐次批准，拒绝就什么都不会发生。", {
               type: "tool",
               server: call.server,
               tool: call.tool,
