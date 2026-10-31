@@ -319,6 +319,12 @@ export interface ModelSettings {
   summaryTokens: number;
 }
 
+/** 新会话默认预算（不含 profileId / thinkingStop，二者由 draftProfileId / draftThinkingStop 承担）。 */
+export type ModelBudget = Pick<
+  ModelSettings,
+  "contextLimit" | "maxReply" | "compression" | "threshold" | "keepRecent" | "summaryTokens"
+>;
+
 export type MessageRole = "system" | "user" | "agent";
 
 export type Card =
@@ -521,6 +527,8 @@ export interface UIState {
   skillsOpen: boolean;
   draftAccess: AccessMode;
   draftProfileId: string;
+  draftModelBudget: ModelBudget | null;
+  modelDialogScope: "task" | "draft";
   skillDraft: SkillDraft | null;
   permissionRequest: PermissionRequest | null;
   newTaskOpen: boolean;

@@ -210,6 +210,10 @@ export function WelcomeHome() {
                   setDraftThinkingStop(next.thinkingStop);
                 }}
                 onThinkingChange={setDraftThinkingStop}
+                onAdvanced={() => {
+                  actions.setUI({ modelDialogScope: "draft" });
+                  actions.openOverlay("modelOpen");
+                }}
               />
               <button
                 type="button"

@@ -6,6 +6,7 @@ import {
   modelSettingsForProfile,
   thinkingLabel
 } from "../domain/catalog";
+import { siteHref } from "../domain/links";
 import type { ModelSettings, ModelStop } from "../domain/types";
 import { useAllModelProfiles } from "../state/modelStore";
 import { Icon } from "./Icon";
@@ -157,7 +158,7 @@ export function ModelPicker({
                 : activeStop?.detail ?? "思考关闭"}
             </small>
           </div>
-          {onAdvanced ? (
+          {onAdvanced && (
             <button
               type="button"
               className="model-advanced"
@@ -170,12 +171,17 @@ export function ModelPicker({
               上下文、回复长度与压缩设置
               <Icon name="arrow" size={11} />
             </button>
-          ) : (
-            <p className="model-menu-note">
-              <Icon name="info" size={11} />
-              思考强度会随新会话保存；上下文、回复长度与压缩在会话内细调。
-            </p>
           )}
+          <a
+            className="model-provider-link"
+            href={siteHref("models/")}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+          >
+            <Icon name="external" size={10} />
+            Provider / API 接入配置
+          </a>
         </div>
       )}
     </div>

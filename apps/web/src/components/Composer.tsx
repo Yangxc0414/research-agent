@@ -352,7 +352,10 @@ export function Composer() {
             onThinkingChange={(stop) =>
               actions.saveModel({ ...task.model, thinkingStop: stop }, { silent: true })
             }
-            onAdvanced={() => actions.openOverlay("modelOpen")}
+            onAdvanced={() => {
+              actions.setUI({ modelDialogScope: "task" });
+              actions.openOverlay("modelOpen");
+            }}
           />
         </div>
       </div>

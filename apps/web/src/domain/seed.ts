@@ -10,6 +10,7 @@ import type {
   Gate,
   Message,
   Mode,
+  ModelBudget,
   PersistedWorkspace,
   ResearchTask,
   TokenUsage,
@@ -480,6 +481,7 @@ export function createTask(input: {
   access?: AccessMode;
   profileId?: string;
   thinkingStop?: string | number | null;
+  modelBudget?: ModelBudget;
 }): ResearchTask {
   const mode = input.mode;
   const messages: Message[] = [
@@ -534,6 +536,7 @@ export function createTask(input: {
     harness: { version: "v1", budget: 6, label: "incumbent · broad-first" },
     model: clampModel({
       ...modelSettingsForProfile(input.profileId ?? "gpt-5"),
+      ...(input.modelBudget ?? {}),
       ...(input.thinkingStop !== undefined ? { thinkingStop: input.thinkingStop } : {})
     }),
     ...seedUsage([]),
@@ -571,6 +574,7 @@ export function createConversationTask(input: {
   access: AccessMode;
   profileId?: string;
   thinkingStop?: string | number | null;
+  modelBudget?: ModelBudget;
   attachments?: ContextAttachment[];
 }): ResearchTask {
   const text = input.text.trim();
@@ -584,7 +588,8 @@ export function createConversationTask(input: {
     workspaceId: input.workspaceId,
     access: input.access,
     profileId: input.profileId,
-    thinkingStop: input.thinkingStop
+    thinkingStop: input.thinkingStop,
+    modelBudget: input.modelBudget
   });
   const attachments = input.attachments ?? [];
   const contextNote = attachments.length

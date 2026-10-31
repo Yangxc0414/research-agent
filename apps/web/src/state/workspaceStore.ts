@@ -60,6 +60,8 @@ const defaultUI: UIState = {
   skillsOpen: false,
   draftAccess: "ask",
   draftProfileId: "gpt-5",
+  draftModelBudget: null,
+  modelDialogScope: "task",
   skillDraft: null,
   permissionRequest: null,
   newTaskOpen: false,
@@ -1149,6 +1151,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           access: input.access,
           profileId: state.ui.draftProfileId,
           thinkingStop: input.thinkingStop,
+          modelBudget: state.ui.draftModelBudget ?? undefined,
           attachments: input.attachments
         });
         const decision = text.startsWith("/")
