@@ -9,9 +9,6 @@ on:
       - "apps/web/**"
       - "scripts/build-site.mjs"
       - "scripts/check-site.mjs"
-      - "16-科研Skill生态调研与动态流程编排.md"
-      - "17-基于Skill契约的上层微服务架构.md"
-      - "18-GitHub Pages部署与多智能体Skill设计.md"
       - ".github/workflows/pages.yml"
   pull_request:
     branches: [main]
@@ -21,9 +18,6 @@ on:
       - "apps/web/**"
       - "scripts/build-site.mjs"
       - "scripts/check-site.mjs"
-      - "16-科研Skill生态调研与动态流程编排.md"
-      - "17-基于Skill契约的上层微服务架构.md"
-      - "18-GitHub Pages部署与多智能体Skill设计.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 

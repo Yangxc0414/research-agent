@@ -176,5 +176,5 @@
     }
   ],
   "errors": [],
-  "note": "manual snapshot built from OpenAlex on 2026-10-23; refresh-digest.yml will replace it on schedule"
+  "note": "manual snapshot built from OpenAlex on 2026-10-23; refresh by regenerating locally in the main project"
 }

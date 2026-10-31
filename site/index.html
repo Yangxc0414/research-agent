@@ -91,7 +91,7 @@
       <span>资源</span>
       <button type="button" class="side-item" data-view="lab"><em>LIVE</em><b>真实检索</b><small>OpenAlex 公共元数据</small></button>
       <button type="button" class="side-item" data-view="deploy"><em>03</em><b>部署</b><small>Pages / Actions / Runtime</small></button>
-      <button type="button" class="side-item" data-view="docs"><em>19</em><b>文档</b><small>设计与限制</small></button>
+      <button type="button" class="side-item" data-view="docs"><em>10</em><b>文档与边界</b><small>能力摘要 · 不可宣称</small></button>
       <a class="side-item" href="./live/"><em>LIVE</em><b>本地运行时</b><small>真实 pipeline · API</small></a>
       <a class="side-item" href="./innovation/"><em>NEW</em><b>创新演示</b><small>5 幕 · 静态 / 无 API</small></a>
     </div>
@@ -773,7 +773,7 @@
     <div class="digest-panel panel" id="digest-panel">
       <div class="panel-head"><span class="panel-kicker">ACTIONS / DIGEST</span><span class="badge cached">CACHED</span></div>
       <div id="digest-body" class="digest-body">
-        <span class="digest-empty">尚未生成 digest.json。启用 <code>refresh-digest.yml</code> 后，这里会出现带时间戳的公开检索结果；没有运行时不伪造数据。</span>
+        <span class="digest-empty">尚未生成 digest.json。在主项目本地刷新并提交快照后，这里会出现带时间戳的公开检索结果；没有运行时不伪造数据。</span>
       </div>
     </div>
 
@@ -822,15 +822,15 @@ python -m http.server 8000 --directory site</code></pre>
     <div class="section-head">
       <div>
         <p class="index">10 / DOCS</p>
-        <h2>设计、部署与反思都在仓库里。</h2>
+        <h2>能力摘要在这里，设计细节留在主项目仓库。</h2>
       </div>
-      <p class="section-note">19 份文档。站点只呈现摘要；原始 Markdown 以副本形式放在 <code>site/docs/</code>。</p>
+      <p class="section-note">内部设计文档不随前端镜像发布；站点只呈现能力摘要、部署方式与不可宣称边界。</p>
     </div>
     <div class="doc-grid">
-      <a class="doc-card" href="./docs/17-上层微服务架构.md"><span>17</span><b>上层微服务架构</b><small>服务 ≠ 模块 ≠ 插件；五个端口；三 deployable MVP</small></a>
-      <a class="doc-card" href="./docs/18-GitHub Pages部署与多智能体Skill设计.md"><span>18</span><b>Pages 部署与多智能体 Skill</b><small>三平面、前端 IA、1+4+人 拓扑、交接契约</small></a>
-      <a class="doc-card" href="./docs/16-科研Skill生态调研.md"><span>16</span><b>科研 Skill 生态调研</b><small>高 star skill 的渐进加载、固定 recipe 与缺口</small></a>
-      <a class="doc-card" href="./docs/README.md"><span>00</span><b>项目总览</b><small>19 份文档的阅读路径、证据等级与限制</small></a>
+      <a class="doc-card" href="https://github.com/Yangxc0414/research-agent#readme" target="_blank" rel="noopener"><span>00</span><b>项目总览</b><small>仓库 README：结构、静态边界、本地预览与部署</small></a>
+      <a class="doc-card" href="./innovation/"><span>01</span><b>创新演示</b><small>五幕演示：SPEC 契约 / span 证据 / SVG provenance / 待证据槽位</small></a>
+      <a class="doc-card" href="./app/"><span>02</span><b>工作台导览</b><small>门禁、证据链、评估隔离与受治理自进化的交互视图</small></a>
+      <a class="doc-card" href="./live/"><span>03</span><b>本地运行时</b><small>真实 pipeline / API / OpenAlex 公开检索</small></a>
     </div>
     <div class="limits">
       <h3>边界与不可宣称</h3>

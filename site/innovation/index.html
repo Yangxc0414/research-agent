@@ -7,7 +7,7 @@
 <meta name="description" content="Research Agent 创新点演示：SPEC 驱动模块、证据 span、AstraDraw SVG provenance、论文/基金待证据槽位；纯静态、无 API、fixture。" />
 <meta name="theme-color" content="#0b1220" />
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
-<meta property="og:description" content="六模块 SPEC / artifact / gate 的可复核科研运行时；静态五幕演示。" />
+<meta property="og:description" content="26 个模块 SPEC / artifact / gate 的可复核科研运行时；静态五幕演示。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="styles.css" />
 </head>
@@ -36,14 +36,14 @@
         <div class="hero-copy">
           <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME / 毕设创新点演示</p>
           <h1>不是把论文写长，<br/><span>而是让每个结论有出处。</span></h1>
-          <p class="lede">十个模块共享同一套 <b>SPEC / artifact / gate</b>：文献留下 span，实验设计只产草稿，图表留下 provenance，论文结果槽在 EA 到达前保持 pending。不是“全自动写完”，而是把科研过程做成可复核、可阻断、可维护的运行时。</p>
+          <p class="lede">26 个模块共享同一套 <b>SPEC / artifact / gate</b>：文献留下 span，实验设计只产草稿，图表留下 provenance，论文结果槽在 EA 到达前保持 pending。不是“全自动写完”，而是把科研过程做成可复核、可阻断、可维护的运行时。</p>
           <div class="hero-actions">
             <button type="button" class="primary-btn" id="start-btn">开始 90 秒演示 <span aria-hidden="true">→</span></button>
             <a class="ghost-btn" href="#proof">看技术证据</a>
           </div>
           <div class="hero-facts" aria-label="实现事实">
-            <span><b>6</b> 模块 SPEC</span>
-            <span><b>27</b> 静态测试</span>
+            <span><b>26</b> 模块 SPEC</span>
+            <span><b>107</b> 个测试文件</span>
             <span><b>0</b> API 调用</span>
             <span><b>5</b> 幕演示</span>
           </div>
@@ -122,7 +122,7 @@
         <p>下面每一条都能在代码、SPEC 或测试里找到对应物；没有效果数字，也不宣称通用能力。</p>
       </div>
       <div class="proof-grid">
-        <article class="proof-card"><span class="mono">01 / SPEC</span><h3>模块先有契约</h3><p>十个模块各有一份 SPEC.md；CLI 只做最小更新，改一个模块不必理解全部代码。</p><div class="proof-foot">10 SPEC · 57 tests <span>→</span></div></article>
+        <article class="proof-card"><span class="mono">01 / SPEC</span><h3>模块先有契约</h3><p>26 个模块各有一份 SPEC 契约；CLI 只做最小更新，改一个模块不必理解全部代码。</p><div class="proof-foot">26 SPEC · 107 test files <span>→</span></div></article>
         <article class="proof-card"><span class="mono">02 / ARTIFACT</span><h3>证据不是聊天记录</h3><p>模块交换 QueryPlan、Span、DesignCard、PaperContract；摘要-only 永远不能变成 span。</p><div class="proof-foot">span / coverage / gap <span>→</span></div></article>
         <article class="proof-card"><span class="mono">03 / SVG</span><h3>图也有 provenance</h3><p>AstraDraw scene → SVG；审计 XML、ID、文本、外部引用与 aria；结果图和示意图分开。</p><div class="proof-foot">scene hash / svg hash <span>→</span></div></article>
         <article class="proof-card"><span class="mono">04 / BOUNDARY</span><h3>结果槽保持 pending</h3><p>论文和基金只产骨架；没有 EA/Closure，G5 导出一直 blocked。这不是“不能做”，是“不乱做”。</p><div class="proof-foot">5 slots pending <span>→</span></div></article>
@@ -134,7 +134,7 @@
         <div class="comparison-row"><b>ARIS / AutoResearchClaw</b><span>强在评审与技能演化</span><em>我们把审计放进模块契约与工作台</em></div>
         <div class="comparison-row"><b>AstraDraw</b><span>强在参考图→scene→SVG/PPTX</span><em>我们加 SVG 审计与证据边界</em></div>
       </div>
-      <p class="proof-note">边界：当前是 fixture + CC-BY 论文正文 probe 的纵切；没有真实检索 API、用户研究或论文效果。H1–H4 仍是待验证假设。受治理 RSI 控制面（StepLedger / pending / lease / MetaTracker）已实现；S1 compare 选中 MiniLM+budget3 并回灌 pipeline；S5 iris 选 seeds3、breast_cancer 选 seeds2，均被 run 消费并通过新协议 sealed 复核；pipeline 用 S5 lease 跑真实 run，产出 EA + claim draft，人签 claim 后才把 paper.result.primary 标为 bound_claim；ChemLab 真实反应数据做受控 baseline（Ridge R²0.193 vs mean −0.048），人签 claim + 数据图后绑定；protocol 冻结 + 数据图 + 4 条 DataCite 元数据后 closure 11/11 ready，人签 export manifest（submission=false）（协议验证，非新发现）。本地 Qwen2.5-0.5B 的 3-prompt 审计 1/3 eligible。**仍无可靠开放式 proposer、peer-review benchmark、真实研究实验，不宣称 RSI**；详见仓库内 <b>24- 工程反思</b> 与 <b>25- 受治理的 RSI</b>。</p>
+      <p class="proof-note">边界：当前是 fixture + CC-BY 论文正文 probe 的纵切；站点没有真实检索 API、用户研究或论文效果数字。受治理 RSI 控制面（StepLedger / pending / lease / MetaTracker）已实现：S1 compare 选中 MiniLM+budget3 并回灌 pipeline；S5 在 iris（seeds 3）与 breast_cancer（seeds 2）上通过 lease 跑真实 run，EA sealed 后由人工签署 claim；ChemLab 真实反应数据做受控 baseline（Ridge R² 0.193 vs mean −0.048）；protocol 冻结、数据图与 DataCite 元数据齐备后 closure 11/11 ready，export manifest 由人签署（submission=false，协议验证而非新发现）。本地 Qwen2.5-0.5B 的 3-prompt 审计 1/3 eligible。<b>仍无可靠开放式 proposer、peer-review benchmark 与真实研究实验，不宣称 RSI</b>。</p>
     </section>
   </main>
 
