@@ -115,6 +115,45 @@
       </div>
     </section>
 
+    <section class="wiring" id="wiring">
+      <div class="proof-head">
+        <p class="eyebrow">LIVE MODEL WIRING / 本地 runtime 实测 · 2026-10-31</p>
+        <h2>模型接进模块链路，<br/>但门禁没有让步。</h2>
+        <p>OpenAI 兼容端点 agnes-2.5-flash 经模型网关绑定到 literature 与 idea 模块；以下是在本地 127.0.0.1:8787 上的真实调用记录。五幕演示本体仍然零 API，本节是那次实测的静态快照。</p>
+      </div>
+      <div class="wiring-grid">
+        <article class="wiring-card">
+          <span class="mono">S1 / QUERY PLANNER</span>
+          <h3>检索规划器直调模型</h3>
+          <p>规划器经网关真实调用，产出 13 条中英双语检索式，覆盖综述 / 方法 / 评测 / 局限 / 最新进展五个面向；检索落账 3 来源 · 5 spans · 3 gaps。</p>
+          <div class="chip-row">
+            <span class="chip">perovskite passivation humidity stability review</span>
+            <span class="chip">钙钛矿 界面钝化材料 湿热老化 机理</span>
+            <span class="chip">strategies for enhancing humidity stability</span>
+            <span class="chip">钙钛矿 界面工程 湿热稳定性 提升策略</span>
+            <span class="chip">评测 / 局限 / 最新进展 …</span>
+            <span class="chip chip-more">+8</span>
+          </div>
+          <div class="wiring-foot">agnes-2.5-flash · 6.5s · 471 tok · ok</div>
+        </article>
+        <article class="wiring-card">
+          <span class="mono">S2–S3 / PROPOSER</span>
+          <h3>候选自带可否证声明</h3>
+          <p>账本记录 <code>model_proposed_candidates: 3 accepted</code>：每条候选附假设、可否证条件与 span 引用；评审层给出 1 advance / 2 revise，novelty 标记 unverified，G1 交回人工。</p>
+          <div class="wiring-quote">IDEA-03：「当前所有关于界面钝化对湿热稳定性影响的因果推断均超出了 Fixture 数据的有效范围……」——模型自己指出了数据边界，而不是编一个材料学结论。</div>
+          <div class="wiring-foot">candidates_need_human · G1 required</div>
+        </article>
+        <article class="wiring-card">
+          <span class="mono">GATES / FALLBACK</span>
+          <h3>门禁没有让步</h3>
+          <p>Q0 / G1 / G2 全部 needs_human；paper 与 experiment 回退 host-agent——S4 设计挂起 host-model 轮次等待人工作答，而不是自动编一份设计；judge 使用确定性模板。</p>
+          <div class="wiring-quote">awaiting-host-model.json：「a host answer is capability output, not evidence: gates, audits and signature rules are unchanged」</div>
+          <div class="wiring-foot">调用审计只记 provider / model / usage / latency，不记 prompt</div>
+        </article>
+      </div>
+      <p class="wiring-note">边界：fixture 来源仅用于流程验证、不可引用（运行时原样给出该警告）；API 密钥只存在于本地 runtime 内存，不落盘、不进浏览器、不进本仓库；本节是实测记录的静态快照，不构成能力增益声明。</p>
+    </section>
+
     <section class="proof" id="proof">
       <div class="proof-head">
         <p class="eyebrow">WHY THIS IS DIFFERENT / 可检验的工程差异</p>

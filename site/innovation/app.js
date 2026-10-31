@@ -14,7 +14,7 @@ const ACTS = [
     key: "spec", name: "契约", sub: "SPEC / MODULE", title: "先写契约，再写代码。",
     noteTitle: "最小的可演进单元",
     noteBody: "每个子智能体都有 SPEC.md。改行为先改契约，再用 CLI 做最小更新；正文与未涉及字段保持不动。",
-    noteFact: "6", noteFactLabel: "SPEC · 35 TESTS", tags: ["SPEC", "minimal diff", "changelog"]
+    noteFact: "26", noteFactLabel: "SPEC · 107 TESTS", tags: ["SPEC", "minimal diff", "changelog"]
   },
   {
     key: "evidence", name: "证据", sub: "SPAN / COVERAGE", title: "证据不是聊天记录。",
@@ -37,8 +37,8 @@ const ACTS = [
   {
     key: "boundary", name: "边界", sub: "CLAIM / NEXT", title: "不宣称“通用 AI 科学家”。",
     noteTitle: "把不能说的说清楚",
-    noteBody: "当前是 fixture、无 API、无真实 run/EA 的纵切。我们展示的是工程差异与可检验假设，不是论文效果。",
-    noteFact: "0", noteFactLabel: "API CALLS", tags: ["fixture", "H1–H4", "next: OpenAlex / EA"]
+    noteBody: "五幕演示本体是 fixture、零 API。模型接线已在本地 runtime 实测：S1 规划器与 S2–S3 提案器经网关真实调用而门禁不减，见下方 LIVE WIRING 一节。",
+    noteFact: "0", noteFactLabel: "API CALLS", tags: ["fixture acts", "live wiring ✓", "H1–H4"]
   }
 ];
 const CHECK_LABELS = {

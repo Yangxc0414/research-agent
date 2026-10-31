@@ -355,3 +355,19 @@ body.is-present .present-inline { background: var(--ink); color: #fff; border-co
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+
+/* live wiring（真实模型接线实测） */
+.wiring { padding: 76px 30px 46px; background: var(--bg); border-top: 1px solid var(--line); }
+.wiring-grid { width: min(1240px,100%); margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+.wiring-card { border: 1px solid var(--line); border-radius: 11px; padding: 14px; background: #fff; display: grid; gap: 7px; align-content: start; }
+.wiring-card .mono { color: var(--indigo); font-size: 7.5px; }
+.wiring-card h3 { margin: 2px 0 2px; font-family: var(--serif); font-size: 18px; font-weight: 600; }
+.wiring-card p { margin: 0; color: var(--muted); font-size: 9.5px; line-height: 1.65; }
+.wiring-card code { font-family: var(--mono); font-size: 8.5px; color: var(--ink); background: #f2f5fb; border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip-row .chip { border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 8px; background: #fbfcff; color: var(--muted); font-family: var(--mono); font-size: 7.5px; }
+.chip-row .chip-more { border-style: dashed; color: var(--faint); }
+.wiring-quote { border-left: 2px solid var(--indigo); background: #fbfcff; border-radius: 0 8px 8px 0; padding: 8px 10px; color: var(--muted); font-size: 9px; line-height: 1.6; }
+.wiring-foot { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--line); color: var(--faint); font-family: var(--mono); font-size: 7.5px; }
+.wiring-note { width: min(1240px,100%); margin: 14px auto 0; color: var(--faint); font-size: 9px; line-height: 1.6; }
+@media (max-width: 980px) { .wiring-grid { grid-template-columns: 1fr; } }
