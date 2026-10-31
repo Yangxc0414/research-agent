@@ -8,10 +8,12 @@ type Block =
   | { kind: "ul"; items: string[] }
   | { kind: "ol"; items: string[] }
   | { kind: "quote"; text: string }
-  | { kind: "code"; lang: string; code: string };
+  | { kind: "code"; lang: string; code: string }
+  | { kind: "table"; header: string[]; rows: string[][] }
+  | { kind: "hr" };
 
 function inline(text: string): ReactNode[] {
-  const pattern = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+  const pattern = /(\*\*[^*]+\*\*|\*[^*`\n]+\*|`[^`]+`|\[[^\]]+\]\([^)\s]+\))/g;
   const nodes: ReactNode[] = [];
   let cursor = 0;
   for (const match of text.matchAll(pattern)) {
@@ -19,13 +21,35 @@ function inline(text: string): ReactNode[] {
     const token = match[0];
     if (token.startsWith("**")) {
       nodes.push(<strong key={`${match.index}-b`}>{token.slice(2, -2)}</strong>);
-    } else {
+    } else if (token.startsWith("`")) {
       nodes.push(<code key={`${match.index}-c`}>{token.slice(1, -1)}</code>);
+    } else if (token.startsWith("[")) {
+      const link = token.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+      if (link) {
+        nodes.push(
+          <a key={`${match.index}-a`} href={link[2]} target="_blank" rel="noopener noreferrer">
+            {link[1]}
+          </a>
+        );
+      } else {
+        nodes.push(token);
+      }
+    } else {
+      nodes.push(<em key={`${match.index}-i`}>{token.slice(1, -1)}</em>);
     }
     cursor = match.index + token.length;
   }
   if (cursor < text.length) nodes.push(text.slice(cursor));
   return nodes;
+}
+
+function splitCells(line: string): string[] {
+  const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  return trimmed.split("|").map((cell) => cell.trim());
+}
+
+function isTableDivider(line: string): boolean {
+  return /^\|?[\s:|-]+\|?$/.test(line.trim()) && line.includes("-");
 }
 
 function parse(text: string): Block[] {
@@ -38,6 +62,8 @@ function parse(text: string): Block[] {
     /^[-*]\s+/.test(line) ||
     /^\d+\.\s+/.test(line) ||
     /^>\s?/.test(line) ||
+    /^---+\s*$/.test(line) ||
+    /^\s*\|.*\|/.test(line) ||
     !line.trim();
 
   while (index < lines.length) {
@@ -63,6 +89,25 @@ function parse(text: string): Block[] {
     const heading = line.match(/^(#{1,3})\s+(.+)$/);
     if (heading) {
       blocks.push({ kind: "heading", level: heading[1].length, text: heading[2] });
+      index += 1;
+      continue;
+    }
+
+    if (/^\s*\|.*\|/.test(line)) {
+      const rows: string[] = [];
+      while (index < lines.length && /^\s*\|.*\|/.test(lines[index])) {
+        rows.push(lines[index]);
+        index += 1;
+      }
+      const body = rows.filter((row) => !isTableDivider(row));
+      if (body.length) {
+        blocks.push({ kind: "table", header: splitCells(body[0]), rows: body.slice(1).map(splitCells) });
+      }
+      continue;
+    }
+
+    if (/^---+\s*$/.test(line)) {
+      blocks.push({ kind: "hr" });
       index += 1;
       continue;
     }
@@ -163,6 +208,33 @@ export function RichText({ text }: { text: string }) {
         }
         if (block.kind === "code") {
           return <CodeBlock key={index} code={block.code} lang={block.lang} />;
+        }
+        if (block.kind === "table") {
+          return (
+            <div className="rich-table" key={index}>
+              <table>
+                <thead>
+                  <tr>
+                    {block.header.map((cell, cellIndex) => (
+                      <th key={cellIndex}>{inline(cell)}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {block.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex}>{inline(cell)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+        if (block.kind === "hr") {
+          return <hr key={index} />;
         }
         return <p key={index}>{inline(block.text)}</p>;
       })}

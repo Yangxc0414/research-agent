@@ -328,7 +328,7 @@ function seedPerovskite(): ResearchTask {
       )),
       user("先调研界面钝化与长期稳定性的证据，重点看湿热稳定性。"),
       agent(
-        "**检索完成** · 4 sources\n\n- 3 条全文，1 条摘要-only\n- 12 个可定位 span\n- 2 个 coverage gap\n\n> 摘要-only 只作线索，不进入 claim。",
+        "**检索完成** · 4 sources\n\n| # | 来源 | 全文 | span |\n| --- | --- | --- | --- |\n| 01 | Huang et al. · 2024 · Joule | 是 | 6 |\n| 02 | Wang et al. · 2023 · ACS Energy Lett. | 是 | 4 |\n| 03 | Chen et al. · 2025 · Adv. Mater. | 是 | 2 |\n| 04 | Liu et al. · 2022 · Sol. RRL | 摘要-only | 0 |\n\n- 12 个可定位 span · 2 个 coverage gap\n- 覆盖饱和度 partial；缺口集中在湿热循环后的配对对照\n\n> 摘要-only 只作线索，不进入 claim。",
         sourcesCard()
       ),
       agent(

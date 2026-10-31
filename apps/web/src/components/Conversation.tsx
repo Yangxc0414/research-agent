@@ -116,6 +116,36 @@ function MessageView({ item }: { item: Message }) {
   );
 }
 
+function StreamingMessage({ text }: { text: string }) {
+  return (
+    <div className="message is-streaming">
+      <div className="avatar" aria-hidden="true">
+        <Icon name="logo" size={14} />
+      </div>
+      <div className="message-body">
+        <div className="message-head">
+          <b>Research Agent</b>
+          <span>{text ? "正在输出…" : "正在思考…"}</span>
+        </div>
+        <div className="bubble is-agent-bubble">
+          {text ? (
+            <>
+              <RichText text={text} />
+              <span className="stream-caret" aria-hidden="true" />
+            </>
+          ) : (
+            <span className="typing-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RunIndicator() {
   const task = useWorkspaceStore(selectCurrentTask);
   if (!task?.auto.running) return null;
@@ -144,9 +174,11 @@ export function Conversation() {
   const task = useWorkspaceStore(selectCurrentTask);
   const autoScroll = useWorkspaceStore((state) => state.preferences.autoScroll);
   const reduceMotion = useWorkspaceStore((state) => state.preferences.reduceMotion);
+  const streaming = useWorkspaceStore((state) => state.streaming);
   const threadRef = useRef<HTMLDivElement>(null);
   const messageCount = task?.messages.length ?? 0;
   const autoIndex = task?.auto.index ?? 0;
+  const streamingText = streaming && task && streaming.taskId === task.id ? streaming.text : null;
 
   useEffect(() => {
     if (!autoScroll || !threadRef.current) return;
@@ -154,7 +186,7 @@ export function Conversation() {
       top: threadRef.current.scrollHeight,
       behavior: reduceMotion ? "auto" : "smooth"
     });
-  }, [messageCount, autoIndex, autoScroll, reduceMotion]);
+  }, [messageCount, autoIndex, autoScroll, reduceMotion, streamingText === null, streamingText?.length ?? 0]);
 
   return (
     <main className="conversation">
@@ -164,6 +196,7 @@ export function Conversation() {
           {task?.messages.map((item) => (
             <MessageView key={item.id} item={item} />
           ))}
+          {streamingText !== null && <StreamingMessage text={streamingText} />}
           <RunIndicator />
         </div>
       </div>

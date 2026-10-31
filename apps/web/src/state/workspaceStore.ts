@@ -80,6 +80,13 @@ export interface ToastState {
   text: string;
 }
 
+export interface StreamingState {
+  taskId: string;
+  full: string;
+  text: string;
+  card?: Card;
+}
+
 type OverlayKey = "newTaskOpen" | "modelOpen" | "pluginsOpen" | "skillsOpen" | "paletteOpen";
 type NewTaskInput = { name: string; goal: string; domain: string; mode: Mode; workspaceId: string; access?: AccessMode; profileId?: string };
 type AddWorkspaceInput = { name: string; note: string; folder: WorkspaceFolder };
@@ -160,11 +167,13 @@ interface WorkspaceActions {
   resetWorkspace: () => void;
   notify: (text: string) => void;
   dismissToast: () => void;
+  agentReply: (taskId: string, text: string, card?: Card) => void;
 }
 
 export interface WorkspaceStore extends PersistedWorkspace {
   ui: UIState;
   toast: ToastState | null;
+  streaming: StreamingState | null;
   actions: WorkspaceActions;
 }
 
@@ -708,7 +717,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
     };
     gates = gate(gates, "S5", "pass", "RUN-014 完成；EA 已封存 (SIM)");
     messages.push(
-      message("agent", "**RUN-014 完成**\n\n- 3 seeds · EA 已封存\n- 数值只来自本地 fixture\n\n> 它与真实材料实验不是同一证据臂。", runCard())
+      message("agent", "**RUN-014 完成**\n\n| seed | T80 (h) |\n| --- | --- |\n| 1 | 404 |\n| 2 | 415 |\n| 3 | 417 |\n| **mean** | **412** |\n\n- 3 seeds · EA-7c41 已封存；基线 286 h 来自复现\n- 数值只来自本地 fixture，不冒充真实材料实验\n\n> 它与真实材料实验不是同一证据臂。", runCard())
     );
   } else if (index === 5) {
     messages.push(message("system", "S6 · SVG 与 manifest 已绑定到 EA-7c41；图不能脱离 EA 单独引用。"));
@@ -875,6 +884,53 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     set({ toast: { id: uid("toast"), text } });
   };
 
+  // 流式回复：思考停顿 → 逐段显现 → 落盘为正式消息；reduceMotion 直出。
+  let streamTimer: number | null = null;
+  let streamSeq = 0;
+  const clearStreamTimer = (): void => {
+    if (streamTimer !== null) {
+      window.clearTimeout(streamTimer);
+      streamTimer = null;
+    }
+  };
+  const finalizeStream = (): void => {
+    clearStreamTimer();
+    const active = get().streaming;
+    if (!active) return;
+    set({ streaming: null });
+    mutateTask(active.taskId, (item) => ({
+      ...item,
+      messages: [...item.messages, message("agent", active.full, active.card)]
+    }));
+  };
+  const agentReply = (taskId: string, text: string, card?: Card): void => {
+    if (get().streaming) finalizeStream();
+    if (!text || get().preferences.reduceMotion) {
+      mutateTask(taskId, (item) => ({
+        ...item,
+        messages: [...item.messages, message("agent", text, card)]
+      }));
+      return;
+    }
+    const seq = ++streamSeq;
+    set({ streaming: { taskId, full: text, text: "", ...(card ? { card } : {}) } });
+    const perTick = Math.max(2, Math.ceil(text.length / 85));
+    let shown = 0;
+    const step = (): void => {
+      if (seq !== streamSeq) return;
+      shown = Math.min(text.length, shown + perTick);
+      set((state) => (state.streaming ? { streaming: { ...state.streaming, text: text.slice(0, shown) } } : {}));
+      if (shown < text.length) {
+        streamTimer = window.setTimeout(step, 24);
+      } else {
+        streamTimer = window.setTimeout(() => {
+          if (seq === streamSeq) finalizeStream();
+        }, 280);
+      }
+    };
+    streamTimer = window.setTimeout(step, 430 + Math.min(700, text.length * 2));
+  };
+
   const openOverlay = (key: OverlayKey): void => {
     set((state) => ({
       ui: {
@@ -978,6 +1034,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     },
     ui: defaultUI,
     toast: null,
+    streaming: null,
     actions: {
       selectTask: (id) => {
         const task = get().tasks.find((item) => item.id === id);
@@ -1719,24 +1776,29 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           get().actions.runResearch();
         } else if (/证据|claim|EA|门禁/i.test(text)) {
           get().actions.setContextTab("evidence");
-          appendToCurrent((item) => ({
-            ...item,
-            messages: [
-              ...item.messages,
-              message("agent", "右侧已切到证据链。当前可宣称的边界以 span 与 gate 为准；静态预览不会自动写 claim。")
-            ]
-          }));
+          get().actions.agentReply(
+            latest.id,
+            "右侧已切到证据链。当前可宣称的边界以 span 与 gate 为准：\n\n- **GAP-001** 湿热循环后的配对定量对照缺失（open）\n- **CAND-H1 / H2** 两个候选假设，等待 G1 人工收敛\n- 没有 span 支撑的说法不会进入 claim\n\n> 静态预览不会自动写 claim；签署只能由作者完成。"
+          );
         } else {
-          appendToCurrent((item) => ({
-            ...item,
-            messages: [
-              ...item.messages,
-              message(
-                "agent",
-                "已收到。当前是静态适配器，不会调用模型或外部 API。你可以点上方建议推进流程，或用 /start 运行受治理全自动、/plugins 查看工具审批。"
-              )
-            ]
-          }));
+          const clean = text.replace(/\s+/g, " ").trim();
+          const short = clean.length > 42 ? `${clean.slice(0, 42)}…` : clean;
+          const core = clean
+            .replace(/[？?！!。.]+$/, "")
+            .replace(/(是什么|怎么样|有哪些|为什么|如何|怎么办|吗)$/g, "");
+          let q1 = core.slice(0, 12);
+          if (core.length > 12) q1 = q1.replace(/ ?[A-Za-z]+$/, "");
+          q1 = q1.trim() || "研究问题";
+          get().actions.agentReply(
+            latest.id,
+            `已收到：**${short}**\n\n按证据边界把它拆成三步：\n\n1. **对象与范围** — 明确研究对象、时间窗与纳入标准；先宽后深，避免一开始就收窄到结论\n2. **检索式** — \`${q1}\` 与 \`${q1} review\`，中英各一组；综述/方法/评测三个入口都扫一遍\n3. **证据出口** — 全文登记为可定位 span，摘要-only 只作线索；先看覆盖，再谈 gap\n\n> 静态预览不调用模型，这是确定性路由的示例回答；接入本地 runtime 后会替换为真实检索与模型回复。`,
+            planCard(
+              [q1, `${q1} review`, "英文对应检索式"],
+              "近五年 · 中英双语 · 公开摘要/全文",
+              "4 sources · span-only",
+              "摘要-only 只作线索；没有全文不生成 span。"
+            )
+          );
         }
       },
       runResearch: () => {
@@ -1919,7 +1981,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           budget: { ...item.budget, used: Math.min(item.budget.total, item.budget.used + 6) },
           messages: [
             ...item.messages,
-            message("agent", "**RUN-014 完成**\n\n- 3 seeds · EA 已封存\n- 数值来自本地 fixture\n\n> 不冒充真实材料实验。", runCard()),
+            message("agent", "**RUN-014 完成**\n\n| seed | T80 (h) |\n| --- | --- |\n| 1 | 404 |\n| 2 | 415 |\n| 3 | 417 |\n| **mean** | **412** |\n\n- 3 seeds · EA-7c41 已封存；基线 286 h 来自复现\n- 数值来自本地 fixture，不冒充真实材料实验", runCard()),
             message("agent", "现在停在 claim 人工门。\n\n- 未签 claim 之前，写作与导出保持 pending\n- 系统不会自动生成结论", claimGateCard("needs_human"))
           ]
         }, "evidence-audit", "EA 已封存，按需检查 span→claim→EA 边界。"));
@@ -2629,7 +2691,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         });
       },
       notify,
-      dismissToast: () => set({ toast: null })
+      dismissToast: () => set({ toast: null }),
+      agentReply: (taskId, text, card) => agentReply(taskId, text, card)
     }
   };
 });
