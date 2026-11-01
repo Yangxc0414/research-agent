@@ -3,12 +3,12 @@ const MOTION_OFF = /[?&]motion=off\b/.test(location.search);
 const REDUCED = MOTION_OFF || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.documentElement.classList.add(REDUCED ? "still" : "motion");
 const MODULES = {
-  literature: { label: "文献调研", kind: "literature" },
-  idea: { label: "假设收敛", kind: "idea" },
-  experiment: { label: "实验设计", kind: "experiment" },
-  figure: { label: "科研绘图", kind: "figure" },
-  paper: { label: "论文契约", kind: "paper" },
-  grant: { label: "基金申报", kind: "grant" }
+  literature: { label: "文献调研", kind: "literature", out: "QueryPlan · SourceHit · Span · Gap" },
+  idea: { label: "假设收敛", kind: "idea", out: "IdeaCard · 可否证声明" },
+  experiment: { label: "实验设计", kind: "experiment", out: "ExperimentDesign · 设计审计" },
+  figure: { label: "科研绘图", kind: "figure", out: "FigureArtifact · 双哈希" },
+  paper: { label: "论文契约", kind: "paper", out: "PaperContract · 结果槽" },
+  grant: { label: "基金申报", kind: "grant", out: "GrantPlan · 合规检查" }
 };
 const ORDER = ["literature", "idea", "experiment", "figure", "paper", "grant"];
 const ACTS = [
@@ -92,7 +92,7 @@ function noteFor(index) {
 function specAct() {
   const ids = available();
   return `<div class="act-head"><p class="eyebrow">ACT 04 / SPEC · 唯一事实源</p><h2>${esc(ACTS[3].title)}</h2><p>六模块同构：输入、输出、门禁、不变量、实现边界都写在 Markdown 里；代码读取版本，CLI 只改指定字段。</p></div>
-    <div class="spec-grid">${ids.map((id) => `<article class="spec-card" data-kind="${moduleMeta(id).kind}"><b>${esc(moduleMeta(id).label)}</b><small>${esc(specOf(id)?.stage || "")} · v${esc(specOf(id)?.version || state.data.spec_versions?.[id] || "—")}</small><em>${esc(statusOf(id))}</em></article>`).join("")}</div>
+    <div class="spec-grid">${ids.map((id) => `<article class="spec-card" data-kind="${moduleMeta(id).kind}"><b>${esc(moduleMeta(id).label)}</b><small>${esc(specOf(id)?.stage || "")} · v${esc(specOf(id)?.version || state.data.spec_versions?.[id] || "—")}</small><em>${esc(statusOf(id))}</em><code>→ ${esc(moduleMeta(id).out)}</code></article>`).join("")}</div>
     <div class="spec-console"><span class="prompt">$</span> python -m research_agent spec update figure \\
   --version 0.1.1 --status pilot \\
   --changelog "最小改进：增加 SVG 审计"
@@ -158,16 +158,16 @@ function boundaryAct() {
   return `<div class="act-head"><p class="eyebrow">ACT 06 / BOUNDARY</p><h2>${esc(ACTS[4].title)}</h2><p>这一页不把 fixture 说成实验，也不把“架构更清楚”说成“科研效果更好”。能证明的和不能证明的分开写。</p></div>
     <div class="boundary-grid">
       <div class="boundary-card"><b>不是通用 AI 科学家</b><p>机器负责检索、草稿、图、核验；科学决策、实验安全、署名与责任在人。</p></div>
-      <div class="boundary-card"><b>不是效果论文</b><p>当前没有真实检索、run/EA、用户研究；不引用任何外部效果数字。</p></div>
+      <div class="boundary-card"><b>拦截生效 ≠ 效果更好</b><p>真实接线与 4 种子 run 已经发生（见运行幕与 LIVE WIRING）；但“门禁会拦”不等于“科研做得更好”——那需要对照实验与用户研究，本页没有这类数字。</p></div>
       <div class="boundary-card"><b>可检验的工程差异</b><p>28 份 SPEC、119 个测试文件、32 个数据契约、SVG audit、结果槽阻断；这些都能在代码里找到。</p></div>
-      <div class="boundary-card"><b>下一轮</b><p>OpenAlex adapter → EA/Run 账本 → 真实模板 → 5–8 人可用性测试。</p></div>
+      <div class="boundary-card"><b>下一轮</b><p>差一次人签：作者签署 claim → closure → export；随后是开放检索 adapter、跨数据集复现计数（study replicate）与小样本可用性测试。</p></div>
     </div>
     <div class="advantage-list">
       <div class="advantage-row"><b>SPEC</b><span>模块先有契约，改一个模块不必理解全部代码</span><em>implemented</em></div>
       <div class="advantage-row"><b>ARTIFACT</b><span>模块交换 artifact，不共享聊天上下文</span><em>implemented</em></div>
       <div class="advantage-row"><b>SVG</b><span>scene / svg / manifest / audit 一体</span><em>implemented</em></div>
       <div class="advantage-row"><b>BOUNDARY</b><span>结果槽 pending，G5 导出阻断</span><em>implemented</em></div>
-      <div class="advantage-row"><b>RSI</b><span>StepLedger / policy / lease / MetaTracker；真实 evaluator 未接</span><em>control plane</em></div>
+      <div class="advantage-row"><b>RSI</b><span>StepLedger / lease / MetaTracker；两个 scope 已在真实 evaluator 闭合，增益不宣称</span><em>control plane</em></div>
     </div>`;
 }
 
