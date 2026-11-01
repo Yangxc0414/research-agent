@@ -703,7 +703,7 @@ html.still *, html.still *::before, html.still *::after { animation: none !impor
 .arch-head h2 { margin: 8px 0 0; font-family: var(--serif); font-size: clamp(32px,3.6vw,47px); line-height: 1.15; font-weight: 600; letter-spacing: -.03em; text-wrap: balance; }
 .arch-head p:last-child { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.75; text-wrap: pretty; }
 .arch-board { position: relative; width: min(1240px,100%); margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) 250px; gap: 18px; }
-.arch-main { display: grid; gap: 24px; min-width: 0; }
+.arch-main { display: grid; gap: 24px; min-width: 0; padding-left: 30px; }
 .arch-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .arch-band { display: grid; gap: 8px; background: var(--apanel); border: 1px dashed var(--aline); border-radius: 14px; padding: 12px 14px 14px; }
 .arch-band-label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--mono); font-size: 8px; letter-spacing: .1em; font-weight: 700; color: var(--aink); }
@@ -753,6 +753,9 @@ html.still *, html.still *::before, html.still *::after { animation: none !impor
 .arch-link-dash { stroke-dasharray: 4 4; opacity: .85; }
 .arch-bus { fill: none; stroke: #6b7aa8; stroke-width: 1.8; }
 .arch-rail-line { fill: none; stroke: var(--ao); stroke-width: 1.6; stroke-dasharray: 6 4; }
+.arch-feed { fill: none; stroke-width: 1.6; stroke-dasharray: 5 5; animation: link-march 1.15s linear infinite; }
+.arch-feed.rose { stroke: var(--arose); }
+.arch-feed.amber { stroke: var(--ao); }
 @media (max-width: 1100px) {
   .arch-board { grid-template-columns: 1fr; }
   .arch-svg { display: none; }

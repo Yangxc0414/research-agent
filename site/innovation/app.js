@@ -339,8 +339,18 @@ function drawArch() {
     railBoxes.forEach((b) => {
       body += `<path class="arch-link arch-link-dash" d="M ${skillsRight + 4} ${Math.round(b.cy)} H ${rx - 3}"/>`;
     });
+    // ④ 租约消费：RSI 租约管到整条流程的预算参数（S5 种子 / 检索预算）
+    const panelB = rel(board.querySelector('[data-band="skills"]'));
+    body += `<path class="arch-feed amber" d="M ${Math.round(railBoxes[0].l) - 3} ${Math.round(railBoxes[0].cy)} H ${Math.round(panelB.r) + 4}" marker-end="url(#arch-arrow-amber)"><title>④ 租约门控：S5 种子/检索预算只能由有效租约给出，每次消费复查，撤销即失效</title></path>`;
   }
-  svg.innerHTML = `<defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs>` + body;
+  // ③ lineage 失效回环 + next_actions：S13-S16 底部 → 左侧回程 → S0 左侧
+  if (skills.length > 1) {
+    const s0f = skills[0], sLast = skills[skills.length - 1];
+    const laneX = Math.round(s0f.l) - 12;
+    const rowB = Math.round(Math.max(s0f.b, sLast.b));
+    body += `<path class="arch-feed rose" d="M ${Math.round(sLast.cx) - 18} ${rowB + 2} V ${rowB + 12} H ${laneX} V ${Math.round(s0f.cy)} H ${Math.round(s0f.l) - 3}" marker-end="url(#arch-arrow-rose)"><title>③ lineage 失效回环：变更 → stale → 重签；同一回程承载 next_actions（任意站 → S0 下一轮）</title></path>`;
+  }
+  svg.innerHTML = `<defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker><marker id="arch-arrow-rose" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#C76E79"/></marker><marker id="arch-arrow-amber" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#C3A253"/></marker></defs>` + body;
 }
 
 function scheduleFlows() {
