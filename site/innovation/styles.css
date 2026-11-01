@@ -627,3 +627,27 @@ html.still *, html.still *::before, html.still *::after { animation: none !impor
 .judge-card:hover { transform: translateY(-2px); border-color: var(--line-2); box-shadow: 0 20px 44px -32px rgba(15,23,42,.5); }
 .judge-card .anchor { transition: color .16s ease; }
 .judge-card:hover .anchor { color: var(--indigo); }
+/* ---- ACT 05 运行留痕：智能体阶段重放 ---- */
+.trace-list { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; background: #fff; overflow: hidden; }
+.trace-line { display: grid; grid-template-columns: 46px 74px minmax(0,1fr) 26px; gap: 10px; align-items: start; padding: 8px 12px; border-top: 1px solid #eef1f6; opacity: 1; }
+.trace-line:first-child { border-top: 0; }
+.trace-line:nth-child(odd) { background: #fbfcff; }
+.trace-t { font-family: var(--mono); font-size: 8px; color: var(--faint); padding-top: 2px; }
+.trace-stage { font-family: var(--mono); font-size: 8px; color: var(--indigo); font-weight: 700; letter-spacing: .04em; padding-top: 2px; }
+.trace-main b { display: block; font-size: 10.5px; font-weight: 600; color: var(--ink); line-height: 1.5; }
+.trace-main small { display: block; margin-top: 3px; font-size: 9px; color: var(--muted); line-height: 1.55; }
+.trace-mark { font-size: 12px; text-align: center; padding-top: 1px; }
+.trace-line.is-ok .trace-mark { color: var(--teal); }
+.trace-line.is-warn .trace-mark { color: var(--amber); }
+.trace-line.is-block .trace-mark { color: var(--rose); }
+.trace-line.is-hold .trace-mark { color: var(--faint); }
+.trace-line.is-block { background: #fff7f2; }
+.trace-line.is-block .trace-stage { color: var(--rose); }
+.motion .trace-line { opacity: 0; transform: translateX(10px); animation: trace-line-in .42s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--td, 0ms); }
+@keyframes trace-line-in { to { opacity: 1; transform: none; } }
+.trace-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-family: var(--mono); font-size: 8px; color: var(--muted); }
+.trace-legend .is-ok { color: var(--teal); }
+.trace-legend .is-warn { color: var(--amber); }
+.trace-legend .is-block { color: var(--rose); }
+.trace-legend .is-hold { color: var(--faint); }
+@media (max-width: 860px) { .trace-line { grid-template-columns: 40px 60px minmax(0,1fr) 22px; gap: 7px; padding: 7px 9px; } }

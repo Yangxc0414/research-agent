@@ -37,9 +37,15 @@ const ACTS = [
     noteFact: "28", noteFactLabel: "SPEC · 119 TEST FILES", tags: ["SPEC = single source", "拒绝测试", "changelog"]
   },
   {
+    key: "trace", name: "运行", sub: "TRACE · 全程留痕", title: "智能体的每一步，都留痕。",
+    noteTitle: "拦截记录，不是错误堆栈",
+    noteBody: "PIPE-20261031T163234Z 实测快照的阶段重放：智能体每一步做什么、报什么、被拦在哪。它说“做不了”的时候，留下的是可复核的拦截记录，而不是一条错误日志。",
+    noteFact: "2", noteFactLabel: "REAL INTERCEPTS", tags: ["stage replay", "全程留痕", "needs_human 终态"]
+  },
+  {
     key: "boundary", name: "边界", sub: "CLAIM · 说“不”是设计", title: "边界不是免责，是设计。",
     noteTitle: "把“不”写进代码",
-    noteBody: "五幕本体是 fixture；真实接线在 LIVE WIRING：统计门槛与设计审计两次拦下模型草稿，结果槽锁定等待作者签署。说“不”的记录，就是这套系统的创新点记录。",
+    noteBody: "六幕本体是 fixture；真实接线在 LIVE WIRING：统计门槛与设计审计两次拦下模型草稿，结果槽锁定等待作者签署。说“不”的记录，就是这套系统的创新点记录。",
     noteFact: "0", noteFactLabel: "SIGN ENDPOINTS IN MCP", tags: ["fixture acts", "两次真实拦截", "四个判定"]
   }
 ];
@@ -149,7 +155,7 @@ function paperAct() {
 }
 
 function boundaryAct() {
-  return `<div class="act-head"><p class="eyebrow">ACT 05 / BOUNDARY</p><h2>${esc(ACTS[4].title)}</h2><p>这一页不把 fixture 说成实验，也不把“架构更清楚”说成“科研效果更好”。能证明的和不能证明的分开写。</p></div>
+  return `<div class="act-head"><p class="eyebrow">ACT 06 / BOUNDARY</p><h2>${esc(ACTS[4].title)}</h2><p>这一页不把 fixture 说成实验，也不把“架构更清楚”说成“科研效果更好”。能证明的和不能证明的分开写。</p></div>
     <div class="boundary-grid">
       <div class="boundary-card"><b>不是通用 AI 科学家</b><p>机器负责检索、草稿、图、核验；科学决策、实验安全、署名与责任在人。</p></div>
       <div class="boundary-card"><b>不是效果论文</b><p>当前没有真实检索、run/EA、用户研究；不引用任何外部效果数字。</p></div>
@@ -165,7 +171,31 @@ function boundaryAct() {
     </div>`;
 }
 
-const RENDERERS = [evidenceAct, paperAct, figureAct, specAct, boundaryAct];
+/* ---- ACT 05 数据：实测快照的阶段重放（时间轴为相对时刻） ---- */
+const TRACE = [
+  { t: "00:00", stage: "plan", text: "生成检索计划：13 条中英双语查询，覆盖综述 / 方法 / 评测 / 局限 / 最新进展", status: "ok", sub: "S1 planner · agnes-2.5-flash · 6.5s · 471 tok · 审计只记元数据" },
+  { t: "00:07", stage: "retrieve", text: "CC-BY 冻结语料 probe → 3 个来源命中，2 篇全文送达", status: "ok" },
+  { t: "00:09", stage: "span", text: "全文句级定位 → 5 个 spans；摘要-only 来源不产 span", status: "ok", sub: "上报 3 条覆盖缺口——缺口是产出，不是失误" },
+  { t: "00:12", stage: "synthesis", text: "主题 × 来源矩阵：一致 4 · 张力 1 · 未使用 1", status: "ok" },
+  { t: "00:15", stage: "idea", text: "3 条候选，各带假设与可否证条件 → G1 交回人工", status: "warn", sub: "「……因果推断均超出了 Fixture 数据的有效范围」——模型自己指出数据边界（IDEA-03）" },
+  { t: "00:31", stage: "design", text: "S4 草案提交 design-audit → BLOCKER", status: "block", sub: "缺 stopping budget 字段：退回补齐，而不是替模型猜一个" },
+  { t: "00:44", stage: "design", text: "补齐预算后重审 → ready_for_g2", status: "ok" },
+  { t: "00:52", stage: "gate", text: "G2：人工确认设计、数据与统计口径", status: "hold" },
+  { t: "01:03", stage: "study", text: "模型起草沿用 3 seeds → 统计门槛拒绝", status: "block", sub: "配对种子 <4 不写任何文件；改为 4 配对种子重新执行" },
+  { t: "01:10", stage: "study", text: "iris · 4 配对种子真实执行", status: "ok", sub: "CI95 [-0.41, 0.51] 跨零 → 如实判「不可判定」；power note：同效应 80% 功效需 263 种子" },
+  { t: "01:38", stage: "figure", text: "示意图 scene → SVG · 审计 9 项全过", status: "ok", sub: "scene / svg 双 SHA-256 写进 manifest；结果图与示意图分离" },
+  { t: "01:52", stage: "paper", text: "方法与结构章节起草 · 结果槽 5 × pending", status: "hold", sub: "模型可以写骨架；结果句没有 EA 资格" },
+  { t: "02:07", stage: "terminal", text: "needs_human：结果锁定，等待作者签署 claim", status: "hold", sub: "门禁没有让步——export 在 closure + 签名之前始终 blocked" }
+];
+const TRACE_MARK = { ok: "✓", warn: "⚠", block: "⛔", hold: "⏸" };
+
+function traceAct() {
+  return `<div class="act-head"><p class="eyebrow">ACT 05 / RUN TRACE · 全程留痕</p><h2>${esc(ACTS[4].title)}</h2><p>把 PIPE-20261031T163234Z 实测快照按阶段重放：智能体每一步做什么、报什么、被拦在哪。时间为相对时刻；拦截与等待都是产出。</p></div>
+    <div class="trace-list">${TRACE.map((line, i) => `<div class="trace-line is-${line.status}" style="--td:${Math.min(i * 110, 1400)}ms"><span class="trace-t">${esc(line.t)}</span><span class="trace-stage">${esc(line.stage)}</span><span class="trace-main"><b>${esc(line.text)}</b>${line.sub ? `<small>${esc(line.sub)}</small>` : ""}</span><span class="trace-mark" aria-hidden="true">${TRACE_MARK[line.status]}</span></div>`).join("")}</div>
+    <div class="trace-legend"><span class="is-ok">✓ 完成</span><span class="is-warn">⚠ 需人复核</span><span class="is-block">⛔ 拦截</span><span class="is-hold">⏸ 等待 / 暂停</span></div>`;
+}
+
+const RENDERERS = [evidenceAct, paperAct, figureAct, specAct, traceAct, boundaryAct];
 
 function animateCounts(root) {
   root.querySelectorAll("[data-count]").forEach((el) => {
@@ -240,7 +270,7 @@ window.addEventListener("load", scheduleFlows);
 function renderAct(index, animate = true) {
   state.act = Math.max(0, Math.min(ACTS.length - 1, index));
   const act = ACTS[state.act];
-  $("stage-act-label").textContent = `0${state.act + 1} / 05`;
+  $("stage-act-label").textContent = `0${state.act + 1} / ${String(ACTS.length).padStart(2, "0")}`;
   $("stage-title").textContent = act.title;
   const canvas = $("act-canvas");
   if (!state.data) {

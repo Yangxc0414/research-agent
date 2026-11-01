@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Research Agent · 创新点演示</title>
-<meta name="description" content="Research Agent 创新点演示：四个判定（资格 / 完成 / 失效 / 供给）、28 模块 SPEC、人签导出硬门、lineage 失效传播；静态五幕 + 接线实测。" />
+<meta name="description" content="Research Agent 创新点演示：四个判定（资格 / 完成 / 失效 / 供给）、28 模块 SPEC、人签导出硬门、lineage 失效传播；静态六幕 + 接线实测。" />
 <meta name="theme-color" content="#0b1220" />
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
 <meta property="og:description" content="证据闭合科研运行时：别人优化生成得多快，我们优化变更之后哪一句还成立。28 SPEC · 119 测试 · 0 签核端点。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=20261104" />
+<link rel="stylesheet" href="styles.css?v=20261105" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -25,7 +25,7 @@
       <span class="pill">STATIC</span><span class="pill">NO API</span><span class="pill amber">SIM</span>
     </div>
     <nav class="nav-menu" aria-label="页面分节">
-      <a href="#demo" data-section="demo">五幕推演</a>
+      <a href="#demo" data-section="demo">六幕推演</a>
       <a href="#judgments" data-section="judgments">四个判定</a>
       <a href="#wiring" data-section="wiring">接线实测</a>
       <a href="#proof" data-section="proof">技术证据</a>
@@ -41,7 +41,7 @@
     <section class="hero" id="top">
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME · 五幕推演 + 真实接线实测</p>
+          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME · 六幕推演 + 真实接线实测</p>
           <h1>不是把论文写长，<br/><span>而是让每个结论，都有出处可查。</span></h1>
           <p class="lede">生成能力到处都有，<b>判定能力没有</b>。这套运行时对每句结论回答四个问题：这句话有资格写吗（span-only）、这次运行能签吗（closure 11 项检查 + 作者签署）、输入变了谁失效（lineage stale 传播）、模型草稿能信到哪一步（host 只供草稿不给资格）。28 个模块共用同一套 <b>SPEC / artifact / gate</b>。</p>
           <div class="hero-actions">
@@ -97,7 +97,7 @@
           <p class="eyebrow">THE FOUR JUDGMENTS / 运行时说“不”的四种方式</p>
           <h2>科研智能体缺的不是生成，是判定。</h2>
         </div>
-        <p>生成能力到处都有，判定能力没有。全部设计文档把差异收敛为三个判定加一个供给口径——下面每张卡都能在代码里找到对应物，五幕推演就是它们逐个发生的样子。</p>
+        <p>生成能力到处都有，判定能力没有。全部设计文档把差异收敛为三个判定加一个供给口径——下面每张卡都能在代码里找到对应物，系统地图与六幕推演就是它们逐个发生的样子。</p>
       </div>
       <div class="judgments-grid">
         <article class="judge-card reveal" style="--rd:60ms"><span class="mono">J1 / SPAN-ONLY · 资格判定</span><p class="q">这句话，有资格写吗？</p><p>摘要只是线索；全文定位到句才成为 span，[REF-xx] 逐句绑定写作包——没有证据的句子进不了稿件。</p><div class="anchor">contracts.py · SourceHit → Span → CoverageReceipt</div></article>
@@ -127,7 +127,7 @@
       <div class="section-intro reveal">
         <div>
           <p class="eyebrow">THE 90-SECOND WALKTHROUGH</p>
-          <h2>把“创新点”变成五个可看见的状态。</h2>
+          <h2>把“创新点”变成六个可看见的状态。</h2>
         </div>
         <p>不是流程图。每一幕都对应仓库里真实存在的 SPEC、artifact 或 audit；数字来自 fixture，不冒充实验结果。</p>
       </div>
@@ -135,7 +135,7 @@
       <div class="stage-frame reveal" id="stage">
         <div class="stage-top">
           <div class="stage-heading">
-            <span class="eyebrow">INNOVATION STAGE / <span id="stage-act-label">01 / 05</span></span>
+            <span class="eyebrow">INNOVATION STAGE / <span id="stage-act-label">01 / 06</span></span>
             <b id="stage-title">先写契约，再写代码。</b>
           </div>
           <div class="stage-controls" aria-label="演示控制">
@@ -163,7 +163,7 @@
       <div class="proof-head reveal">
         <p class="eyebrow">LIVE MODEL WIRING / 本地 runtime 实测 · 2026-10-31</p>
         <h2>模型接进模块链路，<br/>但门禁没有让步。</h2>
-        <p>OpenAI 兼容端点 agnes-2.5-flash 经模型网关绑定到 literature 与 idea 模块；以下是在本地 127.0.0.1:8787 上的真实调用记录。五幕演示本体仍然零 API，本节是那次实测的静态快照。</p>
+        <p>OpenAI 兼容端点 agnes-2.5-flash 经模型网关绑定到 literature 与 idea 模块；以下是在本地 127.0.0.1:8787 上的真实调用记录。六幕演示本体仍然零 API，本节是那次实测的静态快照。</p>
       </div>
       <div class="wiring-grid">
         <article class="wiring-card reveal" style="--rd:70ms">
@@ -246,7 +246,7 @@
         <div class="comparison-row"><b>ARIS / AutoResearchClaw</b><span>强在评审与技能演化</span><em>我们的改进要先领租约，禁写证据核心</em></div>
         <div class="comparison-row"><b>AstraDraw</b><span>强在参考图 → scene → SVG/PPTX</span><em>我们加 SVG 审计与结果图 / 示意图强制分离</em></div>
       </div>
-      <p class="proof-note reveal">边界如实写：五幕演示本体是 fixture + 冻结 CC-BY 语料；RSI 控制面已实现、只在两个 scope 闭合，不宣称能力增益；<b>submission_ready 恒为 false</b>。完整事实基线见仓库 README 的“当前事实基线”一节。</p>
+      <p class="proof-note reveal">边界如实写：六幕演示本体是 fixture + 冻结 CC-BY 语料；RSI 控制面已实现、只在两个 scope 闭合，不宣称能力增益；<b>submission_ready 恒为 false</b>。完整事实基线见仓库 README 的“当前事实基线”一节。</p>
     </section>
 
     <section class="cite" id="cite">
@@ -282,6 +282,6 @@
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js?v=20261104"></script>
+<script src="app.js?v=20261105"></script>
 </body>
 </html>
