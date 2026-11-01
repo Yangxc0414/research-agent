@@ -386,3 +386,102 @@ body.is-present .present-inline { background: var(--ink); color: #fff; border-co
 .loop-step.warn em { color: #9a6b1e; }
 .wiring-loop p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.7; }
 .wiring-loop p b { color: var(--ink); }
+
+/* ---- fancy line animations（线条动画系统；prefers-reduced-motion 全局关闭） ---- */
+
+/* 数据脉冲：CSS offset-path 沿模块连线流动（受 prefers-reduced-motion 约束） */
+.board-lines .pulse { fill: var(--indigo); filter: drop-shadow(0 0 3px rgba(79,70,229,.65)); opacity: 0; offset-rotate: 0deg; animation: path-flow 4s linear infinite; }
+.board-lines .pulse.p-cyan { fill: #0891b2; filter: drop-shadow(0 0 3px rgba(8,145,178,.6)); }
+.board-lines .pulse.p1 { offset-path: path('M74 92 C160 92 170 190 245 190'); animation-duration: 3.8s; }
+.board-lines .pulse.p2 { offset-path: path('M74 300 C160 300 170 215 245 215'); animation-duration: 4.6s; animation-delay: 1.2s; }
+.board-lines .pulse.p3 { offset-path: path('M300 190 C370 190 380 118 442 118'); animation-duration: 3.4s; animation-delay: .6s; }
+.board-lines .pulse.p4 { offset-path: path('M300 215 C370 215 380 300 442 300'); animation-duration: 4.2s; animation-delay: 1.8s; }
+.board-lines .pulse.p5 { offset-path: path('M300 202 C380 202 390 360 442 360'); animation-duration: 5.2s; animation-delay: 2.6s; }
+@keyframes path-flow {
+  0% { offset-distance: 0%; opacity: 0; }
+  14% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* 图纸扫描线：绘图仪式的水平细线缓慢下扫 */
+.board::after {
+  content: ""; position: absolute; left: 0; right: 0; top: -2px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(79,70,229,.5) 30%, rgba(8,145,178,.5) 70%, transparent);
+  animation: plotter-sweep 7.5s ease-in-out infinite;
+}
+@keyframes plotter-sweep {
+  0%, 12% { transform: translateY(0); opacity: 0; }
+  18% { opacity: .8; }
+  82% { opacity: .8; }
+  88%, 100% { transform: translateY(441px); opacity: 0; }
+}
+
+/* 渐变副句缓移：让白底上的渐变文字保持呼吸感 */
+.hero h1 span { background-size: 170% 100%; animation: hue-drift 9s ease-in-out infinite alternate; }
+@keyframes hue-drift { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+/* 轨道节点：光点呼吸 */
+.orbit-node i { animation: node-breathe 3.6s ease-in-out infinite; }
+.orbit-node.n2 i { animation-delay: .5s; }
+.orbit-node.n3 i { animation-delay: 1s; }
+.orbit-node.n4 i { animation-delay: 1.5s; }
+.orbit-node.n5 i { animation-delay: 2s; }
+.orbit-node.n6 i { animation-delay: 2.5s; }
+@keyframes node-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(79,70,229,.14); }
+  50% { box-shadow: 0 0 0 4px rgba(79,70,229,.05); }
+}
+
+/* 分节发丝线：proof / wiring 顶部的流动渐变线 */
+.proof, .wiring { position: relative; }
+.proof::before, .wiring::before {
+  content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--indigo) 22%, #0891b2 50%, var(--indigo) 78%, transparent);
+  background-size: 220% 100%; opacity: .4;
+  animation: hairline-flow 9s linear infinite;
+}
+@keyframes hairline-flow { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* wiring 卡片：顶部信号线 + 缓慢扫过的高光 */
+.wiring-card { position: relative; overflow: hidden; }
+.wiring-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(79,70,229,.55), rgba(8,145,178,.45), transparent);
+  background-size: 240% 100%;
+  animation: hairline-flow 7s linear infinite;
+  opacity: .55;
+}
+.wiring-card::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 46px;
+  background: linear-gradient(105deg, transparent, rgba(79,70,229,.05), transparent);
+  animation: card-sheen 8s ease-in-out infinite;
+}
+.wiring-card:nth-child(2)::after { animation-delay: 2.4s; }
+.wiring-card:nth-child(3)::after { animation-delay: 4.8s; }
+@keyframes card-sheen { 0%, 55% { left: -60px; } 85%, 100% { left: 110%; } }
+
+/* 闭环条带：缓慢扫过整条链路的“执行光” */
+.wiring-loop { position: relative; overflow: hidden; }
+.wiring-loop::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 70px; pointer-events: none;
+  background: linear-gradient(105deg, transparent, rgba(79,70,229,.06), transparent);
+  animation: card-sheen 10s ease-in-out infinite;
+}
+
+/* 五幕舞台进度：末端光点 */
+.stage-progress i { position: relative; }
+.stage-progress i::after {
+  content: ""; position: absolute; right: -3px; top: -2px; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--indigo); opacity: 0;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12), 0 0 8px rgba(79,70,229,.5);
+  transition: opacity .2s ease;
+}
+.stage-progress i[style*="width"]::after { opacity: 1; }
+
+/* live-dot 心跳 */
+.live-dot { animation: live-pulse 2.4s ease-in-out infinite; }
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,.12); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,.05); }
+}
