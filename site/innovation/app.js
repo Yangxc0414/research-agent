@@ -1,5 +1,5 @@
 const ACT_MS = 6200;
-const ACT_MS_LONG = { trace: 11000 };
+const ACT_MS_LONG = { trace: 14000 };
 function actMs(i) { return (ACTS[i] && ACT_MS_LONG[ACTS[i].key]) || ACT_MS; }
 const MOTION_OFF = /[?&]motion=off\b/.test(location.search);
 const REDUCED = MOTION_OFF || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -39,10 +39,10 @@ const ACTS = [
     noteFact: "28", noteFactLabel: "SPEC · 119 TEST FILES", tags: ["SPEC = single source", "拒绝测试", "changelog"]
   },
   {
-    key: "trace", name: "运行", sub: "TRACE · 全程留痕", title: "智能体的每一步，都留痕。",
-    noteTitle: "拦截记录，不是错误堆栈",
-    noteBody: "PIPE-20261031T163234Z 实测快照的阶段重放：智能体每一步做什么、报什么、被拦在哪。它说“做不了”的时候，留下的是可复核的拦截记录，而不是一条错误日志。",
-    noteFact: "2", noteFactLabel: "REAL INTERCEPTS", tags: ["stage replay", "全程留痕", "needs_human 终态"]
+    key: "trace", name: "闭环", sub: "LOOP · 文献→文章", title: "从文献到文章，每一步都有门槛。",
+    noteTitle: "环是被门串起来的",
+    noteBody: "文献、假设、设计、运行、图、稿件——每一跳换一道门禁：不通过的候选当场死掉，通过的要等签署。全流程的创新不是把步骤串起来，而是让每一步都有拒绝的资格；签署之前，“文章”只是骨架。",
+    noteFact: "4", noteFactLabel: "HUMAN GATES ON CHAIN", tags: ["Q0/G1/G2", "签署 + G5", "lineage 回环"]
   },
   {
     key: "boundary", name: "边界", sub: "CLAIM · 说“不”是设计", title: "边界不是免责，是设计。",
@@ -176,24 +176,31 @@ function boundaryAct() {
 /* ---- ACT 05 数据：实测快照的阶段重放（时间轴为相对时刻） ---- */
 const TRACE = [
   { t: "00:00", stage: "plan", text: "生成检索计划：13 条中英双语查询，覆盖综述 / 方法 / 评测 / 局限 / 最新进展", status: "ok", sub: "S1 planner · agnes-2.5-flash · 6.5s · 471 tok · 审计只记元数据" },
-  { t: "00:07", stage: "retrieve", text: "CC-BY 冻结语料 probe → 3 个来源命中，2 篇全文送达", status: "ok" },
-  { t: "00:09", stage: "span", text: "全文句级定位 → 5 个 spans；摘要-only 来源不产 span", status: "ok", sub: "上报 3 条覆盖缺口——缺口是产出，不是失误" },
+  { t: "00:07", stage: "retrieve", text: "CC-BY 冻结语料 probe → 3 个来源命中，2 篇全文送达", status: "ok", judg: "J1 资格" },
+  { t: "00:09", stage: "span", text: "全文句级定位 → 5 个 spans；摘要-only 来源不产 span", status: "ok", judg: "J1 资格", sub: "上报 3 条覆盖缺口——缺口是产出，不是失误" },
   { t: "00:12", stage: "synthesis", text: "主题 × 来源矩阵：一致 4 · 张力 1 · 未使用 1", status: "ok" },
-  { t: "00:15", stage: "idea", text: "3 条候选，各带假设与可否证条件 → G1 交回人工", status: "warn", sub: "「……因果推断均超出了 Fixture 数据的有效范围」——模型自己指出数据边界（IDEA-03）" },
-  { t: "00:31", stage: "design", text: "S4 草案提交 design-audit → BLOCKER", status: "block", sub: "缺 stopping budget 字段：退回补齐，而不是替模型猜一个" },
+  { t: "00:15", stage: "idea", text: "3 条候选，各带假设与可否证条件 → G1 交回人工", status: "warn", judg: "J4 供给", sub: "「……因果推断均超出了 Fixture 数据的有效范围」——模型自己指出数据边界（IDEA-03）" },
+  { t: "00:31", stage: "design", text: "S4 草案提交 design-audit → BLOCKER", status: "block", judg: "J4 供给", sub: "缺 stopping budget 字段：退回补齐，而不是替模型猜一个" },
   { t: "00:44", stage: "design", text: "补齐预算后重审 → ready_for_g2", status: "ok" },
   { t: "00:52", stage: "gate", text: "G2：人工确认设计、数据与统计口径", status: "hold" },
-  { t: "01:03", stage: "study", text: "模型起草沿用 3 seeds → 统计门槛拒绝", status: "block", sub: "配对种子 <4 不写任何文件；改为 4 配对种子重新执行" },
-  { t: "01:10", stage: "study", text: "iris · 4 配对种子真实执行", status: "ok", sub: "CI95 [-0.41, 0.51] 跨零 → 如实判「不可判定」；power note：同效应 80% 功效需 263 种子" },
+  { t: "01:03", stage: "study", text: "模型起草沿用 3 seeds → 统计门槛拒绝", status: "block", judg: "J2 完成", sub: "配对种子 <4 不写任何文件；改为 4 配对种子重新执行" },
+  { t: "01:10", stage: "study", text: "iris · 4 配对种子真实执行", status: "ok", judg: "J2 完成", sub: "CI95 [-0.41, 0.51] 跨零 → 如实判「不可判定」；power note：同效应 80% 功效需 263 种子" },
   { t: "01:38", stage: "figure", text: "示意图 scene → SVG · 审计 9 项全过", status: "ok", sub: "scene / svg 双 SHA-256 写进 manifest；结果图与示意图分离" },
-  { t: "01:52", stage: "paper", text: "方法与结构章节起草 · 结果槽 5 × pending", status: "hold", sub: "模型可以写骨架；结果句没有 EA 资格" },
-  { t: "02:07", stage: "terminal", text: "needs_human：结果锁定，等待作者签署 claim", status: "hold", sub: "门禁没有让步——export 在 closure + 签名之前始终 blocked" }
+  { t: "01:52", stage: "paper", text: "方法与结构章节起草 · 结果槽 5 × pending", status: "hold", judg: "J2 完成", sub: "模型可以写骨架；结果句没有 EA 资格" },
+  { t: "02:07", stage: "terminal", text: "needs_human：结果锁定，等待作者签署 claim", status: "hold", judg: "J2 完成", sub: "门禁没有让步——export 在 closure + 签名之前始终 blocked" }
 ];
 const TRACE_MARK = { ok: "✓", warn: "⚠", block: "⛔", hold: "⏸" };
 
 function traceAct() {
-  return `<div class="act-head"><p class="eyebrow">ACT 05 / RUN TRACE · 全程留痕</p><h2>${esc(ACTS[4].title)}</h2><p>把 PIPE-20261031T163234Z 实测快照按阶段重放：智能体每一步做什么、报什么、被拦在哪。时间为相对时刻；拦截与等待都是产出。</p></div>
-    <div class="trace-list">${TRACE.map((line, i) => `<div class="trace-line is-${line.status}" style="--td:${Math.min(i * 110, 1400)}ms"><span class="trace-t">${esc(line.t)}</span><span class="trace-stage">${esc(line.stage)}</span><span class="trace-main"><b>${esc(line.text)}</b>${line.sub ? `<small>${esc(line.sub)}</small>` : ""}</span><span class="trace-mark" aria-hidden="true">${TRACE_MARK[line.status]}</span></div>`).join("")}</div>
+  return `<div class="act-head"><p class="eyebrow">ACT 05 / FULL LOOP · 文献→文章</p><h2>${esc(ACTS[4].title)}</h2><p>把 PIPE-20261031T163234Z 实测快照按阶段重放：每一跳的输入、产物、门禁与判定（J1 资格 / J2 完成 / J4 供给）。时间为相对时刻；拦截与等待都是产出。</p></div>
+    <div class="trace-list">${TRACE.map((line, i) => `<div class="trace-line is-${line.status}" style="--td:${Math.min(i * 110, 1400)}ms"><span class="trace-t">${esc(line.t)}</span><span class="trace-stage">${esc(line.stage)}</span><span class="trace-main"><b>${esc(line.text)}</b>${line.judg ? `<i class="trace-judg">${esc(line.judg)}</i>` : ""}${line.sub ? `<small>${esc(line.sub)}</small>` : ""}</span><span class="trace-mark" aria-hidden="true">${TRACE_MARK[line.status]}</span></div>`).join("")}</div>
+    <div class="lastmile">
+      <div class="lm-head"><span class="mono">LAST MILE / needs_human 之后的路——本次未走，门由人开</span></div>
+      <div class="lm-row"><span class="lm-step">签署</span><p><b>作者签署 claim</b>：statement 与 EA 绑定、human_reason 入账。运行幕到此为止；文章的结论从这一次签署才开始成立。</p><span class="lm-tag">人工 · CLI</span></div>
+      <div class="lm-row"><span class="lm-step">closure</span><p><b>Closure 11 项结构检查</b>：槽位、stale、冲突、EA 绑定全过才 ready。它锁结构，不证明语义。</p><span class="lm-tag">运行时</span></div>
+      <div class="lm-row"><span class="lm-step">G5 导出</span><p><b>ExportManifest 由人签署</b>：submission_ready 恒为 false——文章的出口永远有人负责。</p><span class="lm-tag">人工 · CLI</span></div>
+      <p class="lm-loop"><b>↺ 闭环的“闭”字</b>在失效判定：文章交付后，任何输入变更沿 lineage 依赖图传播 stale，把对应结论拉回重签——环从这里闭回文献。</p>
+    </div>
     <div class="trace-legend"><span class="is-ok">✓ 完成</span><span class="is-warn">⚠ 需人复核</span><span class="is-block">⛔ 拦截</span><span class="is-hold">⏸ 等待 / 暂停</span></div>`;
 }
 
