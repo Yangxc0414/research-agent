@@ -189,10 +189,36 @@ const TRACE = [
   { t: "01:52", stage: "paper", text: "方法与结构章节起草 · 结果槽 5 × pending", status: "hold", judg: "J2 完成", sub: "模型可以写骨架；结果句没有 EA 资格" },
   { t: "02:07", stage: "terminal", text: "needs_human：结果锁定，等待作者签署 claim", status: "hold", judg: "J2 完成", sub: "门禁没有让步——export 在 closure + 签名之前始终 blocked" }
 ];
+/* ---- 十站阶段模型与反馈边：结构出处 loop_ledger.py:342-473；重放状态来自 PIPE-20261031 叙事 ---- */
+const STAGES = [
+  { id: "S0", name: "问题框定与路由", artifact: "task.json · task-plan.json", gate: "", run: "done", note: "输出类型、材料、预算 → 能力子图" },
+  { id: "S1", name: "多源检索与全文阅读", artifact: "literature-ledger.json · literature.json", gate: "Q0", run: "done", note: "摘要-only 不产 span" },
+  { id: "S1b", name: "跨来源综合矩阵", artifact: "synthesis-matrix.json", gate: "", run: "done", note: "一致 / 张力 / 未使用" },
+  { id: "S2-S3", name: "缺口与创新评审", artifact: "innovation-review.json", gate: "G1", run: "hold", note: "多轮评审迭代" },
+  { id: "S4", name: "实验设计", artifact: "experiment.json", gate: "G2", run: "hold", note: "design-audit 硬门" },
+  { id: "S5", name: "本地实验执行", artifact: "run-capsule.json · ea.json", gate: "", run: "done", note: "≥4 配对种子 · CI95" },
+  { id: "S5b", name: "Claim 草稿/签核", artifact: "claim-draft.json · claim.json", gate: "S5b", run: "hold", note: "检视 RunCapsule+EA 后签署" },
+  { id: "S6", name: "图表", artifact: "figure.scene.json · result-figure.svg", gate: "G3", run: "done", note: "结果图 / 示意图分离" },
+  { id: "S8-S12", name: "写作包与手稿评审", artifact: "writing-pack.json · manuscript-review.json", gate: "", run: "hold", note: "句槽绑定 · 分数演进" },
+  { id: "S13-S16", name: "闭包与签核", artifact: "closure-report.json · signature.json", gate: "G5", run: "hold", note: "11 项检查 · 人签导出" }
+];
+const FEEDBACK = [
+  { name: "next_actions", from: "任意站", to: "S0 下一轮", desc: "每轮运行把覆盖缺口与缺失门禁编译成可执行的下一步清单", guard: "只读投影" },
+  { name: "文献记忆 advise", from: "S1", to: "S1 下一轮", desc: "本轮覆盖与缺口写入 memory.json，advise() 重排下一轮面向顺序与预算", guard: "memory_order 租约" },
+  { name: "创新评审迭代", from: "S2-S3", to: "S2-S3", desc: "多轮攻防修订候选假设，轮次与 overall 记入 iterations", guard: "评审独立性" },
+  { name: "手稿评审分数演进", from: "S8-S12", to: "S8-S12", desc: "rubric 多轮评审记 score_progression；审计不变差才接受修订", guard: "防篡改审计" },
+  { name: "lineage 失效", from: "任意站", to: "任意站", desc: "输入变更沿依赖图传播 stale，对应结论拉回重签", guard: "SHA-256 哈希链" }
+];
+
 const TRACE_MARK = { ok: "✓", warn: "⚠", block: "⛔", hold: "⏸" };
 
 function traceAct() {
-  return `<div class="act-head"><p class="eyebrow">ACT 05 / FULL LOOP · 文献→文章</p><h2>${esc(ACTS[4].title)}</h2><p>把 PIPE-20261031T163234Z 实测快照按阶段重放：每一跳的输入、产物、门禁与判定（J1 资格 / J2 完成 / J4 供给）。时间为相对时刻；拦截与等待都是产出。</p></div>
+  return `<div class="act-head"><p class="eyebrow">ACT 05 / FULL LOOP · S0→S16 十站与反馈</p><h2>${esc(ACTS[4].title)}</h2><p>十站阶段模型（结构出处 loop_ledger.py）+ 五条反馈边 + 一次真实运行的过程重放（PIPE-20261031T163234Z，判定徽章 J1 资格 / J2 完成 / J4 供给）。时间为相对时刻；拦截与等待都是产出。</p></div>
+    <p class="loop-kicker"><span class="mono">STAGE MODEL / 十站 · 每站有产物与门禁</span><span class="lk-src">loop_ledger.py:342</span></p>
+    <div class="stage-grid">${STAGES.map((s, i) => `<div class="st-card" data-run="${s.run}" style="--td:${i * 60}ms"><span class="st-id">${esc(s.id)}</span><b>${esc(s.name)}</b><code>${esc(s.artifact)}</code><span class="st-foot">${s.gate ? `<i class="st-gate${s.gate === "Q0" ? "" : " st-gate-h"}">${esc(s.gate)}</i>` : ""}<small>${esc(s.note)}</small></span></div>`).join("")}</div>
+    <p class="loop-kicker"><span class="mono">FEEDBACK / 环从哪里闭 · 五条反馈边</span><span class="lk-src">next_actions · memory · iterations · lineage</span></p>
+    <div class="fb-board">${FEEDBACK.map((f, i) => `<div class="fb-row" style="--td:${i * 80 + 420}ms"><svg class="fb-arc" viewBox="0 0 110 30" aria-hidden="true"><defs><marker id="fba${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs><path class="fb-path" d="M6 24 C 36 4, 74 4, 104 24" marker-end="url(#fba${i})"/></svg><div class="fb-text"><b>${esc(f.name)}</b><span class="fb-route">${esc(f.from)} ⟶ ${esc(f.to)}</span><p>${esc(f.desc)}</p></div><span class="fb-guard">${esc(f.guard)}</span></div>`).join("")}</div>
+    <p class="loop-kicker"><span class="mono">REPLAY / 过程证据 · 一次真实运行的重放</span><span class="lk-src">PIPE-20261031T163234Z</span></p>
     <div class="trace-list">${TRACE.map((line, i) => `<div class="trace-line is-${line.status}" style="--td:${Math.min(i * 110, 1400)}ms"><span class="trace-t">${esc(line.t)}</span><span class="trace-stage">${esc(line.stage)}</span><span class="trace-main"><b>${esc(line.text)}</b>${line.judg ? `<i class="trace-judg">${esc(line.judg)}</i>` : ""}${line.sub ? `<small>${esc(line.sub)}</small>` : ""}</span><span class="trace-mark" aria-hidden="true">${TRACE_MARK[line.status]}</span></div>`).join("")}</div>
     <div class="lastmile">
       <div class="lm-head"><span class="mono">LAST MILE / needs_human 之后的路——本次未走，门由人开</span></div>
