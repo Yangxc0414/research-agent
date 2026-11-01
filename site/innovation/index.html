@@ -9,7 +9,7 @@
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
 <meta property="og:description" content="证据闭合科研运行时：别人优化生成得多快，我们优化变更之后哪一句还成立。28 SPEC · 119 测试 · 0 签核端点。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=20261109" />
+<link rel="stylesheet" href="styles.css?v=20261110" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -27,6 +27,7 @@
     <nav class="nav-menu" aria-label="页面分节">
       <a href="#demo" data-section="demo">六幕推演</a>
       <a href="#judgments" data-section="judgments">四个判定</a>
+      <a href="#architecture" data-section="architecture">架构</a>
       <a href="#wiring" data-section="wiring">接线实测</a>
       <a href="#proof" data-section="proof">技术证据</a>
       <a href="#cite" data-section="cite">引用</a>
@@ -123,11 +124,74 @@
       </div>
     </section>
 
+    <section class="arch" id="architecture">
+      <div class="arch-head reveal">
+        <p class="eyebrow">ARCHITECTURE / 四层架构 · 出处 ARCHITECTURE.md §2</p>
+        <h2>四层架构：Kernel 不信任任何模型。</h2>
+        <p>接入换客户端，不换约束；能力可插拔，写权限固定；治理面垂直贯穿。连线只走水平与折弯——架构里没有斜线可走。</p>
+      </div>
+      <div class="arch-board reveal" id="arch-board">
+        <svg class="arch-svg" id="arch-svg" aria-hidden="true"></svg>
+        <div class="arch-main">
+          <div class="arch-band" data-band="adapters">
+            <span class="arch-band-label">ADAPTERS / 接入 · 人工门只在此层</span>
+            <div class="arch-row">
+              <div class="arch-box"><b>CLI</b><small>claim / freeze / sign 在此执行</small></div>
+              <div class="arch-box"><b>MCP stdio</b><small>41 工具 · 0 签核入口</small></div>
+              <div class="arch-box"><b>HTTP runtime</b><small>127.0.0.1:8787 · SSE</small></div>
+              <div class="arch-box"><b>Python SDK</b><small>client.py · 本地嵌入</small></div>
+            </div>
+          </div>
+          <div class="arch-band" data-band="skills">
+            <span class="arch-band-label">SKILLS / 流程与策略 · S0→S16</span>
+            <div class="arch-row">
+              <div class="arch-box"><b>S0</b><small>task-agent 问题框定</small></div>
+              <div class="arch-box"><b>S1</b><small>literature · memory</small></div>
+              <div class="arch-box"><b>S2-S3</b><small>idea · innovation_review</small></div>
+              <div class="arch-box"><b>S4</b><small>experiment · design_audit</small></div>
+              <div class="arch-box"><b>S5</b><small>run · search-study</small></div>
+              <div class="arch-box"><b>S6</b><small>figure · G3</small></div>
+              <div class="arch-box"><b>S8-S12</b><small>writing · paper · revision · grant</small></div>
+              <div class="arch-box"><b>S13-S16</b><small>closure · bibliography · judge</small></div>
+            </div>
+          </div>
+          <div class="arch-band" data-band="capabilities">
+            <span class="arch-band-label">CAPABILITIES / 可插拔能力</span>
+            <div class="arch-row">
+              <div class="arch-chip">retriever · OpenAlex / local / fixture</div>
+              <div class="arch-chip">parser</div>
+              <div class="arch-chip">local runner · iris / breast_cancer / chemlab</div>
+              <div class="arch-chip">writer</div>
+              <div class="arch-chip">figure renderer · AstraDraw*</div>
+              <div class="arch-chip">citation verifier · GB/T 7714</div>
+              <div class="arch-chip">journal template</div>
+            </div>
+          </div>
+          <div class="arch-band" data-band="kernel">
+            <span class="arch-band-label">KERNEL / 稳定内核 · 不允许绕过</span>
+            <div class="arch-kernel">
+              <span>Span-only 证据</span><span>Claim/EA/Gate/Signature 写权限</span><span>human gates Q0 · G1 · G2 · S5b · G5</span><span>artifact hash · RunCapsule · allowlist</span><span>路径越界校验</span><span>审计</span>
+              <em>目标：不信任任何模型或外部 Skill。</em>
+            </div>
+          </div>
+        </div>
+        <aside class="arch-rail" id="arch-rail">
+          <span class="arch-rail-label">GOVERNANCE / 治理面 META</span>
+          <div class="arch-box sm"><b>RSI</b><small>租约 → S1/S5 预算</small></div>
+          <div class="arch-box sm"><b>autopilot</b><small>策略委托 · 越界即停</small></div>
+          <div class="arch-box sm"><b>host-model · waitpoints</b><small>宿主作答 · 挂起点</small></div>
+          <div class="arch-box sm"><b>skills registry</b><small>候选默认 disabled</small></div>
+          <div class="arch-box sm"><b>guideline-memory · mandate</b><small>经验块 · 委托状态</small></div>
+        </aside>
+      </div>
+      <p class="arch-note">* AstraDraw 为 vendored 第三方，发行包不含（DISTRIBUTION.md）。28 个模块全清单见 modules/README.md；human gates 的唯一入口是本地 CLI。结构出处：ARCHITECTURE.md §2。</p>
+    </section>
+
     <section class="stage-section" id="demo">
       <div class="section-intro reveal">
         <div>
-          <p class="eyebrow">THE 90-SECOND WALKTHROUGH</p>
-          <h2>把“创新点”变成六个可看见的状态。</h2>
+          <p class="eyebrow">MECHANISM TOUR / 机制走读</p>
+          <h2>六段机制，一条证据链。</h2>
         </div>
         <p>不是流程图。每一幕都对应仓库里真实存在的 SPEC、artifact 或 audit；数字来自 fixture，不冒充实验结果。</p>
       </div>
@@ -282,6 +346,6 @@
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js?v=20261109"></script>
+<script src="app.js?v=20261110"></script>
 </body>
 </html>

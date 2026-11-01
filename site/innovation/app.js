@@ -217,7 +217,7 @@ function traceAct() {
     <p class="loop-kicker"><span class="mono">STAGE MODEL / 十站 · 每站有产物与门禁</span><span class="lk-src">loop_ledger.py:342</span></p>
     <div class="stage-grid">${STAGES.map((s, i) => `<div class="st-card" data-run="${s.run}" style="--td:${i * 60}ms"><span class="st-id">${esc(s.id)}</span><b>${esc(s.name)}</b><code>${esc(s.artifact)}</code><span class="st-foot">${s.gate ? `<i class="st-gate${s.gate === "Q0" ? "" : " st-gate-h"}">${esc(s.gate)}</i>` : ""}<small>${esc(s.note)}</small></span></div>`).join("")}</div>
     <p class="loop-kicker"><span class="mono">FEEDBACK / 环从哪里闭 · 五条反馈边</span><span class="lk-src">next_actions · memory · iterations · lineage</span></p>
-    <div class="fb-board">${FEEDBACK.map((f, i) => `<div class="fb-row" style="--td:${i * 80 + 420}ms"><svg class="fb-arc" viewBox="0 0 110 30" aria-hidden="true"><defs><marker id="fba${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs><path class="fb-path" d="M6 24 C 36 4, 74 4, 104 24" marker-end="url(#fba${i})"/></svg><div class="fb-text"><b>${esc(f.name)}</b><span class="fb-route">${esc(f.from)} ⟶ ${esc(f.to)}</span><p>${esc(f.desc)}</p></div><span class="fb-guard">${esc(f.guard)}</span></div>`).join("")}</div>
+    <div class="fb-board">${FEEDBACK.map((f, i) => `<div class="fb-row" style="--td:${i * 80 + 420}ms"><svg class="fb-arc" viewBox="0 0 110 30" aria-hidden="true"><defs><marker id="fba${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs><path class="fb-path" d="M6 25 H 40 V 7 H 102" marker-end="url(#fba${i})"/></svg><div class="fb-text"><b>${esc(f.name)}</b><span class="fb-route">${esc(f.from)} ⟶ ${esc(f.to)}</span><p>${esc(f.desc)}</p></div><span class="fb-guard">${esc(f.guard)}</span></div>`).join("")}</div>
     <p class="loop-kicker"><span class="mono">REPLAY / 过程证据 · 一次真实运行的重放</span><span class="lk-src">PIPE-20261031T163234Z</span></p>
     <div class="trace-list">${TRACE.map((line, i) => `<div class="trace-line is-${line.status}" style="--td:${Math.min(i * 110, 1400)}ms"><span class="trace-t">${esc(line.t)}</span><span class="trace-stage">${esc(line.stage)}</span><span class="trace-main"><b>${esc(line.text)}</b>${line.judg ? `<i class="trace-judg">${esc(line.judg)}</i>` : ""}${line.sub ? `<small>${esc(line.sub)}</small>` : ""}</span><span class="trace-mark" aria-hidden="true">${TRACE_MARK[line.status]}</span></div>`).join("")}</div>
     <div class="lastmile">
@@ -280,13 +280,14 @@ function drawFlows(root) {
       const a = pts[i], b = pts[i + 1];
       let pathD;
       if (b.left >= a.right - 8) {
-        const mx = (a.right + 2 + b.left - 4) / 2;
-        pathD = `M ${a.right + 2} ${a.cy} C ${mx} ${a.cy}, ${mx} ${b.cy}, ${b.left - 4} ${b.cy}`;
+        const mx = Math.round((a.right + 2 + b.left - 4) / 2);
+        pathD = `M ${a.right + 2} ${Math.round(a.cy)} H ${mx} V ${Math.round(b.cy)} H ${b.left - 4}`;
       } else if (b.top >= a.bottom - 8) {
-        const my = (a.bottom + 2 + b.top - 4) / 2;
-        pathD = `M ${a.cx} ${a.bottom + 2} C ${a.cx} ${my}, ${b.cx} ${my}, ${b.cx} ${b.top - 4}`;
+        const my = Math.round((a.bottom + 2 + b.top - 4) / 2);
+        pathD = `M ${Math.round(a.cx)} ${a.bottom + 2} V ${my} H ${Math.round(b.cx)} V ${b.top - 4}`;
       } else {
-        pathD = `M ${a.cx} ${a.cy} L ${b.cx} ${b.cy}`;
+        const my = Math.round((a.bottom + b.top) / 2);
+        pathD = `M ${Math.round(a.cx)} ${Math.round(a.cy)} V ${my} H ${Math.round(b.cx)} V ${Math.round(b.cy)}`;
       }
       const gated = /is-gate|is-gap|is-blocked/.test(nodes[i + 1].className);
       body += `<g class="flow-link-g" style="animation-delay:${Math.min(i * 90, 900)}ms"><path class="flow-link${gated ? " is-to-gate" : ""}" marker-end="url(#arrow-${key})" d="${pathD}"/></g>`;
@@ -295,9 +296,55 @@ function drawFlows(root) {
   });
 }
 let flowRaf = null;
+
+/* ---- 四层架构图：水平/折弯总线连接（无斜线） ---- */
+function drawArch() {
+  const board = document.getElementById("arch-board");
+  const svg = document.getElementById("arch-svg");
+  if (!board || !svg || !board.offsetParent) return;
+  const bRect = board.getBoundingClientRect();
+  const w = board.scrollWidth, h = board.scrollHeight;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.setAttribute("width", String(w));
+  svg.setAttribute("height", String(h));
+  const rel = (el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left - bRect.left, r: r.right - bRect.left, t: r.top - bRect.top, b: r.bottom - bRect.top, cx: r.left - bRect.left + r.width / 2 };
+  };
+  const rowOf = (band) => [...board.querySelectorAll(`[data-band="${band}"] .arch-box, [data-band="${band}"] .arch-chip`)].map(rel);
+  const adapters = rowOf("adapters");
+  const skills = rowOf("skills");
+  const caps = rowOf("capabilities");
+  const bandBottom = (band) => rel(board.querySelector(`[data-band="${band}"] .arch-row`)).b;
+  const bandTop = (band) => rel(board.querySelector(`[data-band="${band}"] .arch-row`)).t;
+  let body = "";
+  const bus = (tops, bottoms, yA, yB) => {
+    const busY = Math.round((yA + yB) / 2);
+    const xs = [];
+    tops.forEach((b) => { body += `<path class="arch-link" d="M ${Math.round(b.cx)} ${Math.round(b.b)} V ${busY}"/>`; xs.push(b.cx); });
+    bottoms.forEach((b) => { body += `<path class="arch-link" d="M ${Math.round(b.cx)} ${busY} V ${Math.round(b.t) - 3}" marker-end="url(#arch-arrow)"/>`; xs.push(b.cx); });
+    body += `<path class="arch-bus" d="M ${Math.round(Math.min(...xs))} ${busY} H ${Math.round(Math.max(...xs))}"/>`;
+  };
+  bus(adapters, skills, bandBottom("adapters"), bandTop("skills"));
+  bus(skills, caps, bandBottom("skills"), bandTop("capabilities"));
+  const ker = rel(board.querySelector(".arch-kernel"));
+  const kx = Math.round((caps[0].cx + caps[caps.length - 1].cx) / 2);
+  body += `<path class="arch-bus" d="M ${kx} ${bandBottom("capabilities")} V ${Math.round(ker.t) - 3}" marker-end="url(#arch-arrow)"/>`;
+  const railBoxes = [...board.querySelectorAll(".arch-rail .arch-box")].map(rel);
+  if (railBoxes.length) {
+    const rx = Math.round(railBoxes[0].cx);
+    body += `<path class="arch-rail-line" d="M ${rx} ${Math.round(railBoxes[0].t)} V ${Math.round(railBoxes[railBoxes.length - 1].b)}"/>`;
+    const skillsRight = Math.max(...skills.map((s) => s.r));
+    railBoxes.forEach((b) => {
+      body += `<path class="arch-link arch-link-dash" d="M ${skillsRight + 4} ${Math.round(b.cy)} H ${rx - 3}"/>`;
+    });
+  }
+  svg.innerHTML = `<defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs>` + body;
+}
+
 function scheduleFlows() {
   if (flowRaf) return;
-  flowRaf = requestAnimationFrame(() => { flowRaf = null; drawFlows(document); });
+  flowRaf = requestAnimationFrame(() => { flowRaf = null; drawFlows(document); drawArch(); });
 }
 window.addEventListener("resize", scheduleFlows);
 window.addEventListener("load", scheduleFlows);
@@ -447,7 +494,7 @@ function setupNavSpy() {
       links.forEach((link) => link.classList.toggle("is-active", link.dataset.section === entry.target.id));
     });
   }, { rootMargin: "-45% 0px -50% 0px" });
-  ["judgments", "demo", "wiring", "proof", "cite"].forEach((id) => {
+  ["judgments", "architecture", "demo", "wiring", "proof", "cite"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) spy.observe(el);
   });
