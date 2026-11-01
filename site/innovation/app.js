@@ -224,7 +224,7 @@ function drawFlows(root) {
         pathD = `M ${a.cx} ${a.cy} L ${b.cx} ${b.cy}`;
       }
       const gated = /is-gate|is-gap|is-blocked/.test(nodes[i + 1].className);
-      body += `<path class="flow-link${gated ? " is-to-gate" : ""}" marker-end="url(#arrow-${key})" d="${pathD}"/>`;
+      body += `<g class="flow-link-g" style="animation-delay:${Math.min(i * 90, 900)}ms"><path class="flow-link${gated ? " is-to-gate" : ""}" marker-end="url(#arrow-${key})" d="${pathD}"/></g>`;
     }
     svg.innerHTML = `<defs><marker id="arrow-${key}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs>${body}`;
   });

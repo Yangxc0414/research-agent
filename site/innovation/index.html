@@ -9,7 +9,7 @@
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
 <meta property="og:description" content="证据闭合科研运行时：别人优化生成得多快，我们优化变更之后哪一句还成立。28 SPEC · 119 测试 · 0 签核端点。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=20261103" />
+<link rel="stylesheet" href="styles.css?v=20261104" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -80,10 +80,10 @@
             <div class="board-core">
               <span class="mono">CORE / INVARIANT</span>
               <b>证据闭合</b>
-              <small>claim 只由 Evidence 创建<br/>export 只由 Closure 执行</small>
+              <small>claim 只由 Evidence 创建<br/>export 只由 Closure 执行<br/>输入变更 → lineage stale 传播</small>
             </div>
-            <div class="board-tag tag-a">SPEC VERSIONED</div>
-            <div class="board-tag tag-b">SVG AUDITED</div>
+            <div class="board-tag tag-a">28 SPEC · 119 TESTS</div>
+            <div class="board-tag tag-b">0 SIGN ENDPOINTS</div>
           </div>
           <div class="hero-caption"><span class="live-dot"></span>FIXTURE · 全部状态可复核</div>
         </div>
@@ -104,6 +104,22 @@
         <article class="judge-card reveal" style="--rd:130ms"><span class="mono">J2 / RUN-BOUND · 完成判定</span><p class="q">这次运行，能签吗？</p><p>Claim 只能引用 EA，EA 绑定 RunCapsule；closure 11 项检查全过、再由作者签署，导出才放行。</p><div class="anchor">run.py · closure.py · ClosureReport / SignatureRecord</div></article>
         <article class="judge-card reveal" style="--rd:200ms"><span class="mono">J3 / LINEAGE · 失效判定</span><p class="q">输入变了，谁失效？</p><p>数据与代码哈希进依赖图；一处变更沿图传播 stale，旧签名作废、导出锁死——系统比人先发现。</p><div class="anchor">lineage.py · lineage impact --fail-on-stale</div></article>
         <article class="judge-card reveal" style="--rd:270ms"><span class="mono">J4 / HOST-AS-MODEL · 供给判定</span><p class="q">模型草稿，能信到哪一步？</p><p>宿主模型只提供草稿：引用白名单、结果数字锁定、门禁照常。生成能力可移植，证据资格不可移植。</p><div class="anchor">mcp_server.py · 41 只读工具 / 0 签核入口</div></article>
+      </div>
+      <div class="sysmap reveal" style="--rd:340ms">
+        <p class="sysmap-head"><span class="mono">SYSTEM MAP</span><span>判定发生在流水线的哪一步 · 一条链，四道判定</span></p>
+        <div class="flow-diagram sysmap-chain" data-flow>
+          <span class="flow-node ok"><b>S1 文献</b><small>span-only</small><i class="jbadge">J1 资格判定</i></span>
+          <span class="flow-node is-gate"><b>Q0</b><small>可否证？</small></span>
+          <span class="flow-node ok"><b>S2–S3 假设</b><small>host 起草</small><i class="jbadge">J4 供给判定</i></span>
+          <span class="flow-node is-gate"><b>G1</b><small>人工</small></span>
+          <span class="flow-node ok"><b>S4 设计</b><small>design-audit</small></span>
+          <span class="flow-node is-gate"><b>G2</b><small>人工</small></span>
+          <span class="flow-node ok"><b>S5 运行</b><small>RunCapsule → EA</small><i class="jbadge">J2 完成判定</i></span>
+          <span class="flow-node is-gate"><b>Claim</b><small>作者签署</small></span>
+          <span class="flow-node ok"><b>Closure</b><small>11 项检查</small></span>
+          <span class="flow-node is-blocked"><b>G5 Export</b><small>此前 blocked</small></span>
+        </div>
+        <p class="sysmap-j3"><b>J3 · 失效判定</b>横跨全链：任一节点的数据 / 代码变更沿 lineage 依赖图传播 stale——旧签名作废、导出锁死，系统比人先发现。</p>
       </div>
     </section>
 
@@ -266,6 +282,6 @@
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js?v=20261103"></script>
+<script src="app.js?v=20261104"></script>
 </body>
 </html>
