@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Research Agent — 可核验的科研智能体</title>
-<meta name="description" content="Research Agent：把检索、复现、写作、核验接成一条可核验的证据链。公开工作台支持 OpenAlex 真实检索、证据卡、门禁与案例回放；LLM 与实验执行留在本地运行时。" />
+<meta name="description" content="Research Agent：证据闭合的科研运行时。每句结论过四个判定——资格（span-only）、完成（closure 人签）、失效（lineage stale）、供给（host 只供草稿）；28 SPEC · 119 测试 · 0 签核端点。" />
 <meta name="keywords" content="科研智能体,证据链,科研自动化,RWMT,证据运营,Research Agent" />
 <meta name="author" content="YXC" />
 <meta name="color-scheme" content="light" />
@@ -14,14 +14,14 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Research Agent" />
 <meta property="og:title" content="Research Agent — 可核验的科研智能体" />
-<meta property="og:description" content="把科研自动化，做成一条可核验的证据链。真实 OpenAlex 检索、证据卡、导出门禁与变更回放。" />
+<meta property="og:description" content="别人优化生成得多快；这套运行时优化变更之后哪一句还成立、哪个导出必须被拦。28 SPEC · 119 测试 · 0 MCP 签核端点。" />
 <meta property="og:url" content="https://yangxc0414.github.io/research-agent/" />
 <meta property="og:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Research Agent — 可核验的科研智能体" />
-<meta name="twitter:description" content="把科研自动化，做成一条可核验的证据链。" />
+<meta name="twitter:description" content="别人优化生成得多快；我们优化变更之后哪一句还成立、哪个导出必须被拦。" />
 <meta name="twitter:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
 <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
 <link rel="manifest" href="./manifest.webmanifest" />
@@ -95,9 +95,15 @@
       <a class="side-item" href="./live/"><em>LIVE</em><b>本地运行时</b><small>真实 pipeline · API</small></a>
       <a class="side-item" href="./innovation/"><em>NEW</em><b>创新演示</b><small>四个判定 · 静态 + 实测快照</small></a>
     </div>
-    <div class="side-foot"><span class="live">SIM</span><small>Research Agent · 2026-10-23</small></div>
+    <div class="side-foot"><span class="live">SIM</span><small>Research Agent · 2026-10-31</small></div>
   </aside>
   <main class="app-main" id="main">
+  <div class="claim-strip" role="note">
+    <span class="cs-kicker">RUNTIME RULE</span>
+    <p>每句结论过四个判定：<b>资格</b>（span-only 证据）· <b>完成</b>（closure 人签）· <b>失效</b>（lineage stale 传播）· <b>供给</b>（host 只供草稿，不给资格）</p>
+    <a href="./innovation/">看判定如何拦下模型 →</a>
+  </div>
+
   <section class="section view" id="functions">
     <div class="section-head">
       <div>
@@ -828,7 +834,7 @@ python -m http.server 8000 --directory site</code></pre>
     </div>
     <div class="doc-grid">
       <a class="doc-card" href="https://github.com/Yangxc0414/research-agent#readme" target="_blank" rel="noopener"><span>00</span><b>项目总览</b><small>仓库 README：结构、静态边界、本地预览与部署</small></a>
-      <a class="doc-card" href="./innovation/"><span>01</span><b>创新演示</b><small>五幕演示：SPEC 契约 / span 证据 / SVG provenance / 待证据槽位</small></a>
+      <a class="doc-card" href="./innovation/"><span>01</span><b>创新演示</b><small>四个判定 + 五幕推演 + 两次真实拦截；六条创新点带 CLI 锚点</small></a>
       <a class="doc-card" href="./app/"><span>02</span><b>工作台导览</b><small>门禁、证据链、评估隔离与受治理自进化的交互视图</small></a>
       <a class="doc-card" href="./live/"><span>03</span><b>本地运行时</b><small>真实 pipeline / API / OpenAlex 公开检索</small></a>
     </div>

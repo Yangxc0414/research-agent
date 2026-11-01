@@ -1611,3 +1611,16 @@ html.js body.app.ready .view.is-active .studio-head { transition-delay: .2s; }
 /* Innovation demo entry */
 .nav-cta.innovation-link { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; box-shadow: none; }
 .nav-cta.innovation-link:hover { background: #e0e7ff; border-color: #a5b4fc; color: #4338ca; }
+/* ---- 四判定主张条（全站，浅色主题令牌带回退） ---- */
+.claim-strip {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px;
+  margin: 0 0 18px; padding: 10px 14px;
+  border: 1px solid var(--line, #e4e9f2); border-left: 3px solid var(--accent, #2563eb);
+  border-radius: 12px; background: #fff;
+}
+.claim-strip .cs-kicker { font-family: var(--mono, ui-monospace, monospace); font-size: 9px; letter-spacing: .14em; color: var(--accent, #2563eb); font-weight: 700; }
+.claim-strip p { margin: 0; font-size: 12px; color: var(--muted, #5b677a); }
+.claim-strip p b { color: var(--ink, #0b1220); }
+.claim-strip a { margin-left: auto; font-size: 11.5px; font-weight: 650; color: var(--accent, #2563eb); text-decoration: none; white-space: nowrap; }
+.claim-strip a:hover { text-decoration: underline; }
+@media (max-width: 860px) { .claim-strip a { margin-left: 0; } }
