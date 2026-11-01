@@ -9,7 +9,7 @@
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
 <meta property="og:description" content="证据闭合科研运行时：别人优化生成得多快，我们优化变更之后哪一句还成立。28 SPEC · 119 测试 · 0 签核端点。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=20261111" />
+<link rel="stylesheet" href="styles.css?v=20261113" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -130,9 +130,71 @@
         <h2>四层架构：Kernel 不信任任何模型。</h2>
         <p>接入换客户端，不换约束；能力可插拔，写权限固定；治理面垂直贯穿。连线只走水平与折弯——架构里没有斜线可走。</p>
       </div>
-      <figure class="arch-figure reveal">
-        <img src="data/architecture.svg?v=20261112" alt="Wellspring-Agent 四层架构示意图：(a) 接入层——人工门只在 CLI；(b) S0→S16 流程与策略，门禁串起全链；(c) 可插拔能力；(d) 稳定内核——不信任任何模型；治理面垂直贯穿。创新点：① span-only 证据资格 ② 人工门在架构外 ③ lineage 失效回环 ④ 租约门控自改进" />
-      </figure>
+      <div class="arch-board reveal" id="arch-board">
+        <svg class="arch-svg" id="arch-svg" aria-hidden="true"></svg>
+        <div class="arch-main">
+          <div class="arch-band" data-band="adapters">
+            <span class="arch-band-label"><i class="pl pl-a">a</i>ADAPTERS 接入 · 人工门只在此层 <b class="inn inn-2" title="创新点 ②">②</b><em>人工门在架构外：签核动作不存在于任何接入面</em></span>
+            <div class="arch-row cols-4">
+              <div class="arch-box b"><b>CLI</b><small>claim / freeze / sign 在此执行</small></div>
+              <div class="arch-box b"><b>MCP stdio</b><small>41 工具 · 0 签核入口</small></div>
+              <div class="arch-box b"><b>HTTP runtime</b><small>127.0.0.1:8787 · SSE</small></div>
+              <div class="arch-box b"><b>Python SDK</b><small>client.py · 本地嵌入</small></div>
+            </div>
+          </div>
+          <div class="arch-band" data-band="skills">
+            <span class="arch-band-label"><i class="pl pl-a">b</i>SKILLS 流程与策略 · S0→S16 · 门禁串起全链</span>
+            <div class="lineage-strip"><b class="inn inn-3">③</b><span>lineage 失效回环：交付后任何输入变更沿依赖图传播 stale，对应结论拉回重签</span><em>S13-S16 ⟶ S0</em></div>
+            <div class="arch-row cols-9">
+              <div class="arch-box b"><b>S0</b><small>task-agent 问题框定</small></div>
+              <div class="arch-box b"><i class="inn inn-1" title="创新点 ①">①</i><b>S1</b><small>literature 检索与全文</small><span class="gate machine">Q0</span></div>
+              <div class="arch-box b"><b>S1b</b><small>synthesis 综合矩阵</small></div>
+              <div class="arch-box b"><b>S2-S3</b><small>idea 创新评审</small><span class="gate">G1</span></div>
+              <div class="arch-box b"><b>S4</b><small>experiment 设计审计</small><span class="gate">G2</span></div>
+              <div class="arch-box b"><b>S5</b><small>run · search-study</small></div>
+              <div class="arch-box b"><b>S6</b><small>figure · G3</small></div>
+              <div class="arch-box b"><b>S8-S12</b><small>writing · paper · revision · grant</small></div>
+              <div class="arch-box b"><b>S13-S16</b><small>closure · bibliography · judge</small><span class="gate">G5</span></div>
+            </div>
+            <p class="arch-span-note"><b class="inn inn-1">①</b><span><b>span-only</b>：摘要只是线索，全文定位到句才成证据——S1 的入口检查，摘要-only 永远不变证据。</span></p>
+          </div>
+          <div class="arch-band" data-band="capabilities">
+            <span class="arch-band-label"><i class="pl pl-a">c</i>CAPABILITIES 可插拔能力 · 换实现不换约束</span>
+            <div class="arch-row cols-4">
+              <div class="arch-chip">retriever · OpenAlex / local / fixture</div>
+              <div class="arch-chip">parser</div>
+              <div class="arch-chip">local runner · iris / breast_cancer / chemlab</div>
+              <div class="arch-chip">writer</div>
+              <div class="arch-chip">figure renderer · AstraDraw*</div>
+              <div class="arch-chip">citation verifier · GB/T 7714</div>
+              <div class="arch-chip">journal template</div>
+            </div>
+          </div>
+          <div class="arch-band" data-band="kernel">
+            <span class="arch-band-label"><i class="pl pl-g">d</i>KERNEL 稳定内核 · 不允许绕过</span>
+            <div class="arch-kernel">
+              <span>Span-only 证据</span><span>Claim/EA/Gate/Signature 写权限</span><span>human gates Q0 · G1 · G2 · S5b · G5</span><span>artifact hash · RunCapsule · allowlist</span><span>路径越界校验</span><span>审计</span>
+              <em>目标：不信任任何模型或外部 Skill。</em>
+            </div>
+          </div>
+          <div class="arch-legend">
+            <span class="lg lg-b">流程与策略（可插拔）</span>
+            <span class="lg lg-g">固定内核：验证与写权限</span>
+            <span class="lg lg-o">治理面 META（垂直贯穿）</span>
+            <span class="lg lg-line">实线 = 调用与数据流（水平 / 折弯）</span>
+            <span class="lg lg-dash">虚线 = 治理 / 反馈</span>
+            <span class="lg lg-inn">① span-only ② 人工门在架构外 ③ lineage 回环 ④ 租约门控自改进</span>
+          </div>
+        </div>
+        <aside class="arch-rail" id="arch-rail">
+          <span class="arch-band-label"><i class="pl pl-o">e</i>GOVERNANCE 治理面 META · 垂直贯穿</span>
+          <div class="arch-box o"><i class="inn inn-4" title="创新点 ④">④</i><b>RSI 租约门控自改进</b><small>propose → dry-run → 四套评测 → 人签 → TTL 租约 → 消费复查</small></div>
+          <div class="arch-box o"><b>autopilot 委托</b><small>人写一次策略 · 每步带策略 SHA-256 · 越界即停</small></div>
+          <div class="arch-box o"><b>host-model · waitpoints</b><small>宿主只供草稿 · S4 设计挂起等人作答</small></div>
+          <div class="arch-box o"><b>skills registry</b><small>蒸馏候选默认 disabled</small></div>
+          <div class="arch-box o"><b>guideline-memory · mandate</b><small>经验块准入 · 委托状态</small></div>
+        </aside>
+      </div>
       <p class="arch-note">* AstraDraw 为 vendored 第三方，发行包不含（DISTRIBUTION.md）。28 个模块全清单见 modules/README.md；human gates 的唯一入口是本地 CLI。结构出处：ARCHITECTURE.md §2。</p>
     </section>
 
@@ -295,6 +357,6 @@
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js?v=20261111"></script>
+<script src="app.js?v=20261113"></script>
 </body>
 </html>

@@ -297,9 +297,55 @@ function drawFlows(root) {
 }
 let flowRaf = null;
 
+
+/* ---- 四层架构图：水平/折弯总线连接（无斜线） ---- */
+function drawArch() {
+  const board = document.getElementById("arch-board");
+  const svg = document.getElementById("arch-svg");
+  if (!board || !svg || !board.offsetParent) return;
+  const bRect = board.getBoundingClientRect();
+  const w = board.scrollWidth, h = board.scrollHeight;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  svg.setAttribute("width", String(w));
+  svg.setAttribute("height", String(h));
+  const rel = (el) => {
+    const r = el.getBoundingClientRect();
+    return { l: r.left - bRect.left, r: r.right - bRect.left, t: r.top - bRect.top, b: r.bottom - bRect.top, cx: r.left - bRect.left + r.width / 2 };
+  };
+  const rowOf = (band) => [...board.querySelectorAll(`[data-band="${band}"] .arch-box, [data-band="${band}"] .arch-chip`)].map(rel);
+  const adapters = rowOf("adapters");
+  const skills = rowOf("skills");
+  const caps = rowOf("capabilities");
+  const bandBottom = (band) => rel(board.querySelector(`[data-band="${band}"] .arch-row`)).b;
+  const bandTop = (band) => rel(board.querySelector(`[data-band="${band}"] .arch-row`)).t;
+  let body = "";
+  const bus = (tops, bottoms, yA, yB) => {
+    const busY = Math.round((yA + yB) / 2);
+    const xs = [];
+    tops.forEach((b) => { body += `<path class="arch-link" d="M ${Math.round(b.cx)} ${Math.round(b.b)} V ${busY}"/>`; xs.push(b.cx); });
+    bottoms.forEach((b) => { body += `<path class="arch-link" d="M ${Math.round(b.cx)} ${busY} V ${Math.round(b.t) - 3}" marker-end="url(#arch-arrow)"/>`; xs.push(b.cx); });
+    body += `<path class="arch-bus" d="M ${Math.round(Math.min(...xs))} ${busY} H ${Math.round(Math.max(...xs))}"/>`;
+  };
+  bus(adapters, skills, bandBottom("adapters"), bandTop("skills"));
+  bus(skills, caps, bandBottom("skills"), bandTop("capabilities"));
+  const ker = rel(board.querySelector(".arch-kernel"));
+  const kx = Math.round((caps[0].cx + caps[caps.length - 1].cx) / 2);
+  body += `<path class="arch-bus" d="M ${kx} ${bandBottom("capabilities")} V ${Math.round(ker.t) - 3}" marker-end="url(#arch-arrow)"/>`;
+  const railBoxes = [...board.querySelectorAll(".arch-rail .arch-box")].map(rel);
+  if (railBoxes.length) {
+    const rx = Math.round(railBoxes[0].cx);
+    body += `<path class="arch-rail-line" d="M ${rx} ${Math.round(railBoxes[0].t)} V ${Math.round(railBoxes[railBoxes.length - 1].b)}"/>`;
+    const skillsRight = Math.max(...skills.map((s) => s.r));
+    railBoxes.forEach((b) => {
+      body += `<path class="arch-link arch-link-dash" d="M ${skillsRight + 4} ${Math.round(b.cy)} H ${rx - 3}"/>`;
+    });
+  }
+  svg.innerHTML = `<defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs>` + body;
+}
+
 function scheduleFlows() {
   if (flowRaf) return;
-  flowRaf = requestAnimationFrame(() => { flowRaf = null; drawFlows(document); });
+  flowRaf = requestAnimationFrame(() => { flowRaf = null; drawFlows(document); drawArch(); });
 }
 window.addEventListener("resize", scheduleFlows);
 window.addEventListener("load", scheduleFlows);
