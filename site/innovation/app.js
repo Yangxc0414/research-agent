@@ -1,5 +1,7 @@
 const ACT_MS = 6200;
-const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MOTION_OFF = /[?&]motion=off\b/.test(location.search);
+const REDUCED = MOTION_OFF || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.documentElement.classList.add(REDUCED ? "still" : "motion");
 const MODULES = {
   literature: { label: "文献调研", kind: "literature" },
   idea: { label: "假设收敛", kind: "idea" },
@@ -110,6 +112,7 @@ function evidenceAct() {
       <span class="flow-node"><b>CoverageReceipt</b><small>覆盖回执</small></span>
       <span class="flow-node is-gap"><b>Gap</b><small>覆盖缺口</small></span>
     </div>
+    <p class="fig-caption">图 1 · 证据链 artifact：QueryPlan → SourceHit → 全文 → Span → CoverageReceipt / Gap；摘要-only 在第二步就被阻断。</p>
     <div class="span-stack">${spans.map((span) => `<div class="span-item"><code>${esc(span.span_id)} · ${esc(span.section)}</code>${esc(span.text)}</div>`).join("") || `<div class="span-item">没有 span。先补全文。</div>`}</div>
     <div class="gap-line">${(coverage.gaps || []).map((gap) => `<span class="gap-chip">${esc(gap.code)}</span>`).join("") || `<span class="gap-chip">no gap reported</span>`}</div>`;
 }
@@ -121,7 +124,8 @@ function figureAct() {
   return `<div class="act-head"><p class="eyebrow">ACT 03 / SVG</p><h2>${esc(ACTS[2].title)}</h2><p>scene 由我们的 FigureAgent 生成，AstraDraw 渲染成 SVG；交付前必须通过可访问性、安全与文本检查。</p></div>
     <div class="figure-showcase"><img src="data/figure.svg" alt="研究运行时模块关系示意图；示意图，不是实验结果" /></div>
     <div class="audit-list">${checks.map(([key, value]) => `<div class="audit-row"><span class="audit-tick">${value ? "✓" : "×"}</span><span>${esc(CHECK_LABELS[key] || key)}</span></div>`).join("")}</div>
-    <div class="hash-line"><span>SCENE ${esc((figure.manifest?.scene_sha256 || "").slice(0, 18))}…</span><span>SVG ${esc((figure.manifest?.svg_sha256 || "").slice(0, 18))}…</span><span>SCHEMATIC</span></div>`;
+    <div class="hash-line"><span>SCENE ${esc((figure.manifest?.scene_sha256 || "").slice(0, 18))}…</span><span>SVG ${esc((figure.manifest?.svg_sha256 || "").slice(0, 18))}…</span><span>SCHEMATIC</span></div>
+    <p class="fig-caption">图 2 · AstraDraw scene → SVG：审计通过后 manifest 同时记录 scene 与 svg 的 SHA-256。</p>`;
 }
 
 function paperAct() {
@@ -135,6 +139,7 @@ function paperAct() {
       <span class="flow-node is-gate"><b>Closure</b><small>全部通过</small></span>
       <span class="flow-node is-blocked"><b>G5 Export</b><small>此前 blocked</small></span>
     </div>
+    <p class="fig-caption">图 3 · 结果路径：EA 封存 → 作者签署 Claim → Closure 全过 → G5 才放行导出。</p>
     <div class="slot-grid">${(paper.slots || []).map((slot) => `<div class="slot-card"><b>${esc(slot.slot_id)}</b><span>${esc(slot.section)} · ${esc(slot.required_evidence)}</span><span class="slot-pill">${esc(slot.status)}</span></div>`).join("")}</div>
     <div class="track-grid">
       <div class="track-card"><span class="mono">PAPER TRACK</span><h3>${esc(paper.profile?.venue_type || "论文契约")}</h3><p>${esc(paper.profile?.citation_style || "GB/T 7714")} · ${(paper.sections || []).length} sections · 0 claims</p></div>
@@ -349,6 +354,68 @@ function openDemo() {
   startAuto();
 }
 
+/* ---- 滚动入场 + 分节导航高亮（reduced-motion 或 ?motion=off 时全部停用） ---- */
+function setupReveals() {
+  if (REDUCED || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-in");
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -7% 0px" });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+}
+
+function setupNavSpy() {
+  const topbar = document.querySelector(".topbar");
+  const hero = document.querySelector(".hero");
+  if (!topbar || !hero) return;
+  if (!("IntersectionObserver" in window)) { topbar.classList.add("is-scrolled"); return; }
+  new IntersectionObserver((entries) => {
+    topbar.classList.toggle("is-scrolled", !entries[entries.length - 1].isIntersecting);
+  }, { threshold: 0.06 }).observe(hero);
+  const links = Array.from(document.querySelectorAll(".nav-menu a[data-section]"));
+  if (!links.length) return;
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      links.forEach((link) => link.classList.toggle("is-active", link.dataset.section === entry.target.id));
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  ["demo", "wiring", "proof", "cite"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) spy.observe(el);
+  });
+}
+
+function setupCopyBib() {
+  const btn = $("copy-bib");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    const text = $("bib-text").textContent;
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch (error) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
+      ta.remove();
+    }
+    if (!ok) return;
+    btn.classList.add("is-done");
+    btn.querySelector("span").textContent = "已复制";
+    setTimeout(() => {
+      btn.classList.remove("is-done");
+      btn.querySelector("span").textContent = "复制";
+    }, 1800);
+  });
+}
+
 document.addEventListener("click", (event) => {
   const act = event.target.closest("[data-act]");
   if (act) selectAct(Number(act.dataset.act));
@@ -395,3 +462,6 @@ async function load() {
 
 load();
 scheduleFlows();
+setupReveals();
+setupNavSpy();
+setupCopyBib();
