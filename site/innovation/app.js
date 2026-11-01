@@ -102,7 +102,14 @@ function evidenceAct() {
       <div class="metric"><b data-count="${coverage.spans_extracted ?? 0}">0</b><span>SPANS EXTRACTED</span><em>sentence-level anchors</em></div>
       <div class="metric"><b data-count="${(coverage.gaps || []).length}">0</b><span>COVERAGE GAPS</span><em>reported, not hidden</em></div>
     </div>
-    <div class="flow-line"><span class="flow-step">QueryPlan</span><span class="flow-arrow">→</span><span class="flow-step">SourceHit</span><span class="flow-arrow">→</span><span class="flow-step">full text</span><span class="flow-arrow">→</span><span class="flow-step">Span</span><span class="flow-arrow">→</span><span class="flow-step">CoverageReceipt</span></div>
+    <div class="flow-diagram" data-flow>
+      <span class="flow-node"><b>QueryPlan</b><small>检索计划</small></span>
+      <span class="flow-node"><b>SourceHit</b><small>来源线索</small></span>
+      <span class="flow-node"><b>全文</b><small>full text</small></span>
+      <span class="flow-node"><b>Span</b><small>句级定位</small></span>
+      <span class="flow-node"><b>CoverageReceipt</b><small>覆盖回执</small></span>
+      <span class="flow-node is-gap"><b>Gap</b><small>覆盖缺口</small></span>
+    </div>
     <div class="span-stack">${spans.map((span) => `<div class="span-item"><code>${esc(span.span_id)} · ${esc(span.section)}</code>${esc(span.text)}</div>`).join("") || `<div class="span-item">没有 span。先补全文。</div>`}</div>
     <div class="gap-line">${(coverage.gaps || []).map((gap) => `<span class="gap-chip">${esc(gap.code)}</span>`).join("") || `<span class="gap-chip">no gap reported</span>`}</div>`;
 }
@@ -122,6 +129,12 @@ function paperAct() {
   const grant = state.data.modules.grant;
   const g5 = (state.data.gates || []).find((gate) => gate.gate === "G5") || {};
   return `<div class="act-head"><p class="eyebrow">ACT 04 / SLOTS + GATES</p><h2>${esc(ACTS[3].title)}</h2><p>论文与基金共享同一套 Evidence 约束：方法/结构可以先写，结果槽必须等 EA；示意图不能被冒充成结果图。</p></div>
+    <div class="flow-diagram" data-flow>
+      <span class="flow-node ok"><b>EA</b><small>封存后</small></span>
+      <span class="flow-node is-gate"><b>Claim</b><small>作者签署</small></span>
+      <span class="flow-node is-gate"><b>Closure</b><small>全部通过</small></span>
+      <span class="flow-node is-blocked"><b>G5 Export</b><small>此前 blocked</small></span>
+    </div>
     <div class="slot-grid">${(paper.slots || []).map((slot) => `<div class="slot-card"><b>${esc(slot.slot_id)}</b><span>${esc(slot.section)} · ${esc(slot.required_evidence)}</span><span class="slot-pill">${esc(slot.status)}</span></div>`).join("")}</div>
     <div class="track-grid">
       <div class="track-card"><span class="mono">PAPER TRACK</span><h3>${esc(paper.profile?.venue_type || "论文契约")}</h3><p>${esc(paper.profile?.citation_style || "GB/T 7714")} · ${(paper.sections || []).length} sections · 0 claims</p></div>
@@ -164,6 +177,62 @@ function animateCounts(root) {
   });
 }
 
+/* ---- flow diagrams：框 + SVG 连线 + 箭头（自动换行/resize 重算） ---- */
+function drawFlows(root) {
+  root.querySelectorAll("[data-flow]").forEach((container) => {
+    const nodes = Array.from(container.querySelectorAll(":scope > .flow-node"));
+    const w = container.scrollWidth || container.offsetWidth;
+    const h = container.scrollHeight || container.offsetHeight;
+    if (nodes.length < 2 || !w || !h) return;
+    if (!container.dataset.flowId) {
+      container.dataset.flowId = "fv" + Math.random().toString(36).slice(2, 8);
+    }
+    const key = container.dataset.flowId;
+    let svg = container.querySelector(":scope > svg.flow-svg");
+    if (!svg) {
+      svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "flow-svg");
+      container.insertBefore(svg, container.firstChild);
+    }
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    svg.setAttribute("width", String(w));
+    svg.setAttribute("height", String(h));
+    const cRect = container.getBoundingClientRect();
+    const pts = nodes.map((node) => {
+      const r = node.getBoundingClientRect();
+      return {
+        left: r.left - cRect.left, right: r.right - cRect.left,
+        top: r.top - cRect.top, bottom: r.bottom - cRect.top,
+        cx: r.left - cRect.left + r.width / 2, cy: r.top - cRect.top + r.height / 2
+      };
+    });
+    let body = "";
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      let pathD;
+      if (b.left >= a.right - 8) {
+        const mx = (a.right + 2 + b.left - 4) / 2;
+        pathD = `M ${a.right + 2} ${a.cy} C ${mx} ${a.cy}, ${mx} ${b.cy}, ${b.left - 4} ${b.cy}`;
+      } else if (b.top >= a.bottom - 8) {
+        const my = (a.bottom + 2 + b.top - 4) / 2;
+        pathD = `M ${a.cx} ${a.bottom + 2} C ${a.cx} ${my}, ${b.cx} ${my}, ${b.cx} ${b.top - 4}`;
+      } else {
+        pathD = `M ${a.cx} ${a.cy} L ${b.cx} ${b.cy}`;
+      }
+      const gated = /is-gate|is-gap|is-blocked/.test(nodes[i + 1].className);
+      body += `<path class="flow-link${gated ? " is-to-gate" : ""}" marker-end="url(#arrow-${key})" d="${pathD}"/>`;
+    }
+    svg.innerHTML = `<defs><marker id="arrow-${key}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#8a94b8"/></marker></defs>${body}`;
+  });
+}
+let flowRaf = null;
+function scheduleFlows() {
+  if (flowRaf) return;
+  flowRaf = requestAnimationFrame(() => { flowRaf = null; drawFlows(document); });
+}
+window.addEventListener("resize", scheduleFlows);
+window.addEventListener("load", scheduleFlows);
+
 function renderAct(index, animate = true) {
   state.act = Math.max(0, Math.min(ACTS.length - 1, index));
   const act = ACTS[state.act];
@@ -174,6 +243,7 @@ function renderAct(index, animate = true) {
     canvas.innerHTML = `<div class="act-head"><p class="eyebrow">FIXTURE NOT LOADED</p><h2>先运行 fixture pipeline。</h2><p>从项目根目录运行 <code>python -m research_agent pipeline run ...</code>，再启动静态服务器。当前页面不会调用 API。</p></div>`;
   } else {
     canvas.innerHTML = RENDERERS[state.act]();
+    drawFlows(canvas);
     if (animate) {
       canvas.classList.remove("is-enter");
       void canvas.offsetWidth;
@@ -324,3 +394,4 @@ async function load() {
 }
 
 load();
+scheduleFlows();

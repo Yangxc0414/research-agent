@@ -490,3 +490,30 @@ body.is-present .present-inline { background: var(--ink); color: #fff; border-co
 .orbit-node[data-act] { cursor: pointer; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
 .orbit-node[data-act]:hover { transform: translateY(-2px); border-color: var(--indigo); box-shadow: 0 14px 34px -20px rgba(79,70,229,.55); }
 .orbit-node[data-act]:hover i { box-shadow: 0 0 0 4px rgba(79,70,229,.1); }
+
+/* ---- flow diagrams：小框 + 连线 + 箭头 ---- */
+.flow-diagram { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 26px 42px; }
+.flow-svg { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.flow-svg .flow-link {
+  fill: none; stroke: #97a3c6; stroke-width: 1.4; stroke-dasharray: 5 5;
+  opacity: .85; animation: link-march 1.15s linear infinite;
+}
+.flow-svg .flow-link.is-to-gate { stroke: #c9a45c; }
+@keyframes link-march { to { stroke-dashoffset: -10; } }
+.flow-node {
+  position: relative; z-index: 1; display: grid; gap: 2px; justify-items: start;
+  border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 10px; background: #fff;
+  box-shadow: 0 10px 26px -22px rgba(15,23,42,.5);
+}
+.flow-node b { font-family: var(--mono); font-size: 8.5px; color: var(--ink); }
+.flow-node small { font-size: 7.5px; color: var(--faint); }
+.flow-node.is-gap, .flow-node.is-gate { border-color: rgba(180,83,9,.35); background: #fff7e8; }
+.flow-node.is-gap b, .flow-node.is-gate b { color: var(--amber); }
+.flow-node.is-blocked { border-color: rgba(190,18,60,.3); background: #fff1f3; }
+.flow-node.is-blocked b { color: var(--rose); }
+.flow-node.ok { border-color: rgba(15,118,110,.32); }
+.flow-node.ok b { color: var(--teal); }
+.flow-node.warn { border-color: rgba(180,83,9,.35); }
+.flow-node.warn b { color: var(--amber); }
+.flow-diagram { margin-top: 16px; }
+.slot-grid { margin-top: 12px; }
