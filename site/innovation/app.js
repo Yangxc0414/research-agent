@@ -1,4 +1,6 @@
 const ACT_MS = 6200;
+const ACT_MS_LONG = { trace: 11000 };
+function actMs(i) { return (ACTS[i] && ACT_MS_LONG[ACTS[i].key]) || ACT_MS; }
 const MOTION_OFF = /[?&]motion=off\b/.test(location.search);
 const REDUCED = MOTION_OFF || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.documentElement.classList.add(REDUCED ? "still" : "motion");
@@ -314,7 +316,7 @@ function pauseAuto() {
 function tick(now) {
   if (!state.playing) return;
   const elapsed = state.elapsed + (now - state.startedAt);
-  const p = Math.min(1, elapsed / ACT_MS);
+  const p = Math.min(1, elapsed / actMs(state.act));
   setProgress(p);
   if (p >= 1) {
     if (state.act < ACTS.length - 1) {
@@ -334,7 +336,7 @@ function tick(now) {
 
 function startAuto() {
   if (state.playing) return;
-  if (state.act === ACTS.length - 1 && state.elapsed >= ACT_MS) {
+  if (state.act === ACTS.length - 1 && state.elapsed >= actMs(state.act)) {
     state.elapsed = 0;
     renderAct(0, false);
     state.elapsed = 0;
