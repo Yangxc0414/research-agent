@@ -11,31 +11,31 @@ const MODULES = {
 const ORDER = ["literature", "idea", "experiment", "figure", "paper", "grant"];
 const ACTS = [
   {
-    key: "spec", name: "契约", sub: "SPEC / MODULE", title: "先写契约，再写代码。",
+    key: "spec", name: "契约", sub: "SPEC · 唯一事实源", title: "先写契约，再写代码。",
     noteTitle: "最小的可演进单元",
     noteBody: "每个子智能体都有 SPEC.md。改行为先改契约，再用 CLI 做最小更新；正文与未涉及字段保持不动。",
     noteFact: "26", noteFactLabel: "SPEC · 107 TESTS", tags: ["SPEC", "minimal diff", "changelog"]
   },
   {
-    key: "evidence", name: "证据", sub: "SPAN / COVERAGE", title: "证据不是聊天记录。",
+    key: "evidence", name: "证据", sub: "SPAN · 只认全文", title: "证据不是聊天记录。",
     noteTitle: "摘要不是证据",
     noteBody: "检索、全文、句级 span、覆盖回执分开记录；没有全文就不能生成 span，更不能创建 Claim。",
     noteFact: "0", noteFactLabel: "claims from S1", tags: ["QueryPlan", "Span", "CoverageReceipt"]
   },
   {
-    key: "figure", name: "图", sub: "SVG / PROVENANCE", title: "图也要有 provenance。",
+    key: "figure", name: "图", sub: "SVG · 源头可查", title: "图也要有 provenance。",
     noteTitle: "先审计，再交付",
     noteBody: "AstraDraw 负责 scene→SVG；我们审计 XML、ID、文本、外部引用和 aria，并把哈希写进 manifest。",
     noteFact: "PASS", noteFactLabel: "SVG AUDIT", tags: ["scene hash", "svg hash", "no external"]
   },
   {
-    key: "paper", name: "稿件", sub: "SLOT / GATE", title: "写作可以并行，结果不能抢跑。",
+    key: "paper", name: "稿件", sub: "SLOT · 结果不抢跑", title: "写作可以并行，结果不能抢跑。",
     noteTitle: "结果槽保持 pending",
     noteBody: "论文和基金只产骨架。没有 EA/Claim，结果槽不填；G5 导出保持 blocked，示意图不能绑成结果图。",
     noteFact: "5", noteFactLabel: "PENDING SLOTS", tags: ["PaperContract", "G3", "G5 blocked"]
   },
   {
-    key: "boundary", name: "边界", sub: "CLAIM / NEXT", title: "不宣称“通用 AI 科学家”。",
+    key: "boundary", name: "边界", sub: "CLAIM · 签名在人", title: "不宣称“通用 AI 科学家”。",
     noteTitle: "把不能说的说清楚",
     noteBody: "五幕演示本体是 fixture、零 API。模型接线已在本地 runtime 实测：S1 规划器与 S2–S3 提案器经网关真实调用而门禁不减，见下方 LIVE WIRING 一节。",
     noteFact: "0", noteFactLabel: "API CALLS", tags: ["fixture acts", "live wiring ✓", "H1–H4"]
@@ -282,6 +282,12 @@ function openDemo() {
 document.addEventListener("click", (event) => {
   const act = event.target.closest("[data-act]");
   if (act) selectAct(Number(act.dataset.act));
+});
+document.querySelectorAll(".orbit-node[data-act]").forEach((node) => {
+  node.addEventListener("click", () => {
+    $("stage").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" });
+    selectAct(Number(node.dataset.act));
+  });
 });
 $("start-btn").addEventListener("click", openDemo);
 $("play-btn").addEventListener("click", toggleAuto);

@@ -9,7 +9,7 @@
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
 <meta property="og:description" content="26 个模块 SPEC / artifact / gate 的可复核科研运行时；静态五幕演示。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css?v=20261101" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -34,9 +34,9 @@
     <section class="hero" id="top">
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME / 毕设创新点演示</p>
-          <h1>不是把论文写长，<br/><span>而是让每个结论有出处。</span></h1>
-          <p class="lede">26 个模块共享同一套 <b>SPEC / artifact / gate</b>：文献留下 span，实验设计只产草稿，图表留下 provenance，论文结果槽在 EA 到达前保持 pending。不是“全自动写完”，而是把科研过程做成可复核、可阻断、可维护的运行时。</p>
+          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME · 五幕推演 + 真实接线实测</p>
+          <h1>不是把论文写长，<br/><span>而是让每个结论，都有出处可查。</span></h1>
+          <p class="lede">26 个模块，同一套 <b>SPEC / artifact / gate</b>：文献落账为 span，假设自带可否证声明，实验只出草案，图表带着 provenance，结果槽在 EA 到达前保持 pending。我们做的不是一台“自动写论文”的机器，而是把科研过程本身，变成可复核、可阻断、可追溯的运行时。</p>
           <div class="hero-actions">
             <button type="button" class="primary-btn" id="start-btn">开始 90 秒演示 <span aria-hidden="true">→</span></button>
             <a class="ghost-btn" href="#proof">看技术证据</a>
@@ -64,12 +64,12 @@
               <circle class="pulse p4 p-cyan" r="2.6" />
               <circle class="pulse p5" r="2.2" />
             </svg>
-            <span class="orbit-node n1"><i></i>文献</span>
-            <span class="orbit-node n2"><i></i>假设</span>
-            <span class="orbit-node n3"><i></i>设计</span>
-            <span class="orbit-node n4"><i></i>图</span>
-            <span class="orbit-node n5"><i></i>论文</span>
-            <span class="orbit-node n6"><i></i>基金</span>
+            <span class="orbit-node n1" data-act="1" title="跳到第二幕 · 证据"><i></i>文献</span>
+            <span class="orbit-node n2" data-act="1" title="跳到第二幕 · 证据"><i></i>假设</span>
+            <span class="orbit-node n3" data-act="3" title="跳到第四幕 · 稿件"><i></i>设计</span>
+            <span class="orbit-node n4" data-act="2" title="跳到第三幕 · 图"><i></i>图</span>
+            <span class="orbit-node n5" data-act="3" title="跳到第四幕 · 稿件"><i></i>论文</span>
+            <span class="orbit-node n6" data-act="3" title="跳到第四幕 · 稿件"><i></i>基金</span>
             <div class="board-core">
               <span class="mono">CORE / INVARIANT</span>
               <b>证据闭合</b>
@@ -204,6 +204,6 @@
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js"></script>
+<script src="app.js?v=20261101"></script>
 </body>
 </html>

@@ -485,3 +485,8 @@ body.is-present .present-inline { background: var(--ink); color: #fff; border-co
   0%, 100% { box-shadow: 0 0 0 3px rgba(34,197,94,.12); }
   50% { box-shadow: 0 0 0 6px rgba(34,197,94,.05); }
 }
+
+/* hero 板节点：可点击跳幕 */
+.orbit-node[data-act] { cursor: pointer; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+.orbit-node[data-act]:hover { transform: translateY(-2px); border-color: var(--indigo); box-shadow: 0 14px 34px -20px rgba(79,70,229,.55); }
+.orbit-node[data-act]:hover i { box-shadow: 0 0 0 4px rgba(79,70,229,.1); }
