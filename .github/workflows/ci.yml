@@ -16,7 +16,12 @@ jobs:
         with:
           python-version: "3.11"
       - name: Check delivery surface
-        run: python scripts/release_check.py
+        run: |
+          if [ -f scripts/release_check.py ]; then
+            python scripts/release_check.py
+          else
+            echo "scripts/release_check.py not present (frontend-only public repo); release-surface check not applicable."
+          fi
 
   python:
     runs-on: ubuntu-latest
@@ -26,11 +31,21 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install local test dependencies
-        run: python -m pip install -r requirements-dev.txt
+        run: |
+          if [ -f requirements-dev.txt ]; then
+            python -m pip install -r requirements-dev.txt
+          else
+            echo "requirements-dev.txt not present (frontend-only public repo); skipping backend dependency install."
+          fi
       - name: Run offline test suite
         env:
           PYTHONIOENCODING: utf-8
-        run: python -m unittest discover -s tests -v
+        run: |
+          if [ -d tests ]; then
+            python -m unittest discover -s tests -v
+          else
+            echo "tests/ not present (frontend-only public repo); python suite not applicable. Web suite runs in the web job."
+          fi
 
   web:
     runs-on: ubuntu-latest
