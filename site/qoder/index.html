@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Qoder 接入 · Research Agent</title>
+<meta name="description" content="Qoder 通过 MCP 驱动 Research Agent：工具调用、host-model turn、证据 artifact 与人工门。静态页只做说明，真实运行在本地 runtime。" />
+<style>
+:root{
+  --ink:#0f172a; --muted:#5b6b84; --faint:#8a99ad; --line:#dbe5f2;
+  --bg:#f7faff; --surface:#ffffff; --indigo:#4f46e5; --teal:#0f9f8f;
+  --amber:#b7791f; --violet:#7c3aed; --soft:#eef3fb; --shadow:0 20px 60px rgba(22,45,80,.08);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.top{position:sticky;top:0;z-index:10;background:rgba(247,250,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.brand{font-weight:800;letter-spacing:.08em;font-size:13px}
+.brand span{color:var(--indigo)}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{padding:7px 11px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--muted);background:#fff}
+.nav a:hover{border-color:#b9c8e6;color:var(--ink)}
+.hero{padding:64px 0 36px;border-bottom:1px solid var(--line);background:
+  radial-gradient(900px 380px at 85% -10%,rgba(79,70,229,.12),transparent 65%),
+  radial-gradient(600px 300px at 0% 20%,rgba(15,159,143,.08),transparent 60%)}
+.eyebrow{font:700 11px/1.4 var(--mono);letter-spacing:.16em;color:var(--indigo);text-transform:uppercase}
+h1{font-size:clamp(34px,5.4vw,62px);line-height:1.08;letter-spacing:-.045em;margin:14px 0 18px;max-width:920px}
+h1 em{font-style:normal;color:var(--indigo)}
+.lede{max-width:760px;color:var(--muted);font-size:17px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.btn{padding:11px 16px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:650;font-size:13px}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+section.block{padding:46px 0;border-bottom:1px solid var(--line)}
+h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.035em;margin:8px 0 10px}
+.sub{color:var(--muted);max-width:820px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.step b{display:block;font-size:13px;margin:6px 0 4px}
+.step small{color:var(--muted);font-size:11.5px;line-height:1.55;display:block}
+.no{font:800 11px var(--mono);color:var(--indigo)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 8px;font-size:15px}
+.card p{margin:0;color:var(--muted);font-size:12.5px}
+.card ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:12px}
+.card li{margin:3px 0}
+.tag{display:inline-block;font:700 10px var(--mono);letter-spacing:.08em;color:var(--teal);border:1px solid rgba(15,159,143,.3);background:rgba(15,159,143,.07);border-radius:999px;padding:3px 8px;margin-bottom:8px}
+.tag.warn{color:var(--amber);border-color:rgba(183,121,31,.3);background:rgba(183,121,31,.07)}
+table{width:100%;border-collapse:collapse;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:12.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:700 10px var(--mono);letter-spacing:.12em;color:var(--faint);background:var(--soft)}
+tr:last-child td{border-bottom:0}
+code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:1px 5px;border-radius:5px}
+pre{background:#0f172a;color:#dbeafe;padding:16px;border-radius:14px;overflow:auto;font:12px/1.6 var(--mono);margin-top:16px}
+pre .ok{color:#7dd3fc}
+pre .dim{color:#94a3b8}
+.note{background:linear-gradient(180deg,#fff,#f6f9ff);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:18px}
+.note b{color:var(--indigo)}
+footer{padding:34px 0 50px;color:var(--faint);font-size:12px}
+@media(max-width:860px){.flow{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr}}
+@media(max-width:560px){.flow{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:42px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../">RESEARCH AGENT <span>/ QODER</span></a>
+    <nav class="nav">
+      <a href="../app/">工作台 ↗</a>
+      <a href="../innovation/">六幕创新 ↗</a>
+      <a href="../live/">本地运行时 ↗</a>
+      <a href="../">返回首页</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">MCP / HOST MODEL / HUMAN GATES</p>
+    <h1>Qoder 负责判断与编排，<br/>运行时负责<em>证据与门禁</em>。</h1>
+    <p class="lede">Qoder 通过标准 MCP 调用 40 个工具；需要模型判断的环节变成可回放的 host-model turn；每个产物落到 hash 绑定的 artifact。签名、冻结与导出不在 MCP 里，仍在 CLI 由人执行。</p>
+    <div class="actions">
+      <a class="btn primary" href="../app/">打开工作台</a>
+      <a class="btn" href="../innovation/">看六幕演示</a>
+      <a class="btn" href="#tools">40 个工具</a>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">THE LOOP</p>
+    <h2>不是“让模型写完整篇论文”。</h2>
+    <p class="sub">是把一次科研拆成可调用的工具、可回放的判断和可阻断的产物。Qoder 能推进，但不能替人签字。</p>
+    <div class="flow">
+      <div class="step"><span class="no">01 / PROPOSE</span><b>Qoder 提出</b><small>研究问题、idea、实验设计、写作草案；作为 host-model turn 保存 prompt 与回答。</small></div>
+      <div class="step"><span class="no">02 / CALL</span><b>MCP 调用</b><small>project / run / study / writing / venue 工具；参数校验、路径限制、只读或受控写入。</small></div>
+      <div class="step"><span class="no">03 / BIND</span><b>产物绑定</b><small>study_sha256、claim 草稿、closure report、审计；数字与设计在同一条哈希链上。</small></div>
+      <div class="step"><span class="no">04 / GATE</span><b>人签</b><small>G1/G2、claim/closure 签名、publish/export；Qoder 只能停在门前。</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="tools">
+  <div class="wrap">
+    <p class="eyebrow">40 TOOLS · ONE DISPATCH</p>
+    <h2>Qoder、HTTP 与 Python 共用同一套 schema。</h2>
+    <p class="sub">工具表在 <code>research_agent/mcp_tools.py</code>；没有 sign / approve / freeze / publish / export 入口。下面只列关键组。</p>
+    <table>
+      <tr><th>GROUP</th><th>TOOLS</th><th>BOUNDARY</th></tr>
+      <tr><td>项目 / 运行</td><td><code>research_project_init</code> · <code>research_bootstrap</code> · <code>research_run</code> · <code>research_status</code> · <code>research_next_actions</code></td><td>写项目内 run；不签核</td></tr>
+      <tr><td>模型判断</td><td><code>research_model_profiles</code> · <code>research_model_turns</code> · <code>research_model_respond</code> · <code>research_model_void</code></td><td>turn 可回放；key 不进浏览器</td></tr>
+      <tr><td>写作 / 审计</td><td><code>research_writing_pack</code> · <code>research_manuscript_audit</code> · <code>research_manuscript_draft</code> · <code>research_manuscript_review</code></td><td>submission_ready 恒 false</td></tr>
+      <tr><td><b>中文期刊 / 基金</b></td><td><code>research_venue_audit</code>（kind=zh_journal|grant）· <code>research_grant_template</code></td><td>骨架/合规检查；不提交</td></tr>
+      <tr><td>实验 / 闭合</td><td><code>research_experiment_codegen</code> · <code>research_closure_status</code> · <code>research_lineage_status</code> · <code>research_support_panel</code></td><td>执行与签名留在 CLI</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">A REAL CALL</p>
+    <h2>中文期刊检查是一次可复现的工具调用。</h2>
+    <p class="sub">输入项目内稿件 JSON，输出 <code>venue-audit-0.1</code>；状态只有 ready_for_human / needs_revision / blocked。</p>
+    <pre><span class="dim">// Qoder → tools/call</span>
+{
+  "name": "research_venue_audit",
+  "arguments": {
+    "project_dir": "demo",
+    "file": "inputs/manuscript.json",
+    "kind": "zh_journal",
+    "profile": "zh_core_journal"
+  }
+}
+
+<span class="dim">// result (structural audit, never a submission verdict)</span>
+{
+  "track": "zh_journal:zh_core_journal",
+  "status": "ready_for_human",
+  "submission_ready": false,
+  "checks": 10,
+  "blockers": [],
+  "warnings": []
+}</pre>
+    <div class="note"><b>检查什么：</b>中文摘要、关键词 3–8、章节、参考文献数量与中文文献、基金/资助、创新/贡献、数据/代码可用性。<b>不检查：</b>创新性、同行评审结论、官方模板页限——这些必须人工核对当年通知。</div>
+    <pre><span class="dim"># same check without Qoder, for humans and scripts</span>
+python -m research_agent venue audit --kind zh_journal   --file inputs/manuscript.json --profile zh_core_journal
+<span class="dim"># grant, with NSSFC anonymity confirmed</span>
+python -m research_agent venue audit --kind grant --scheme nssfc   --file inputs/grant.json --anonymous --identity-removed --ai-statement</pre>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">GRANT LOOP · 2026-10-31</p>
+    <h2>先给空白骨架，再检查；不替申请人写科学。</h2>
+    <p class="sub">Qoder 可以生成 NSFC/NSSFC 的章节骨架，申请人填写后再调用只读审计；空白模板会被正确 blocked。</p>
+    <pre>{"name": "research_grant_template",
+ "arguments": {"project_dir": "demo", "scheme": "nssfc",
+               "output": "grant/draft.json"}}
+
+<span class="dim">// blank sections / anonymous / ai_statement=false</span>
+{"name": "research_venue_audit",
+ "arguments": {"project_dir": "demo", "file": "grant/draft.json",
+               "kind": "grant", "scheme": "nssfc",
+               "anonymous": true, "identity_removed": true, "ai_statement": true}}
+<span class="dim">// → blocked: module.* / innovation.stated; no text is invented</span></pre>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">VERIFIED RUN · 2026-10-31</p>
+    <h2>一次真实 MCP 调用链跑到了 S1。</h2>
+    <p class="sub"><code>research_project_init</code> → <code>research_run</code>（literature_review，source=real，max_sources=2）→ <code>completed</code>。这是当前代码上的真实 dispatch，不是截图。</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">RUN</span><h3>literature_review</h3><p><code>RUN-20261031T110413Z-2b9baa</code><br/>2 sources · 761 spans · coverage partial · 2 gaps</p></div>
+      <div class="card"><span class="tag warn">BLOCKERS</span><h3>human gates</h3><p><code>S5_NOT_RUN</code> · <code>CLOSURE_NOT_RUN</code>。没有 claim、没有签名；写稿仍走确定性模板。</p></div>
+      <div class="card"><span class="tag">BOUNDARY</span><h3>不是论文结果</h3><p>S1 已跑通，但 fixture run 正确停在 <code>needs_evidence</code>（1 source / 0 spans）。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">HOST-MODEL LOOP · 2026-10-31</p>
+    <h2>三个判断回放，最后停在人工门。</h2>
+    <p class="sub">绑定 <code>idea/experiment/paper</code> 到 keyless host-agent 后，Qoder 的回答被写入 turn，再回放到同一流水线；不是把模型输出当证据。</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">IDEA</span><h3>3 candidates</h3><p><code>MT-626a27614df0</code><br/>measurement · mechanism · boundary；只引用 evidence refs。</p></div>
+      <div class="card"><span class="tag">EXPERIMENT</span><h3>design draft</h3><p><code>MT-ef31f2f4214c</code><br/>hypothesis / baseline / metric / controls / budget；不写数字。</p></div>
+      <div class="card"><span class="tag">PAPER</span><h3>non-result sections</h3><p><code>MT-dfa4dfcc55ee</code><br/>8 sections；venue audit 仍 blocked（只有 1 篇参考文献）。</p></div>
+    </div>
+    <div class="note"><b>RG-20261031T120202Z-2184bc</b> 的最终状态是 <code>needs_human</code>：Q0 pass，G1/G2 needs_human，G3/G5 blocked。没有 claim、没有签名；这就是“能自动化推进，但不能替人签字”的边界。<br/><b>STDIO SMOKE</b>：按 plugin 配置直接启动 <code>scripts/research_mcp_server.py</code>，initialize 返回 <b>0.29.7</b>、tools/list <b>41</b>，project_init → grant_template → venue_audit(blocked) 全部成功，进程 exit 0。</div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">BOUNDARY</p>
+    <h2>静态页面的“能接入”，和本地真实运行是两件事。</h2>
+    <div class="grid3">
+      <div class="card"><span class="tag">STATIC</span><h3>这个页面</h3><p>只说明接入方式，不发起 MCP 连接，不产生真实 claim。GitHub Pages 不能运行 Python。</p></div>
+      <div class="card"><span class="tag">LOCAL</span><h3>真实运行</h3><p>启动 <code>research_agent.runtime</code> 与 MCP server；Qoder 才能调用工具、回放 turn、读 artifact。</p></div>
+      <div class="card"><span class="tag warn">HUMAN</span><h3>人工门</h3><p>G1/G2、claim/closure 签名、publish/export 只在 CLI；MCP 永远没有这些工具。</p></div>
+    </div>
+    <pre><span class="dim"># local runtime</span>
+python -m research_agent.runtime --port 8787
+
+<span class="dim"># Qoder MCP (plugin/mcp.qoder.json uses the same entry)</span>
+python -m research_agent.mcp_server --root &lt;PROJECT_ROOT&gt;
+
+<span class="dim"># static demo</span>
+python -m http.server 8000 --directory site
+<span class="ok"># /app/  /innovation/  /qoder/  /live/</span></pre>
+  </div>
+</section>
+
+<footer><div class="wrap">Research Agent · Qoder/MCP integration · 40 tools · no signing over MCP · 2026-10-31</div></footer>
+</body>
+</html>

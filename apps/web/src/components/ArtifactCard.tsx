@@ -1,7 +1,32 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import type { Card } from "../domain/types";
+import { runtimeUrl } from "../adapters/runtimeApi";
+import { claimSignCommand, experimentApproveCommands, protocolFreezeCommand } from "../domain/gateCommands";
 import { selectCurrentTask, useWorkspaceStore } from "../state/workspaceStore";
+import { usePreviewStore } from "../state/previewStore";
+import { HumanGateCommand } from "./HumanGateCommand";
 import { Icon } from "./Icon";
+
+function failureSuggestion(
+  errorType: string,
+  retryable: boolean,
+  fallback?: string
+): string {
+  if (errorType === "OpenAlexError") {
+    return "OpenAlex 配额或网络受限：设置 OPENALEX_API_KEY 和/或 OPENALEX_EMAIL 后重试，或改用 local / CC-BY 来源；不要把 fixture 当真实结果。";
+  }
+  if (errorType === "ModelRequiredError") {
+    return "在设置页为必需模块绑定 runtime profile 并配置 API key，然后重试；这是配置问题，不是瞬时错误。";
+  }
+  if (errorType === "SupportAuditError") {
+    return "支持审稿发现矛盾引用：检查 support-audit.json 的句子级引用，修正证据或结论；不要签署当前 claim。";
+  }
+  if (retryable) {
+    return "瞬时检索或网络失败：检查网络后重试，或切换到其他来源。";
+  }
+  return fallback || "打开 failure.json 查看诊断，修复输入或环境后重跑。";
+}
 
 function CardHead({ label, meta }: { label: string; meta?: string }) {
   return (
@@ -37,6 +62,7 @@ function ActionButton({
 export function ArtifactCard({ card }: { card: Card }) {
   const task = useWorkspaceStore(selectCurrentTask);
   const actions = useWorkspaceStore((state) => state.actions);
+  const [gateRevealed, setGateRevealed] = useState(false);
   const autoBusy = Boolean(task?.auto.running);
   const evaluated = (task?.evaluation.hiddenAccessCount ?? 0) > 0;
 
@@ -127,7 +153,7 @@ export function ArtifactCard({ card }: { card: Card }) {
     const frozen = task?.protocolFrozen ?? false;
     return (
       <article className="artifact">
-        <CardHead label="PROTOCOL / S4" meta={frozen ? "FROZEN" : "DRAFT"} />
+        <CardHead label="PROTOCOL / S4" meta={frozen ? "DRAFT · 演示已推进" : "DRAFT"} />
         <p className="artifact-lede">{card.hypothesis}</p>
         <dl className="artifact-kv">
           <dt>Baseline</dt>
@@ -140,23 +166,32 @@ export function ArtifactCard({ card }: { card: Card }) {
           <dd>{card.controls.join(" · ")}</dd>
         </dl>
         <div className="artifact-status-row">
-          <span className={`badge ${frozen ? "ok" : "warn"}`}>
-            {frozen ? "G2 PASS (SIM)" : "G2 NEEDS_HUMAN"}
-          </span>
-          <span>冻结后不得改写主指标、对照与 seeds</span>
+          <span className="badge warn">待人工冻结</span>
+          <span>G2 由人工在终端冻结；冻结后不得改写主指标、对照与 seeds</span>
         </div>
         <Actions>
-          <ActionButton variant="primary" onClick={actions.freezeProtocol} disabled={frozen || autoBusy}>
-            {frozen ? "协议已冻结" : "冻结协议"}
+          <ActionButton variant="primary" onClick={() => setGateRevealed((open) => !open)} disabled={autoBusy}>
+            {gateRevealed ? "收起 G2 命令" : "G2 人工冻结命令"}
           </ActionButton>
           <ActionButton onClick={actions.runExperiment} disabled={!frozen || autoBusy || evaluated}>运行 3 seeds</ActionButton>
           <ActionButton onClick={() => actions.setContextTab("evidence")}>证据链</ActionButton>
         </Actions>
+        {gateRevealed && (
+          <HumanGateCommand
+            title="G2 · 待人工冻结"
+            detail="在终端核对设计、切分与停止规则后运行下面的命令；网页与 runtime 都不会代为冻结。"
+            commands={[
+              protocolFreezeCommand(),
+              ...experimentApproveCommands()
+            ]}
+          />
+        )}
       </article>
     );
   }
 
   if (card.type === "run") {
+    const claim = task?.evidence.find((item) => item.kind === "claim");
     const signed = task?.evidence.some((item) => item.kind === "claim" && item.status === "signed") ?? false;
     const delta = card.mean - card.baseline;
     return (
@@ -184,40 +219,55 @@ export function ArtifactCard({ card }: { card: Card }) {
           <dt>EA</dt>
           <dd>{card.ea}</dd>
           <dt>Claim</dt>
-          <dd>{signed ? "SIGNED (SIM)" : "UNSIGNED · 停在人工门"}</dd>
+          <dd>{signed ? "已人工签署（证据来自 CLI）" : "待人工签署 · 停在人工门"}</dd>
         </dl>
-        <p className="artifact-note">数值来自本地 fixture，仅用于演示 EA → claim 的边界，不作为真实材料实验结论。</p>
+        <p className="artifact-note">数值是演示数据，仅用于展示 EA → claim 的边界，不作为真实材料实验结论。</p>
         <Actions>
           <ActionButton onClick={() => actions.setContextTab("evidence")}>查看 EA</ActionButton>
-          <ActionButton variant="primary" onClick={actions.signClaim} disabled={signed}>
-            {signed ? "claim 已签" : "模拟签核 claim"}
+          <ActionButton variant="primary" onClick={() => setGateRevealed((open) => !open)} disabled={signed}>
+            {gateRevealed ? "收起人签命令" : "claim 人签命令"}
           </ActionButton>
         </Actions>
+        {gateRevealed && (
+          <HumanGateCommand
+            title="Q0 / S5b · 待人工签署"
+            detail="RunCapsule 与 EA 已生成，claim 仍是待签状态；签署要在终端核对数值后完成。"
+            commands={[claimSignCommand({ scope: claim?.status === "signed" ? undefined : claim?.scope })]}
+          />
+        )}
       </article>
     );
   }
 
   if (card.type === "gate") {
+    const claim = task?.evidence.find((item) => item.kind === "claim");
     const signed = task?.evidence.some((item) => item.kind === "claim" && item.status === "signed") ?? false;
-    const passed = signed || card.status === "pass";
+    const passed = signed;
     return (
       <article className={`artifact gate-card${passed ? " is-pass" : ""}`}>
-        <CardHead label={card.gate} meta={passed ? "SIGNED (SIM)" : "HUMAN GATE"} />
+        <CardHead label={card.gate} meta={passed ? "已人工签署" : "待人工签署"} />
         <div className="gate-title">
           <span className="gate-icon">
             <Icon name={passed ? "check" : "lock"} size={16} />
           </span>
           <div>
-            <b>{passed ? "claim 已由作者模拟签署" : card.title}</b>
-            <p>{card.reason}</p>
+            <b>{passed ? "claim 已由作者在 CLI 签署" : card.title}</b>
+            <p>{passed ? card.reason : "系统不会代为签署；界面只显示终端命令。"}</p>
           </div>
         </div>
         <Actions>
-          <ActionButton variant={passed ? "quiet" : "primary"} onClick={actions.signClaim} disabled={passed}>
-            {passed ? "已签署" : "模拟签核"}
+          <ActionButton variant="primary" onClick={() => setGateRevealed((open) => !open)} disabled={passed}>
+            {gateRevealed ? "收起人签命令" : "显示人签命令"}
           </ActionButton>
           <ActionButton onClick={() => actions.setContextTab("evidence")}>查看证据链</ActionButton>
         </Actions>
+        {gateRevealed && (
+          <HumanGateCommand
+            title={`${card.gate} · 待人工签署`}
+            detail={card.reason}
+            commands={[claimSignCommand({ scope: passed ? undefined : claim?.scope })]}
+          />
+        )}
       </article>
     );
   }
@@ -398,6 +448,228 @@ export function ArtifactCard({ card }: { card: Card }) {
     );
   }
 
+  if (card.type === "runtime-run") {
+    const taskFailed = card.status === "failed" || card.taskStatus === "failed";
+    const taskNeedsHuman = !taskFailed && card.status === "completed" && card.taskStatus === "needs_human";
+    const statusTone = taskFailed ? "bad" : taskNeedsHuman ? "warn" : card.status === "completed" ? "ok" : "warn";
+    const packages = card.evidencePackages ?? [];
+    const readyPackages = packages.filter((item) => item.status === "ready").length;
+    const actionPackages = packages.filter((item) =>
+      ["partial", "needs_human", "needs_signature"].includes(item.status)
+    ).length;
+    const blockedPackages = packages.filter((item) =>
+      ["missing", "blocked", "not_run"].includes(item.status)
+    ).length;
+    const sourceLabel = card.source === "fixture"
+      ? "fixture 演示"
+      : card.source === "openalex"
+        ? "OpenAlex 摘要"
+        : card.source === "real_corpus"
+          ? "CC-BY 正文"
+          : "runtime";
+    const provenanceLabel = card.source === "openalex"
+      ? "OpenAlex 摘要（无全文）"
+      : card.source === "local"
+        ? "本地全文"
+        : card.source === "real_corpus"
+          ? "CC-BY 真实正文"
+          : card.fixtureMode
+            ? "fixture（不可引用）"
+            : "runtime";
+    const openArtifact = async (artifact: { path: string; url: string }) => {
+      try {
+        const response = await fetch(runtimeUrl(artifact.url));
+        if (!response.ok) throw new Error(String(response.status));
+        const blob = await response.blob();
+        const name = artifact.path.split("/").pop() || "artifact";
+        const extension = name.split(".").pop()?.toLowerCase() ?? "";
+        const type = extension === "md"
+          ? "text/markdown"
+          : extension === "json"
+            ? "application/json"
+            : extension === "svg"
+              ? "image/svg+xml"
+              : "text/plain";
+        usePreviewStore.getState().addFile(new File([blob], name, { type }), artifact.path);
+      } catch {
+        actions.notify("产物预览失败；可直接打开链接或在本地 job 目录查看");
+      }
+    };
+    return (
+      <article className="artifact tool-card">
+        <CardHead label="LOCAL API / RUNTIME" meta={taskFailed ? "FAILED" : taskNeedsHuman ? "NEEDS HUMAN" : card.status.toUpperCase()} />
+        <div className="tool-head">
+          <span className="tool-server"><Icon name="terminal" size={14} />local runtime</span>
+          <code>{card.jobId || "queued"}</code>
+        </div>
+        <dl className="artifact-kv compact">
+          <dt>Status</dt>
+          <dd><span className={`badge ${statusTone}`}>{taskFailed ? "failed" : taskNeedsHuman ? "needs human" : card.status}</span></dd>
+          <dt>Source</dt>
+          <dd>{sourceLabel}</dd>
+          <dt>Task</dt>
+          <dd>{card.taskType ?? "—"}{card.route ? ` → ${card.route}` : ""}</dd>
+          <dt>Task status</dt>
+          <dd>{card.taskStatus ?? "—"}</dd>
+          <dt>Flow</dt>
+          <dd>{card.flowMode ?? "—"}{card.stoppedAt ? ` · stopped at ${card.stoppedAt}` : ""}</dd>
+          <dt>Run</dt>
+          <dd>{card.runId ?? "—"}</dd>
+          <dt>Job dir</dt>
+          <dd><code>{card.jobDir ?? "—"}</code></dd>
+          <dt>Stage</dt>
+          <dd>{card.stage ?? "—"} · {card.events} events</dd>
+          <dt>Provenance</dt>
+          <dd>{provenanceLabel}</dd>
+          <dt>Evidence packages</dt>
+          <dd>
+            {packages.length
+              ? `${readyPackages} 就绪 · ${actionPackages} 待处理 · ${blockedPackages} 缺失/阻断`
+              : "—"}
+          </dd>
+        </dl>
+        {card.lastEvent && <p className="artifact-note">最近事件：{card.lastEvent}</p>}
+        {card.eventLog && card.eventLog.length > 0 && (
+          <details className="runtime-events">
+            <summary>
+              事件流 · {card.eventLog.length} 条
+              <span>打开查看阶段边界</span>
+            </summary>
+            {card.eventLog.slice(-10).map((event) => (
+              <div className="runtime-event-row" key={event.seq}>
+                <code>#{event.seq}</code>
+                <span>{event.stage ?? event.type}</span>
+                <em>{event.message}</em>
+              </div>
+            ))}
+          </details>
+        )}
+        {card.warnings.length > 0 && <p className="artifact-note">{card.warnings.slice(0, 4).join(" · ")}</p>}
+        {card.error && !card.failure && <p className="artifact-note">{card.error}</p>}
+        {card.failure && (
+          <div className="artifact-next failure">
+            <b>
+              任务失败 · {card.failure.error_type || "error"} ·{" "}
+              {card.failure.retryable ? "可重试" : "需人工修复"}
+            </b>
+            <p>
+              {failureSuggestion(
+                card.failure.error_type || "",
+                Boolean(card.failure.retryable),
+                card.failure.suggested_action
+              )}
+            </p>
+            {card.failure.error && <pre>{card.failure.error}</pre>}
+          </div>
+        )}
+        {card.status === "completed" && card.stoppedAt === "G1" && card.jobDir && (
+          <div className="artifact-next">
+            <b>严格流程停在 G1</b>
+            <p>先在终端人工选择候选并生成 G1 决策，然后在 RUN 面板填入路径续跑。</p>
+            <pre>{`python -m research_agent flow g1 \\
+  --idea-file ${card.jobDir}/idea.json \\
+  --idea-id <IDEA-ID> \\
+  --human-reason "选择该候选的理由" \\
+  --output-dir ${card.jobDir}`}</pre>
+          </div>
+        )}
+        {card.status === "completed" && card.stoppedAt === "G2" && card.jobDir && (
+          <div className="artifact-next">
+            <b>严格流程停在 G2</b>
+            <p>先检查 S4 设计，再用 CLI 冻结 ProtocolCard；runtime 不会代签 G2。</p>
+            <pre>{`python -m research_agent protocol freeze-design \\
+  --design ${card.jobDir}/experiment.json \\
+  --limitation "本次适用范围" \\
+  --human-reason "已核对 baseline / 指标 / seeds" \\
+  --output-dir ${card.jobDir}/protocol`}</pre>
+          </div>
+        )}
+        {card.status === "completed"
+          && !card.stoppedAt
+          && card.jobDir
+          && card.gates?.some((gate) => gate.gate === "S5" && gate.status === "needs_human") && (
+          <div className="artifact-next">
+            <b>下一步：人签 claim</b>
+            <p>RunCapsule/EA 已生成；结果仍保持 pending。请在终端核对 EA 与数值后签署 claim，再回到 RUN 面板填入 claim 路径续跑。</p>
+            <pre>{`python -m research_agent run claim \\
+  --capsule ${card.jobDir}/run/run-capsule.json \\
+  --ea ${card.jobDir}/run/ea.json \\
+  --statement "<claim-draft.json 中的 statement>" \\
+  --human-reason "已核对 EA 与指标" \\
+  --scope S5/demo/${card.dataset || "iris"} \\
+  --output-dir ${card.jobDir}/claim`}</pre>
+            <p>续跑时在 RUN 面板填入本 job 的 run 目录，复用原 RunCapsule/EA；不要再执行新的 S5。</p>
+          </div>
+        )}
+        {card.status === "completed"
+          && !card.stoppedAt
+          && card.artifacts.some((artifact) => artifact.path.endsWith("claim/claim.json"))
+          && card.gates?.some((gate) => gate.gate === "G5" && gate.status === "blocked") && (
+          <div className="artifact-next">
+            <b>下一步：补全 Closure</b>
+            <p>claim 已绑定，但 closure 仍有未通过项。打开下方 closure-report.json 查看具体缺口；常见项是 citation.related 未绑定 bibliography。</p>
+          </div>
+        )}
+        {card.status === "completed"
+          && !card.stoppedAt
+          && card.jobDir
+          && card.artifacts.some((artifact) => artifact.path.endsWith("claim/claim.json"))
+          && card.gates?.some((gate) => gate.gate === "G5" && gate.status === "needs_human") && (
+          <div className="artifact-next">
+            <b>Closure 已就绪，等待导出签核</b>
+            <p>closure report 已通过；导出仍需人工签核。runtime 不提供 sign 端点。</p>
+            <pre>{`python -m research_agent closure sign \\
+  --report ${card.jobDir}/closure/closure-report.json \\
+  --demo ${card.jobDir}/demo.json \\
+  --claim ${card.jobDir}/claim/claim.json \\
+  --human-reason "已复核 closure 与导出清单" \\
+  --output-dir ${card.jobDir}/closure-signature`}</pre>
+          </div>
+        )}
+        {card.status === "completed"
+          && card.artifacts.some((artifact) => artifact.path.endsWith("support-audit.json")) && (
+          <p className="artifact-note">
+            {card.supportAudit?.counts
+              ? `Support audit（${card.supportAudit.method || "unknown"}）：${card.supportAudit.counts.supported ?? 0} supported · ${card.supportAudit.counts.partial ?? 0} partial · ${card.supportAudit.counts.contradicted ?? 0} contradicted · ${card.supportAudit.counts.insufficient ?? 0} insufficient。`
+              : "Support audit 已生成："}
+            句子级判定是 advisory（production 下 contradicted 会阻断），不修改 claim/gate；打开 support-audit.json 查看逐句 verdict。
+          </p>
+        )}
+        {card.status === "completed"
+          && card.artifacts.some((artifact) => artifact.path.endsWith("manuscript-audit.json")) && (
+          <p className="artifact-note">
+            中文投稿工作稿：`manuscript.md`；审计见 `manuscript-audit.json`（submission_ready
+            以文件中的 blockers 为准，不保证期刊录用）。
+          </p>
+        )}
+        {card.artifacts.length > 0 ? (
+          <ul className="source-list">
+            {card.artifacts.map((artifact, index) => (
+              <li key={artifact.path} className="runtime-artifact">
+                <span className="source-index">{String(index + 1).padStart(2, "0")}</span>
+                <a href={runtimeUrl(artifact.url)} target="_blank" rel="noopener noreferrer">{artifact.path}</a>
+                <small>{artifact.kind} · {Math.round(artifact.size / 1024)} KB</small>
+                {(artifact.kind === "text" || artifact.kind === "data" || artifact.kind === "figure") && (
+                  <button type="button" className="artifact-preview-btn" onClick={() => void openArtifact(artifact)}>
+                    预览
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="artifact-note">运行中；artifacts 会在 job 完成后出现在这里。</p>
+        )}
+        <p className="artifact-note">{card.note}</p>
+        <Actions>
+          <ActionButton onClick={() => actions.setContextTab("evidence")}>查看证据包</ActionButton>
+          <ActionButton onClick={() => actions.openSettings("runtime")}>打开执行环境</ActionButton>
+        </Actions>
+      </article>
+    );
+  }
+
+  if (card.type !== "tool") return null;
   const liveCall = task?.toolCalls.find((call) => call.tool === card.tool && call.args === card.args);
   const status = liveCall?.status ?? card.status;
   return (

@@ -51,14 +51,14 @@ export function CommandPalette() {
       { label: "工作区文件", hint: "FILES", keywords: "files folder workspace 文件 文件夹 项目说明", icon: "folder", run: () => actions.openFiles(task?.workspaceId) },
       { label: hasEvidence ? "扩展检索" : "开始检索", hint: "S1", keywords: "检索 research literature", icon: "search", run: actions.runResearch },
       ...(hasEvidence && !hasProtocol ? [{ label: "送入实验设计", hint: "S2–S4", keywords: "假设 experiment design", icon: "branch" as IconName, run: actions.designExperiment }] : []),
-      ...(hasProtocol && !protocolFrozen ? [{ label: "冻结协议", hint: "G2", keywords: "protocol freeze 冻结", icon: "lock" as IconName, run: actions.freezeProtocol }] : []),
+      ...(hasProtocol && !protocolFrozen ? [{ label: "G2 人签冻结命令", hint: "CLI ONLY", keywords: "protocol freeze 冻结 g2 人工门 cli", icon: "lock" as IconName, run: actions.freezeProtocol }] : []),
       ...(protocolFrozen && !evaluated ? [{ label: "运行实验", hint: "S5", keywords: "run experiment seeds", icon: "play" as IconName, run: actions.runExperiment }] : []),
-      ...(unsignedClaim ? [{ label: "模拟签署 claim", hint: "HUMAN GATE", keywords: "claim sign 签核 人工门", icon: "lock" as IconName, run: actions.signClaim }] : [])
+      ...(unsignedClaim ? [{ label: "claim 人签命令", hint: "CLI ONLY", keywords: "claim sign 签核 人工门 cli", icon: "lock" as IconName, run: actions.signClaim }] : [])
     ];
     const autoItems: PaletteItem[] = autoRunning
       ? [
           gateUnsigned
-            ? { label: "模拟签署 claim", hint: "HUMAN GATE", keywords: "claim sign 签核 人工门", icon: "lock", run: actions.signClaim }
+            ? { label: "claim 人签命令", hint: "CLI ONLY", keywords: "claim sign 签核 人工门 cli", icon: "lock", run: actions.signClaim }
             : autoPaused
               ? { label: "继续全自动", hint: "RESUME", keywords: "auto continue resume 自动 继续", icon: "play", run: actions.resumeAuto }
               : { label: "暂停全自动", hint: "PAUSE", keywords: "auto pause 自动 暂停", icon: "pause", run: actions.pauseAuto },

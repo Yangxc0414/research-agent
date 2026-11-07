@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Icon } from "../Icon";
+import { snapshotDateLabel } from "../../domain/rsiSemantics";
+import { LineageDag } from "./LineageDag";
 
 interface LineageNode {
   id: string;
@@ -23,6 +25,8 @@ interface ChangeSummary {
   exportAllowed: boolean;
   requiresReclosure?: boolean;
   requiresResign?: boolean;
+  actionCounts?: Record<string, number>;
+  nextSteps?: string[];
 }
 
 interface LineageSnapshot {
@@ -41,6 +45,7 @@ interface LineageSnapshot {
     signatureId: string;
     submission: boolean;
   };
+  generated_at?: string;
   nodes: LineageNode[];
   clean: ChangeSummary;
   simulatedChange: ChangeSummary & {
@@ -197,6 +202,7 @@ export function LineagePage() {
             {simulated ? "STALE PROPAGATION" : "CLEAN SNAPSHOT"}
           </span>
           <span>{data.source} · {data.summary.claimId} · {data.summary.signatureId}</span>
+          <span>{snapshotDateLabel(data.generatedAt ?? data.generated_at)}</span>
         </div>
         <button type="button" aria-pressed={simulated} className={`settings-btn ${simulated ? "primary" : ""}`} onClick={toggleSimulation}>
           {simulated ? "恢复闭合快照" : "模拟数据集变更"}
@@ -217,6 +223,14 @@ export function LineagePage() {
           <span className="lineage-blocked">EXPORT BLOCKED</span>
         </div>
       )}
+
+      <LineageDag
+        groups={groups}
+        selectedId={selected?.id ?? ""}
+        staleIds={staleSet}
+        changedIds={changedSet}
+        onSelect={setSelectedId}
+      />
 
       <div className="lineage-layout">
         <div className="lineage-flow">
@@ -277,6 +291,19 @@ export function LineagePage() {
                   <span>SHA256</span>
                   <code>{selected.hash}</code>
                 </div>
+                {Object.keys(selected.metadata).length > 0 && (
+                  <div className="lineage-deps-block">
+                    <span>METADATA</span>
+                    <div className="lineage-meta-list">
+                      {Object.entries(selected.metadata).map(([key, value]) => (
+                        <div className="lineage-meta-row" key={key}>
+                          <span>{key}</span>
+                          <code>{value === null ? "—" : String(value)}</code>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="lineage-deps-block">
                   <span>UPSTREAM</span>
                   <div className="lineage-dep-list">
@@ -311,15 +338,31 @@ export function LineagePage() {
                 <p>这是一个静态预览；真实重跑/重签走 CLI。</p>
               </div>
             </div>
+            {simulated && data.simulatedChange.actionCounts && (
+              <div className="lineage-action-counts">
+                {(["rerun", "rewrite", "recheck"] as const).map((action) => (
+                  <span key={action} className={`is-${action}`}>
+                    <b>{data.simulatedChange.actionCounts?.[action] ?? 0}</b>
+                    {action}
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="settings-note">
+              {simulated
+                ? "模拟变更已触发：以下为需要执行的处置，均未执行。"
+                : "当前快照已闭合：以下为真实重跑时的处置顺序，本预览未执行任何一步（含人签）。"}
+            </p>
             <ol className="lineage-action-list">
-              <li className={simulated ? "" : "is-done"}>用新数据重跑 S5 run</li>
-              <li className={simulated ? "" : "is-done"}>重新封存 EA 与 claim</li>
-              <li className={simulated ? "" : "is-done"}>重绑 figure / paper slots</li>
-              <li className={simulated ? "" : "is-done"}>重跑 11 项 closure</li>
-              <li className={simulated ? "" : "is-done"}>人签新 signature</li>
+              <li>用新数据重跑 S5 run</li>
+              <li>重新封存 EA 与 claim</li>
+              <li>重绑 figure / paper slots</li>
+              <li>重跑 11 项 closure</li>
+              <li>人签新 signature</li>
             </ol>
             <p className="settings-note">
               闭合快照：{data.summary.closureStatus} · {data.summary.closureChecks} checks · submission={String(data.summary.submission)}
+              {simulated && " · 处置由 lineage impact 生成，本页不执行"}
             </p>
           </div>
 

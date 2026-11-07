@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { importRuntimeSkills } from "../adapters/runtimeApi";
+import { importRuntimeSkills, loadRuntimeSkills, loadSkillUsage, loadSkillVersions } from "../adapters/runtimeApi";
 import { parseSkillFiles, scanSkillDirectory } from "../domain/skillImport";
 import { skillActivationLabel } from "../domain/skillRouting";
 import type { Skill } from "../domain/types";
@@ -31,8 +31,39 @@ export function SkillsDrawer() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [importMessage, setImportMessage] = useState("");
+  const [runtimeCatalog, setRuntimeCatalog] = useState<{ count: number; enabled: number } | null>(null);
+  const [runtimeCatalogError, setRuntimeCatalogError] = useState("");
+  const [usage, setUsage] = useState<{ total: number; failed: number } | null>(null);
+  const [versions, setVersions] = useState<Record<string, string> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadRuntimeSkills()
+      .then((snapshot) => {
+        setRuntimeCatalog({
+          count: snapshot.count,
+          enabled: snapshot.skills.filter((skill) => skill.enabled).length
+        });
+        setRuntimeCatalogError("");
+      })
+      .catch(() => {
+        setRuntimeCatalog(null);
+        setRuntimeCatalogError("runtime 未连接；仅显示浏览器本地目录");
+      });
+    loadSkillUsage()
+      .then((snapshot) => {
+        const failed = Object.values(snapshot.skills).reduce(
+          (sum, item) => sum + item.fail + item.blocked,
+          0
+        );
+        setUsage({ total: snapshot.count, failed });
+      })
+      .catch(() => setUsage(null));
+    loadSkillVersions()
+      .then((snapshot) => setVersions(snapshot.active))
+      .catch(() => setVersions(null));
+  }, []);
 
   useEffect(() => {
     if (!skillDraft) return;
@@ -244,6 +275,14 @@ export function SkillsDrawer() {
           {importMessage && <p className="skill-import-message">{importMessage}</p>}
           <p className="skill-import-note">
             导入项来自本地文件，默认停用；只登记 name / description / instructions 与工具声明，不执行 scripts，也不进入 Claim/EA。runtime 在线时会同步技能目录，但仍不授予执行权限。
+          </p>
+          <p className="skill-import-note">
+            Runtime 目录：{runtimeCatalog ? `${runtimeCatalog.count} 个 · ${runtimeCatalog.enabled} 个已启用` : runtimeCatalogError || "读取中…"}。
+            本地浏览器目录：{skills.length} 个。两套目录不会互相授予执行权限。
+            {usage ? ` 使用证据：${usage.total} 条 · 失败/阻断 ${usage.failed} 条（仅记录，不自动改 Skill）。` : ""}
+            {versions
+              ? ` 内置版本：${Object.entries(versions).map(([id, version]) => `${id}@${version}`).join(" · ")}（激活/回滚只走 CLI 人签）。`
+              : ""}
           </p>
 
           {creating && (

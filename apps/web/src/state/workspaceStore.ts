@@ -1,7 +1,19 @@
 import { create } from "zustand";
 import { folderStorage } from "../adapters/folderStorage";
 import { isSnapshot, normalizeSkill, staticAdapter } from "../adapters/staticAdapter";
-import { loadCustomAgents } from "../adapters/runtimeApi";
+import {
+  createRun,
+  getRun,
+  loadCustomAgents,
+  loadRunArtifactJson,
+  loadRunArtifacts,
+  loadRunEvents,
+  runtimeUrl,
+  type RunEvent
+} from "../adapters/runtimeApi";
+import { applyRuntimeSnapshot, defaultRuntimeSource, type RuntimeDemo } from "../domain/runtimeSnapshot";
+import { compactRuntimeLoop } from "../domain/runtimeLoop";
+import { claimSignCommand, CLI_ONLY_NOTE, protocolFreezeCommand } from "../domain/gateCommands";
 import { ACCESS_META, AUTO_STAGE_CATALOG, DEFAULT_PREFERENCES, builtinSkills, clampModel } from "../domain/catalog";
 import { DEFAULT_SHORTCUTS } from "../domain/shortcuts";
 import { hypothesisConvergence, literatureCoverage } from "../domain/researchBrief";
@@ -35,6 +47,9 @@ import type {
   Plugin,
   Preferences,
   ResearchTask,
+  RuntimeFlowMode,
+  RuntimeSource,
+  RuntimeTaskType,
   SettingsOrigin,
   SettingsSection,
   ShortcutAction,
@@ -59,9 +74,7 @@ const defaultUI: UIState = {
   welcomeOpen: true,
   skillsOpen: false,
   draftAccess: "ask",
-  draftProfileId: "gpt-5",
-  draftModelBudget: null,
-  modelDialogScope: "task",
+  draftProfileId: "glm-5.3-flash",
   skillDraft: null,
   permissionRequest: null,
   newTaskOpen: false,
@@ -80,13 +93,6 @@ const defaultUI: UIState = {
 export interface ToastState {
   id: string;
   text: string;
-}
-
-export interface StreamingState {
-  taskId: string;
-  full: string;
-  text: string;
-  card?: Card;
 }
 
 type OverlayKey = "newTaskOpen" | "modelOpen" | "pluginsOpen" | "skillsOpen" | "paletteOpen";
@@ -147,6 +153,20 @@ interface WorkspaceActions {
   deleteSkill: (id: string) => void;
   invokeSkill: (id: string, note?: string) => void;
   runReviewPack: () => Promise<void>;
+  startLiveRun: (
+    source?: RuntimeSource,
+    taskType?: RuntimeTaskType,
+    flowMode?: RuntimeFlowMode,
+    options?: {
+      runDataset?: "" | "iris" | "breast_cancer" | "chemlab";
+      runSeeds?: number;
+      g1DecisionFile?: string;
+      protocolFile?: string;
+      claimFile?: string;
+      bibliographyFile?: string;
+      runDir?: string;
+    }
+  ) => Promise<void>;
   confirmPermission: () => void;
   cancelPermission: () => void;
   startAuto: () => void;
@@ -169,14 +189,34 @@ interface WorkspaceActions {
   resetWorkspace: () => void;
   notify: (text: string) => void;
   dismissToast: () => void;
-  agentReply: (taskId: string, text: string, card?: Card) => void;
 }
 
 export interface WorkspaceStore extends PersistedWorkspace {
   ui: UIState;
   toast: ToastState | null;
-  streaming: StreamingState | null;
   actions: WorkspaceActions;
+}
+
+const RUNTIME_STAGE_ALIASES: Record<string, string> = {
+  literature: "S1",
+  idea: "S2–S3",
+  experiment: "S4",
+  run: "S5a",
+  judge: "S5b",
+  support: "S5b",
+  figure: "S6",
+  paper: "S8–S12",
+  writing: "S8–S12",
+  closure: "S13–S16",
+  meta: "META",
+  rsi: "META"
+};
+
+function runtimeStageIndex(stage?: string | null): number {
+  if (!stage) return -1;
+  const normalize = (value: string) => value.replace(/[-–—]/g, "–").trim().toUpperCase();
+  const target = normalize(RUNTIME_STAGE_ALIASES[stage.trim().toLowerCase()] ?? stage);
+  return AUTO_STAGE_CATALOG.findIndex((entry) => normalize(entry.id) === target);
 }
 
 function message(role: Message["role"], text: string, card?: Card): Message {
@@ -247,11 +287,11 @@ function claimGateCard(status: GateStatus = "needs_human"): Card {
   return {
     type: "gate",
     gate: "S5 · CLAIM",
-    title: status === "pass" ? "claim 已由作者模拟签署" : "人工门：claim 尚未签署",
+    title: status === "pass" ? "claim 已由作者在 CLI 签署" : "人工门：claim 待人工签署",
     reason:
       status === "pass"
-        ? "静态预览中由人工按钮触发；真实系统只接受作者/PI 的签名，且签名进入不可回写证据层。"
-        : "EA 已封存，但 claim 必须由作者/PI 签核；系统不会自动生成结论。",
+        ? "签名来自本地 CLI 的证据文件；工作台只读取该状态，不会代为签署。"
+        : "EA 已封存，但 claim 必须由作者/PI 在终端签核；系统不会自动生成结论，也不会代为签署。",
     status
   };
 }
@@ -397,7 +437,7 @@ function skillCardFor(task: ResearchTask, skill: Skill): Card {
       steps: [
         skillStep("候选目标", Boolean(candidate), candidate?.target ?? "无候选"),
         skillStep("dry-run / public / hidden", Boolean(candidate), candidate?.evidence ?? "未登记证据"),
-        skillStep("人工准入", active, active ? "已准入 (SIM)" : "等待人工"),
+        skillStep("人工准入", active, active ? "已准入（演示数据）" : "等待人工"),
         skillStep("租约与回滚", active, candidate?.lease ?? "未授予")
       ],
       note: "preflight 只检查治理字段；claim / evidence / gate / rubric / export / signature 保持不可写。"
@@ -645,7 +685,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
 
   if (stage.gate) {
     coverage = { sources: 4, spans: 12, gaps: 2, abstractOnly: 1 };
-    gates = gate(gates, "S5", "pass", "EA sealed (SIM)");
+    gates = gate(gates, "S5", "pass", "EA 已封存（演示数据）");
     gates = gate(gates, "G5", "blocked", "claim 未签；closure 未运行");
     evidence = withEvidence(evidence, {
       id: "CLAIM-014",
@@ -661,13 +701,13 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
     messages.push(
       message(
         "agent",
-        "EA 已封存。claim 尚未签署，全自动停在人工门；你可以先看证据链，再决定是否模拟签核。",
+        "EA 已封存。claim 尚未签署，全自动停在人工门；你可以先看证据链，再查看终端里的人签命令。",
         claimGateCard("needs_human")
       )
     );
   } else if (index === 0) {
     coverage = { sources: 4, spans: 12, gaps: 2, abstractOnly: 1 };
-    gates = gate(gates, "Q0", "pass", "12 spans / 2 gaps recorded (SIM)");
+    gates = gate(gates, "Q0", "pass", "12 spans / 2 gaps 已记录（演示数据）");
     gates = gate(gates, "G1", "needs_human", "2 个候选假设等待收敛");
     evidence = withEvidence(evidence, {
       id: "GAP-001",
@@ -679,7 +719,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
       note: "4 篇来源中只有 2 篇报告 T80。"
     });
     messages.push(
-      message("agent", "**S1 · 检索完成**\n\n- 3 条全文 / 1 条摘要-only，覆盖 2022–2025 主线文献\n- 12 个可定位 span；2 个 coverage gap 已登记\n- 方法学与评测口径两个面向覆盖偏薄，饱和度停在 partial\n\n> 摘要-only 只作线索，不生成 span。", sourcesCard())
+      message("agent", "**S1 · 检索完成**\n\n- 3 条全文 / 1 条摘要-only\n- 12 个可定位 span\n- 2 个 coverage gap\n\n> 摘要-only 只作线索，不生成 span。", sourcesCard())
     );
   } else if (index === 1) {
     gates = gate(gates, "G1", "pass", "演示策略自动收敛；生产环境需人签");
@@ -692,12 +732,12 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
       refs: ["SPAN-014", "SPAN-021"]
     });
     messages.push(
-      message("agent", "### G1 · 假设收敛\n\n两个候选的取舍理由：\n\n- **保留 H1**（双分子钝化层 → 延长 T80）：有缺陷密度测量的直接 span 支撑，且能设计出对照实验\n- **搁置 H2**（疏水性主因）：SPAN-009 只有间接关联，先验证 H1 再回头检验更省预算\n\n> 候选仍不是 claim；生产环境必须人签。", ideaCard())
+      message("agent", "### G1 · 假设收敛\n\n- 保留 H1：双分子钝化层 → 延长 T80\n- 搁置 H2：疏水性主因\n\n> 候选仍不是 claim；生产环境必须人签。", ideaCard())
     );
   } else if (index === 2) {
     protocol = { ...DEFAULT_PROTOCOL, controls: [...DEFAULT_PROTOCOL.controls] };
     protocolFrozen = true;
-    gates = gate(gates, "G2", "pass", "协议冻结 (SIM)");
+    gates = gate(gates, "G2", "pass", "演示推进；真实 G2 冻结由 CLI 完成");
     messages.push(message("system", "G2 · 协议已冻结；后续运行不得改写主指标、对照与 seeds。"));
   } else if (index === 3) {
     run = {
@@ -717,17 +757,17 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
       trainCost: evaluation.trainCost ?? 2.4,
       evalRuleHash: evaluation.evalRuleHash === "—" ? "sha256:7c41e2" : evaluation.evalRuleHash
     };
-    gates = gate(gates, "S5", "pass", "RUN-014 完成；EA 已封存 (SIM)");
+    gates = gate(gates, "S5", "pass", "RUN-014 完成；EA 已封存（演示数据）");
     messages.push(
-      message("agent", "**RUN-014 完成**\n\n| seed | T80 (h) |\n| --- | --- |\n| 1 | 404 |\n| 2 | 415 |\n| 3 | 417 |\n| **mean** | **412** |\n\n- 3 seeds · EA-7c41 已封存；基线 286 h 来自复现\n- 数值只来自本地 fixture，不冒充真实材料实验\n\n> 它与真实材料实验不是同一证据臂。", runCard())
+      message("agent", "**RUN-014 完成**\n\n- 3 seeds · EA 已封存\n- 数值只来自本地 fixture\n\n> 它与真实材料实验不是同一证据臂。", runCard())
     );
   } else if (index === 5) {
     messages.push(message("system", "S6 · SVG 与 manifest 已绑定到 EA-7c41；图不能脱离 EA 单独引用。"));
   } else if (index === 6) {
     messages.push(message("system", "S8–S12 · result.primary 仍为 pending_evidence；写作槽位不会抢先填数。"));
   } else if (index === 7) {
-    gates = gate(gates, "G5", "blocked", "closure 9/11；citation.related 仍待补");
-    messages.push(message("system", "S13–S16 · closure 9/11；缺 citation.related。导出保持锁定。"));
+    gates = gate(gates, "G5", "blocked", "演示快照：closure 未运行；导出保持锁定");
+    messages.push(message("system", "S13–S16 · 演示快照：closure 未运行，导出保持锁定；真实闭合状态请读 CLI closure 报告。"));
   } else if (index === 8) {
     const candidate = makeCandidate();
     evolution = {
@@ -749,7 +789,7 @@ function advanceAuto(task: ResearchTask, pauseAfter: boolean, skills: Skill[] = 
   if (finished) {
     auto = { ...auto, running: false, paused: false, gate: "", gateApproved: false };
     messages.push(
-      message("system", "全自动完成（SIM）。claim 已签署；closure 仍未通过，导出与署名保持锁定。")
+      message("system", "全自动演示已跑完阶段；claim 仍待人工签署，closure 未通过，导出与署名保持锁定。")
     );
   } else if (!auto.paused) {
     const next = autoStages[index + 1];
@@ -886,53 +926,6 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     set({ toast: { id: uid("toast"), text } });
   };
 
-  // 流式回复：思考停顿 → 逐段显现 → 落盘为正式消息；reduceMotion 直出。
-  let streamTimer: number | null = null;
-  let streamSeq = 0;
-  const clearStreamTimer = (): void => {
-    if (streamTimer !== null) {
-      window.clearTimeout(streamTimer);
-      streamTimer = null;
-    }
-  };
-  const finalizeStream = (): void => {
-    clearStreamTimer();
-    const active = get().streaming;
-    if (!active) return;
-    set({ streaming: null });
-    mutateTask(active.taskId, (item) => ({
-      ...item,
-      messages: [...item.messages, message("agent", active.full, active.card)]
-    }));
-  };
-  const agentReply = (taskId: string, text: string, card?: Card): void => {
-    if (get().streaming) finalizeStream();
-    if (!text || get().preferences.reduceMotion) {
-      mutateTask(taskId, (item) => ({
-        ...item,
-        messages: [...item.messages, message("agent", text, card)]
-      }));
-      return;
-    }
-    const seq = ++streamSeq;
-    set({ streaming: { taskId, full: text, text: "", ...(card ? { card } : {}) } });
-    const perTick = Math.max(2, Math.ceil(text.length / 85));
-    let shown = 0;
-    const step = (): void => {
-      if (seq !== streamSeq) return;
-      shown = Math.min(text.length, shown + perTick);
-      set((state) => (state.streaming ? { streaming: { ...state.streaming, text: text.slice(0, shown) } } : {}));
-      if (shown < text.length) {
-        streamTimer = window.setTimeout(step, 24);
-      } else {
-        streamTimer = window.setTimeout(() => {
-          if (seq === streamSeq) finalizeStream();
-        }, 280);
-      }
-    };
-    streamTimer = window.setTimeout(step, 430 + Math.min(700, text.length * 2));
-  };
-
   const openOverlay = (key: OverlayKey): void => {
     set((state) => ({
       ui: {
@@ -975,7 +968,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     messages: [
       ...task.messages,
       message("system", `受治理全自动 · cycle ${task.auto.cycle + 1} · 将在 S5b claim 人工门暂停。`),
-      message("agent", "我会按 S1 → META 连续推进，每一步的产物都写进右侧 stage trace：检索留下 span，设计只出草案，EA 封存后停在 claim 人工门等你签署。\n\n运行中随时输入文字就是指导，会在下一个阶段边界生效；暂停、单步、停止随时可用。claim 与导出不会自动签署。")
+      message("agent", "我会连续执行 S1→META。你可以随时输入指导，指导会在下一个阶段边界生效；claim 与导出不会自动签署。")
     ]
   });
 
@@ -1036,7 +1029,6 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
     },
     ui: defaultUI,
     toast: null,
-    streaming: null,
     actions: {
       selectTask: (id) => {
         const task = get().tasks.find((item) => item.id === id);
@@ -1145,17 +1137,23 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           notify(`技能草稿已生成：${skillDraft.name}；在 Skills 面板确认保存`);
           return;
         }
+        const liveMatch = /^\/live(?:\s+(.*))?$/i.exec(text);
+        const liveTopic = liveMatch ? (liveMatch[1] || "").trim() : "";
+        if (liveMatch && !liveTopic) {
+          notify("在欢迎页使用 /live 需要跟上研究问题，例如：/live 钙钛矿界面钝化");
+          return;
+        }
+        const sessionText = liveMatch ? liveTopic : text;
         const baseTask = createConversationTask({
-          text,
+          text: sessionText,
           workspaceId: workspace.id,
           access: input.access,
           profileId: state.ui.draftProfileId,
           thinkingStop: input.thinkingStop,
-          modelBudget: state.ui.draftModelBudget ?? undefined,
           attachments: input.attachments
         });
-        const decision = text.startsWith("/")
-          ? routeSkill({ text, mode: baseTask.mode, skills: state.skills })
+        const decision = sessionText.startsWith("/")
+          ? routeSkill({ text: sessionText, mode: baseTask.mode, skills: state.skills })
           : null;
         const task = decision?.primary ? insertSkillUse(baseTask, decision.primary) : baseTask;
         set((current) => ({
@@ -1174,6 +1172,11 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             expandedWorkspaces: { ...current.ui.expandedWorkspaces, [workspace.id]: true }
           }
         }));
+        if (liveMatch) {
+          notify("新会话已开始 · 正在连接本地 runtime");
+          void get().actions.startLiveRun();
+          return;
+        }
         notify("新会话已开始 · 本地静态状态");
       },
       activateWorkspace: (id) => {
@@ -1660,6 +1663,15 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             case "run":
               get().actions.runExperiment();
               return;
+            case "live": {
+              const latestTask = currentTask();
+              const source: RuntimeSource | undefined =
+                arg === "fixture" || arg === "real" || arg === "openalex"
+                  ? (arg === "real" ? "real_corpus" : arg)
+                  : latestTask ? defaultRuntimeSource(latestTask) : undefined;
+              void get().actions.startLiveRun(source);
+              return;
+            }
             case "writing":
               get().actions.prepareWriting();
               return;
@@ -1716,7 +1728,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
                   ...item.messages,
                   message(
                     "agent",
-                    "可用指令：/research 检索、/review 运行审阅包、/experiment 设计、/freeze 冻结、/run 运行、/writing 写作槽位、/sign 签署、/start 全自动、/pause /resume /step /stop 控制、/evidence、/eval、/evolution、/lineage、/skills、/agents、/files、/memory、/new、/model、/plugins、/export、/settings、/help；输入 /技能 id 可直接调用 Skill。也可以说“帮我创建一个技能……”或 /skill-creator 生成草稿，确认后再保存。运行中输入普通文本会变成指导，在下一个阶段边界生效。"
+                    "可用指令：/research 检索、/review 运行审阅包、/experiment 设计、/freeze 冻结、/run 运行、/live 本地 API 运行、/writing 写作槽位、/sign 签署、/start 全自动、/pause /resume /step /stop 控制、/evidence、/eval、/evolution、/lineage、/skills、/agents、/files、/memory、/new、/model、/plugins、/export、/settings、/help；输入 /技能 id 可直接调用 Skill。也可以说“帮我创建一个技能……”或 /skill-creator 生成草稿，确认后再保存。运行中输入普通文本会变成指导，在下一个阶段边界生效。"
                   )
                 ]
               }));
@@ -1779,29 +1791,24 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           get().actions.runResearch();
         } else if (/证据|claim|EA|门禁/i.test(text)) {
           get().actions.setContextTab("evidence");
-          get().actions.agentReply(
-            latest.id,
-            "右侧已切到证据链。当前可宣称的边界以 span 与 gate 为准：\n\n- **GAP-001** 湿热循环后的配对定量对照缺失（open）\n- **CAND-H1 / H2** 两个候选假设，等待 G1 人工收敛\n- 没有 span 支撑的说法不会进入 claim\n\n> 静态预览不会自动写 claim；签署只能由作者完成。"
-          );
+          appendToCurrent((item) => ({
+            ...item,
+            messages: [
+              ...item.messages,
+              message("agent", "右侧已切到证据链。当前可宣称的边界以 span 与 gate 为准；静态预览不会自动写 claim。")
+            ]
+          }));
         } else {
-          const clean = text.replace(/\s+/g, " ").trim();
-          const short = clean.length > 42 ? `${clean.slice(0, 42)}…` : clean;
-          const core = clean
-            .replace(/[？?！!。.]+$/, "")
-            .replace(/(是什么|怎么样|有哪些|为什么|如何|怎么办|吗)$/g, "");
-          let q1 = core.slice(0, 12);
-          if (core.length > 12) q1 = q1.replace(/ ?[A-Za-z]+$/, "");
-          q1 = q1.trim() || "研究问题";
-          get().actions.agentReply(
-            latest.id,
-            `已收到：**${short}**\n\n按证据边界把它拆成三步：\n\n1. **对象与范围** — 明确研究对象、时间窗与纳入标准；先宽后深，避免一开始就收窄到结论\n2. **检索式** — \`${q1}\` 与 \`${q1} review\`，中英各一组；综述/方法/评测三个入口都扫一遍\n3. **证据出口** — 全文登记为可定位 span，摘要-only 只作线索；先看覆盖，再谈 gap\n\n> 静态预览不调用模型，这是确定性路由的示例回答；接入本地 runtime 后会替换为真实检索与模型回复。`,
-            planCard(
-              [q1, `${q1} review`, "英文对应检索式"],
-              "近五年 · 中英双语 · 公开摘要/全文",
-              "4 sources · span-only",
-              "摘要-only 只作线索；没有全文不生成 span。"
-            )
-          );
+          appendToCurrent((item) => ({
+            ...item,
+            messages: [
+              ...item.messages,
+              message(
+                "agent",
+                "已收到。当前是静态适配器，不会调用模型或外部 API。你可以点上方建议推进流程，或用 /start 运行受治理全自动、/plugins 查看工具审批。"
+              )
+            ]
+          }));
         }
       },
       runResearch: () => {
@@ -1819,7 +1826,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           autoStages: stagesDone(task.autoStages, [0]),
           coverage: { sources: 4, spans: 12, gaps: 2, abstractOnly: 1 },
           budget: { ...task.budget, used: Math.min(task.budget.total, task.budget.used + 4) },
-          gates: gate(gate(task.gates, "Q0", "pass", "12 spans / 2 gaps recorded (SIM)"), "G1", "needs_human", "2 个候选假设等待收敛"),
+          gates: gate(gate(task.gates, "Q0", "pass", "12 spans / 2 gaps 已记录（演示数据）"), "G1", "needs_human", "2 个候选假设等待收敛"),
           evidence: withEvidence(
             withEvidence(
               withEvidence(task.evidence, {
@@ -1851,11 +1858,11 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           ),
           messages: [
             ...task.messages,
-            message("agent", "**扩展检索完成（SIM）**\n\n- 3 条全文 / 1 条摘要-only；12 个可定位 span\n- 新增 2 条 gap：评测口径不统一、长期循环数据缺失\n\n并排读完后的判断：钝化有效这件事证据充分，缺的是“增益里有多少来自钝化层”的配对对照。", sourcesCard()),
-            message("agent", "### 证据边界\n\n现在的证据状态：**足以支撑假设，还不足以支撑 claim**。\n\n- 缺口集中在长期循环数据与统一评测口径\n\n> 可以选一个候选进入 S4，但 G1 收敛必须由你完成——这一步没有委托路径。", ideaCard())
+            message("agent", "**扩展检索完成（演示数据）**\n\n- 3 条全文 / 1 条摘要-only\n- 12 个可定位 span\n- 新增 2 条 gap", sourcesCard()),
+            message("agent", "### 证据边界\n\n- 证据足够支撑假设\n- 还不足以支撑 claim\n\n> 可以选一个候选进入 S4，但不能跳过人工门。", ideaCard())
           ]
         }, "literature-brief", "检索完成，按需复核来源、全文与 span。"));
-        notify("检索完成（SIM）：12 spans / 2 gaps");
+        notify("检索完成（演示数据）：12 spans / 2 gaps");
       },
       designExperiment: () => {
         const active = currentTask();
@@ -1880,13 +1887,13 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           completedStages: Array.from(new Set([...task.completedStages, 0, 1])),
           autoStages: stagesDone(task.autoStages, [0, 1]),
           protocol: task.protocol ?? { ...DEFAULT_PROTOCOL, controls: [...DEFAULT_PROTOCOL.controls] },
-          gates: gate(gate(task.gates, "G1", "pass", "人工选择 H1 (SIM)"), "G2", "needs_human", "协议等待人工冻结"),
+          gates: gate(gate(task.gates, "G1", "pass", "演示推进；真实 G1 由 CLI flow g1 决定"), "G2", "needs_human", "协议等待人工冻结"),
           budget: { ...task.budget, used: Math.min(task.budget.total, task.budget.used + 2) },
           messages: [
             ...task.messages,
             message(
               "agent",
-              "**H1 已送入 S4 设计**\n\n设计草案围绕“可否证”展开：\n\n- **主指标**：T80 / 初始 PCE——T80 直接对应你的问题；PCE 用来排除“用效率换寿命”的假改进\n- **对照**：未钝化 / 单分子钝化——把“加层有效”与“加法本身有效”分开\n- **seeds：3**——当前预算内可复现的最小配置\n\n> 下一步是人工冻结协议，而不是直接运行。",
+              "**H1 已送入 S4 设计**\n\n- 主指标：T80 / 初始 PCE\n- 对照：未钝化 / 单分子钝化\n- seeds：3\n\n> 下一步是人工冻结协议，而不是直接运行。",
               protocolCard()
             )
           ]
@@ -1896,28 +1903,25 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
       freezeProtocol: () => {
         const task = currentTask();
         if (!task) return;
-        if (task.auto.running) {
-          notify("全自动运行中；人工冻结前请先暂停并停止");
-          return;
-        }
-        if (denyReadOnly(task, "冻结协议")) return;
         if (!task.protocol) {
-          notify("没有可冻结的协议；先送入实验设计");
+          notify("没有可冻结的协议草案；先送入实验设计");
           return;
         }
-        mutateTask(task.id, (item) => appendAutoSkill({
+        mutateTask(task.id, (item) => ({
           ...item,
-          protocolFrozen: true,
-          stage: Math.max(item.stage, 2),
-          completedStages: Array.from(new Set([...item.completedStages, 2])),
-          autoStages: stagesDone(item.autoStages, [2]),
-          gates: gate(item.gates, "G2", "pass", "协议已冻结 (SIM)"),
+          gates: gate(item.gates, "G2", "needs_human", "G2 等待人工在终端冻结；网页不冻结协议"),
           messages: [
             ...item.messages,
-            message("system", "G2 · 协议已由人工模拟冻结；主指标、对照与 seeds 锁定。")
+            message(
+              "agent",
+              "G2 · 待人工冻结。协议保持待定，主指标、对照与 seeds 尚未锁定。请在终端核对后执行：\n\n```bash\n" +
+                protocolFreezeCommand() +
+                "\n```\n\n" +
+                CLI_ONLY_NOTE
+            )
           ]
-        }, "protocol-review", "协议已冻结，按需检查 G2 与不可改写字段。"));
-        notify("协议已冻结（SIM）；现在可以运行");
+        }));
+        notify("G2 保持待人工冻结；已在会话中给出 CLI 命令");
       },
       runExperiment: () => {
         const task = currentTask();
@@ -1971,7 +1975,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             trainCost: item.evaluation.trainCost ?? 2.4,
             evalRuleHash: item.evaluation.evalRuleHash === "—" ? "sha256:7c41e2" : item.evaluation.evalRuleHash
           },
-          gates: gate(gate(item.gates, "S5", "pass", "EA sealed (SIM)"), "G5", "blocked", "claim 未签；closure 未运行"),
+          gates: gate(gate(item.gates, "S5", "pass", "EA 已封存（演示数据）"), "G5", "blocked", "claim 未签；closure 未运行"),
           evidence: withEvidence(item.evidence, {
             id: "CLAIM-014",
             kind: "claim",
@@ -1984,37 +1988,37 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           budget: { ...item.budget, used: Math.min(item.budget.total, item.budget.used + 6) },
           messages: [
             ...item.messages,
-            message("agent", "**RUN-014 完成**\n\n| seed | T80 (h) |\n| --- | --- |\n| 1 | 404 |\n| 2 | 415 |\n| 3 | 417 |\n| **mean** | **412** |\n\n- 3 seeds · EA-7c41 已封存；基线 286 h 来自复现\n- 数值来自本地 fixture，不冒充真实材料实验", runCard()),
-            message("agent", "现在停在 **claim 人工门**。\n\n- EA-7c41 已封存：mean 412 h，比复现基线 286 h 高约 44%\n- 效应量看起来明显，但 3 个种子不足以排除随机性——签署前建议看一眼 EA 里的逐种子分布\n- 未签 claim 之前，写作与导出保持 pending\n\n> 系统不会自动生成结论；签署只能由作者完成。", claimGateCard("needs_human"))
+            message("agent", "**RUN-014 完成**\n\n- 3 seeds · EA 已封存\n- 数值来自本地 fixture\n\n> 不冒充真实材料实验。", runCard()),
+            message("agent", "现在停在 claim 人工门。\n\n- 未签 claim 之前，写作与导出保持 pending\n- 系统不会自动生成结论", claimGateCard("needs_human"))
           ]
         }, "evidence-audit", "EA 已封存，按需检查 span→claim→EA 边界。"));
-        notify("EA 已封存（SIM）；claim 等待人工签署");
+        notify("EA 已封存（演示数据）；claim 等待人工签署");
       },
       signClaim: () => {
         const task = currentTask();
         if (!task) return;
-        if (denyReadOnly(task, "签署 claim")) return;
         const claim = task.evidence.find((item) => item.kind === "claim" && item.status === "unsigned");
         if (!claim) {
-          notify("没有待签署的 claim；先生成 EA");
+          notify("没有待签署的 claim；先生成 EA 与 claim draft");
           return;
         }
-        mutateTask(task.id, (item) => appendAutoSkill({
+        mutateTask(task.id, (item) => ({
           ...item,
-          status: "active",
-          auto: { ...item.auto, gate: "", gateApproved: true },
-          completedStages: Array.from(new Set([...item.completedStages, 4])),
-          autoStages: stagesDone(item.autoStages, [4]),
-          gates: gate(item.gates, "G5", "blocked", "claim 已签；closure 未运行"),
-          evidence: item.evidence.map((entry) =>
-            entry.id === claim.id ? { ...entry, status: "signed" } : entry
-          ),
+          auto: { ...item.auto, paused: true, gate: "claim", gateApproved: false },
+          gates: gate(item.gates, "G5", "blocked", "claim 待人工签署；closure 未运行"),
           messages: [
             ...item.messages,
-            message("agent", "claim 已由作者在静态预览中模拟签署。签署后它进入证据层的不可回写区：RSI 候选、写作槽位与导出模板都只能引用，不能改写。\n\n- closure 仍未通过：citation.related 还有 2 条待补，导出保持锁定\n- 下一步是补齐引用，跑 closure.check", claimGateCard("pass"))
+            message(
+              "agent",
+              "Q0 / S5b · claim 保持待人工签署。浏览器里的点击不产生签名；请在终端核对 EA 后执行：\n\n```bash\n" +
+                claimSignCommand({ scope: claim.scope }) +
+                "\n```\n\n" +
+                CLI_ONLY_NOTE,
+              claimGateCard("needs_human")
+            )
           ]
-        }, "evidence-audit", "claim 已签，按需检查 closure 与导出边界。"));
-        notify("claim 已模拟签署；可继续全自动");
+        }));
+        notify("claim 仍为待人工签署；已在会话中给出 CLI 命令");
       },
       prepareWriting: () => {
         const task = currentTask();
@@ -2037,14 +2041,14 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
               message(
                 "agent",
                 claimSigned
-                  ? `已按当前证据刷新写作槽位：${bound}/6 已绑定。已绑定的槽位只接受 EA 引用；引用仍待 closure，导出保持锁定。`
-                  : "已生成写作槽位。当前状态：结果、主图与摘要三个槽位保持 **locked**——它们的输入只能来自已签 claim 与 EA，而这正是还没有的东西。\n\n可以先回到调研或实验补齐证据；写作不会替你先编一个结论。",
+                  ? `已按当前证据刷新写作槽位：${bound}/6 已绑定；引用仍待 closure，导出保持锁定。`
+                  : "已生成写作槽位：结果、主图与摘要保持 locked，因为还没有已签 claim。可以先回到调研或实验补齐证据。",
                 card
               )
             ]
           }, "paper-slots", "写作槽位已生成，按需检查绑定与 locked 槽位。");
         });
-        notify(signed ? "写作槽位已刷新（SIM）" : "写作槽位已生成；结果槽仍 locked");
+        notify(signed ? "写作槽位已刷新（演示数据）" : "写作槽位已生成；结果槽仍 locked");
       },
       submitEvaluation: () => {
         const task = currentTask();
@@ -2067,10 +2071,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           evaluation: { ...item.evaluation, hiddenAccessCount: 1, audit: "pending" },
           messages: [
             ...item.messages,
-            message("system", "已提交独立评估（SIM）：held-out 只读一次；评估结果不回流到改进阶段。")
+            message("system", "已提交独立评估（演示数据）：held-out 只读一次；评估结果不回流到改进阶段。")
           ]
         }));
-        notify("已提交独立评估（SIM）");
+        notify("已提交独立评估（演示数据）");
       },
       runEvaluationAudit: () => {
         const task = currentTask();
@@ -2103,12 +2107,12 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             message(
               "system",
               flagged
-                ? `过程审计（SIM）标记风险：${risks.join("；")}。结果保留，但不应作为可信改进。`
-                : "过程审计（SIM）通过：未发现测试泄漏、规则改写或异常验证选择。"
+                ? `过程审计（演示数据）标记风险：${risks.join("；")}。结果保留，但不应作为可信改进。`
+                : "过程审计（演示数据）通过：未发现测试泄漏、规则改写或异常验证选择。"
             )
           ]
         }));
-        notify(flagged ? "审计发现风险，已标记" : "过程审计通过（SIM）");
+        notify(flagged ? "审计发现风险，已标记" : "过程审计通过（演示数据）");
       },
       createSkill: (input) => {
         const name = input.name.trim();
@@ -2279,13 +2283,389 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           reviewPack: pack,
           messages: [
             ...item.messages,
-            message("agent", "**审阅包完成** · advisory only\n\n三个审阅视角的确定性检查跑完了：覆盖、引用与假设各出了一条发现，都在卡片里。这是参考意见，不替代人工评审。", {
+            message("agent", "**审阅包完成** · advisory only", {
               type: "review-pack",
               ...pack
             })
           ]
         }));
         notify(`审阅包完成：${pack.summary}`);
+      },
+      startLiveRun: async (source, taskType, flowMode, options) => {
+        const task = currentTask();
+        if (!task) return;
+        if (task.access === "read_only") {
+          notify("只读模式不启动本地 API 运行");
+          return;
+        }
+        if (task.auto.running) {
+          notify("全自动运行中：先暂停并停止再启动 API 运行");
+          return;
+        }
+        if (task.evidence.some((item) => item.kind === "claim" && item.status === "signed")) {
+          notify("claim 已签：API 重跑会使旧签名失效，请先走 maintenance");
+          return;
+        }
+        if (task.messages.some((item) => item.card?.type === "runtime-run" && (item.card.status === "queued" || item.card.status === "running"))) {
+          notify("已有本地 API 运行进行中");
+          return;
+        }
+        const chosen = source ?? defaultRuntimeSource(task);
+        const chosenType = taskType ?? "auto";
+        const topic = (task.goal || task.name).trim().slice(0, 500);
+        if (topic.length < 2) {
+          notify("任务主题太短，无法启动 pipeline");
+          return;
+        }
+        const isZh = /[\u4e00-\u9fff]/.test(topic);
+        const note = chosen === "fixture"
+          ? "fixture 演示语料：只验证流程与证据边界，不是科学结论，也不能引用。"
+          : chosen === "openalex"
+            ? "OpenAlex 只返回摘要线索；未取得全文的来源不会生成 span，也不会产生 claim。"
+            : "冻结 CC-BY 真实正文；若主题不在语料范围内，会明确返回证据不足。";
+        const initial: Card = {
+          type: "runtime-run",
+          jobId: "",
+          status: "queued",
+          events: 0,
+          source: chosen,
+          taskType: chosenType,
+          dataset: options?.runDataset || undefined,
+          warnings: [],
+          artifacts: [],
+          evidencePackages: [],
+          note: chosenType === "auto" ? `${note} 任务类型由 runtime 自动路由。` : `${note} 任务类型：${chosenType}。`,
+        };
+        const pendingMessage = message("agent", `本地 API 任务已提交：${topic}\n\n${initial.note}`, initial);
+        mutateTask(task.id, (item) => ({
+          ...item,
+          evidencePackages: [],
+          runtime: { source: chosen, appliedAt: new Date().toISOString() },
+          messages: [
+            ...item.messages.filter(
+              (entry) =>
+                !(
+                  entry.role === "system" &&
+                  entry.text.startsWith("STATIC WORKSPACE")
+                )
+            ),
+            message(
+              "system",
+              "RUNTIME WORKSPACE · 本地 API pipeline；claim/closure/export 仍需离线人工签署。"
+            ),
+            pendingMessage
+          ]
+        }));
+        const messageId = pendingMessage.id;
+        const updateCard = (patch: Partial<Extract<Card, { type: "runtime-run" }>>) => {
+          mutateTask(task.id, (item) => {
+            const completedStages = new Set(item.completedStages);
+            const messages = item.messages.map((entry) => {
+              if (entry.id !== messageId || entry.card?.type !== "runtime-run") return entry;
+              const incoming = patch.eventLog ?? [];
+              const merged = [...(entry.card.eventLog ?? []), ...incoming]
+                .filter(
+                  (event, index, list) =>
+                    list.findIndex((item) => item.seq === event.seq) === index
+                )
+                .slice(-40);
+              for (const event of merged) {
+                if (event.type !== "step_end" && event.type !== "stage_end") continue;
+                const index = runtimeStageIndex(event.stage);
+                if (index >= 0) completedStages.add(index);
+              }
+              return {
+                ...entry,
+                card: {
+                  ...entry.card,
+                  ...patch,
+                  eventLog: merged.length ? merged : undefined
+                }
+              };
+            });
+            return {
+              ...item,
+              completedStages: [...completedStages].sort((a, b) => a - b),
+              runtime: {
+                source: item.runtime?.source ?? chosen,
+                runId: patch.runId ?? item.runtime?.runId,
+                appliedAt: item.runtime?.appliedAt ?? new Date().toISOString()
+              },
+              messages
+            };
+          });
+        };
+        let lastSeq = 0;
+        let pollErrors = 0;
+        const poll = async (jobId: string) => {
+          try {
+            const [job, eventBody] = await Promise.all([
+              getRun(jobId),
+              loadRunEvents(jobId, lastSeq).catch(() => null)
+            ]);
+            const events = eventBody?.events ?? [];
+            if (events.length) lastSeq = events[events.length - 1].seq;
+            const last = events[events.length - 1];
+            const lastStage = [...events]
+              .reverse()
+              .find((entry) => entry.stage && entry.type !== "stage_skip")?.stage;
+            const finished = job.status === "completed" || job.status === "failed";
+            const status = (job.status === "completed" && job.result?.status === "failed"
+              ? "failed"
+              : ["queued", "running", "completed", "failed"].includes(job.status)
+                ? job.status
+                : "running") as "queued" | "running" | "completed" | "failed";
+            let artifacts: Awaited<ReturnType<typeof loadRunArtifacts>> = [];
+            if (finished) {
+              // An interrupted artifact fetch must not turn a completed run into a failed one.
+              try {
+                artifacts = await loadRunArtifacts(jobId);
+              } catch {
+                artifacts = [];
+              }
+            }
+            pollErrors = 0;
+            updateCard({
+              jobId,
+              status,
+              events: job.events_count,
+              runId: job.result?.run_id,
+              jobDir: job.result?.job_dir,
+              fixtureMode: job.result?.fixture_mode,
+              route: job.result?.route,
+              taskStatus: job.result?.status,
+              flowMode: job.result?.flow_mode,
+              stoppedAt: job.result?.stopped_at,
+              gates: job.result?.gates,
+              ...(lastStage ? { stage: lastStage } : {}),
+              lastEvent: last?.message ?? undefined,
+              eventLog: events.map((event) => ({
+                seq: event.seq,
+                type: event.type,
+                stage: event.stage,
+                message: event.message,
+                ts: event.ts
+              })),
+              warnings: job.result?.warnings ?? [],
+              artifacts,
+              evidencePackages: job.result?.evidence_packages ?? [],
+              supportAudit: job.result?.support_audit,
+              failure:
+                job.result?.failure &&
+                Object.keys(job.result.failure).length > 0
+                  ? job.result.failure
+                  : undefined,
+              error: job.error || job.result?.error || undefined,
+            });
+            if (finished && job.result?.evidence_packages?.length) {
+              mutateTask(task.id, (item) => ({
+                ...item,
+                evidencePackages: job.result?.evidence_packages ?? item.evidencePackages ?? [],
+              }));
+            }
+            if (finished && job.result?.status === "failed") {
+              const failure = job.result?.failure;
+              notify(
+                `任务失败：${failure?.error_type || "unknown"}${
+                  failure?.suggested_action ? ` · ${failure.suggested_action}` : ""
+                }`
+              );
+            } else if (finished && status === "failed") {
+              notify(`本地 API pipeline 失败：${job.error || "unknown"}`);
+            } else if (finished) {
+              const literatureArtifact = artifacts.find((artifact) => artifact.path.endsWith("literature.json"));
+              if (literatureArtifact) {
+                try {
+                  const literature = await loadRunArtifactJson<{
+                    spans?: unknown[];
+                    coverage?: { sources_found?: number; spans_extracted?: number; gaps?: unknown[] };
+                  }>(literatureArtifact.url);
+                  const coverage = literature?.coverage ?? {};
+                  mutateTask(task.id, (item) => ({
+                    ...item,
+                    coverage: {
+                      sources: typeof coverage.sources_found === "number" ? coverage.sources_found : item.coverage.sources,
+                      spans: typeof coverage.spans_extracted === "number"
+                        ? coverage.spans_extracted
+                        : Array.isArray(literature?.spans)
+                          ? literature.spans.length
+                          : item.coverage.spans,
+                      gaps: Array.isArray(coverage.gaps) ? coverage.gaps.length : item.coverage.gaps,
+                      abstractOnly: item.coverage.abstractOnly
+                    }
+                  }));
+                } catch {
+                  // Coverage stays at its previous value if the artifact cannot be read.
+                }
+              }
+              const loadLoopArtifact = async (suffix: string): Promise<unknown> => {
+                const artifact = artifacts.find((item) => item.path.endsWith(suffix));
+                if (!artifact) return undefined;
+                try {
+                  return await loadRunArtifactJson<unknown>(artifact.url);
+                } catch {
+                  return undefined;
+                }
+              };
+              const [
+                ideaArtifact,
+                experimentArtifact,
+                paperArtifact,
+                figureArtifact,
+                registryArtifact,
+                closureArtifact,
+                loopCapsuleArtifact
+              ] = await Promise.all([
+                loadLoopArtifact("idea.json"),
+                loadLoopArtifact("experiment.json"),
+                loadLoopArtifact("paper.json"),
+                loadLoopArtifact("figure.manifest.json"),
+                loadLoopArtifact("claim-registry.json"),
+                loadLoopArtifact("closure-report.json"),
+                loadLoopArtifact("loop-capsule.json")
+              ]);              mutateTask(task.id, (item) => ({
+                ...item,
+                runtimeLoop: compactRuntimeLoop({
+                  idea: ideaArtifact,
+                  experiment: experimentArtifact,
+                  paper: paperArtifact,
+                  figure: figureArtifact,
+                  claimRegistry: registryArtifact,
+                  closure: closureArtifact,
+                  loopCapsule: loopCapsuleArtifact,
+                  observationId: job.result?.observation_id,
+                  activePolicyId: job.result?.active_policy?.policy_id,
+                  appliedPolicy: job.result?.active_policy,
+                  activeLease: job.result?.active_s5_lease
+                })
+              }));
+              const demoArtifact = artifacts.find((artifact) => artifact.path.endsWith("demo.json"));              if (demoArtifact) {
+                try {
+                  const demo = await loadRunArtifactJson<RuntimeDemo>(demoArtifact.url);
+                  const latest = get().tasks.find((entry) => entry.id === task.id) ?? task;
+                  mutateTask(task.id, (item) => ({
+                    ...item,
+                    ...applyRuntimeSnapshot(latest, demo, chosen),
+                    messages: [
+                      ...item.messages,
+                      message(
+                        "system",
+                        `RUNTIME SNAPSHOT · ${demo.run_id ?? "run"} · ${note} 证据链与门禁已从产物回填；claim 仍只能在离线签署。`
+                      )
+                    ]
+                  }));
+                  notify("runtime 产物已回填到证据链；claim 仍需离线人签");
+                } catch {
+                  notify("pipeline 完成，但 demo.json 回填失败；可直接打开产物核对");
+                }
+              } else {
+                notify("pipeline 完成；产物已附在会话卡片");
+              }
+            } else {
+              window.setTimeout(() => void poll(jobId), 900);
+            }
+            if (finished) return;
+          } catch (error) {
+            pollErrors += 1;
+            if (pollErrors <= 3) {
+              window.setTimeout(() => void poll(jobId), 1200);
+              return;
+            }
+            const latestCard = [...(get().tasks.find((entry) => entry.id === task.id)?.messages ?? [])]
+              .reverse()
+              .find((entry) => entry.card?.type === "runtime-run")?.card;
+            if (
+              latestCard?.type === "runtime-run"
+              && (latestCard.status === "completed" || latestCard.status === "failed")
+            ) {
+              notify("本地 API 轮询中断；可手动刷新产物列表");
+              return;
+            }
+            updateCard({ status: "failed", error: error instanceof Error ? error.message : String(error) });
+            notify("本地 API 轮询失败");
+          }
+        };
+        try {
+          const job = await createRun({
+            topic,
+            task_type: chosenType,
+            language: isZh ? "zh" : "en",
+            venue_type: isZh ? "zh_core_journal" : "en_conference",
+            max_sources: 6,
+            real_corpus: chosen === "real_corpus",
+            local_corpus: chosen === "local",
+            openalex: chosen === "openalex",
+            planner: "gateway",
+            run_dataset: options?.runDataset || "",
+            run_seeds: options?.runSeeds ?? 3,
+            flow_mode: flowMode ?? "review",
+            g1_decision_file: options?.g1DecisionFile?.trim() || "",
+            protocol_file: options?.protocolFile?.trim() || "",
+            claim_file: options?.claimFile?.trim() || "",
+            bibliography_file: options?.bibliographyFile?.trim() || "",
+            run_dir: options?.runDir?.trim() || "",
+          });
+          updateCard({ jobId: job.job_id, status: "queued" });
+          let stream: EventSource | null = null;
+          try {
+            stream = new EventSource(
+              runtimeUrl(
+                `/api/runs/${encodeURIComponent(job.job_id)}/events/stream?after=0`
+              )
+            );
+            stream.onmessage = (message) => {
+              try {
+                const event = JSON.parse(message.data) as RunEvent;
+                updateCard({
+                  events: Math.max(0, Number(event.seq) || 0),
+                  lastEvent: event.message,
+                  ...(event.stage ? { stage: event.stage } : {}),
+                  eventLog: [
+                    {
+                      seq: event.seq,
+                      type: event.type,
+                      stage: event.stage,
+                      message: event.message,
+                      ts: event.ts
+                    }
+                  ]
+                });
+              } catch {
+                /* ignore malformed SSE frames */
+              }
+            };
+            stream.onerror = () => {
+              // EventSource is closed here, so the browser will not reconnect. The poll loop
+              // still carries every event via loadRunEvents(lastSeq); say so instead of letting
+              // the live indicator silently degrade.
+              notify("实时事件通道断开；已由 900ms 轮询继续同步，产物不会丢失");
+              stream?.close();
+              stream = null;
+            };
+          } catch {
+            stream = null;
+          }
+          try {
+            await poll(job.job_id);
+          } finally {
+            stream?.close();
+            stream = null;
+          }
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : String(error);
+          // A static build disables the runtime at compile time; reporting it as
+          // "start the runtime" misattributes a build-time limitation to the user.
+          const staticDisabled = __STATIC_ONLY__ && detail.includes("runtime disabled in static build");
+          updateCard({
+            status: "failed",
+            error: staticDisabled ? "静态演示构建不支持真实运行" : detail
+          });
+          notify(
+            staticDisabled
+              ? "当前是静态演示构建，runtime 在编译时已禁用；/live 需以非 static 模式重新构建前端"
+              : "本地 API 启动失败：需要先运行 runtime"
+          );
+        }
       },
       confirmPermission: () => {
         const request = get().ui.permissionRequest;
@@ -2477,13 +2857,13 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           },
           messages: [
             ...item.messages,
-            message("agent", "已生成一个静态自进化候选（SIM）。我只给了它一个可写面：S1 检索预算 6→3，依据是连续两轮 gap 数为 0、覆盖率饱和，宽检索的边际收益在下降。\n\nclaim、gate、导出与签名是它的不可写面——提案再合理也碰不到。", {
+            message("agent", "已生成一个静态自进化候选（演示数据）。它只改检索预算，不触碰 claim、gate 与导出。", {
               type: "evolution",
               candidate
             })
           ]
         }));
-        notify("已生成自进化候选（SIM）");
+        notify("已生成自进化候选（演示数据）");
       },
       approveCandidate: () => {
         const task = currentTask();
@@ -2492,8 +2872,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         if (
           !requestPermission(task, {
             kind: "approve_candidate",
-            title: "准入自进化候选",
-            detail: "将授予 literature.query_planner 的最小运行租约；claim / evidence / gate / export 仍不可写。"
+            title: "演示：批准自进化候选",
+            detail: "只在本地演示状态里标记；真实租约必须由 CLI 人工准入，claim / evidence / gate / export 仍不可写。"
           })
         ) {
           return;
@@ -2508,18 +2888,18 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
               status: "active",
               candidate: updated,
               lease: updated.lease,
-              history: [...item.evolution.history, { at: clockTime(), text: "人工准入（SIM）：授予 2 次运行租约。" }]
+              history: [...item.evolution.history, { at: clockTime(), text: "演示状态：本地标记为已准入；正式租约仍须 CLI 人工准入。" }]
             },
             messages: [
               ...item.messages,
-              message("agent", "候选已准入（SIM）。租约只授权 `literature.query_planner` 的 2 次运行：\n\n- 生效范围：S1 检索预算 6→3\n- 到期自动回收，trace 留档\n- 不可写面不变：claim / EA / gate / signature", {
+              message("agent", "演示状态更新：候选在本地标记为 active，不代表真实租约；正式准入请执行 CLI 的 rsi admit。此动作不写 claim / EA / gate。", {
                 type: "evolution",
                 candidate: updated
               })
             ]
           };
         });
-        notify("候选已准入（SIM），仅授予最小租约");
+        notify("演示状态已更新；正式准入仍须 CLI 人签");
       },
       rejectCandidate: () => {
         const task = currentTask();
@@ -2615,7 +2995,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           toolCalls: [call, ...item.toolCalls],
           messages: [
             ...item.messages,
-            message("agent", "准备调用 GitHub MCP 的只读 `search_repositories`。这一步会查询公开仓库元数据；工具调用进入会话前需要你逐次批准，拒绝就什么都不会发生。", {
+            message("agent", "准备调用 GitHub MCP 的只读 search_repositories；工具结果进入会话前需要你逐次批准。", {
               type: "tool",
               server: call.server,
               tool: call.tool,
@@ -2643,7 +3023,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         ) {
           return;
         }
-        const result = "2 repositories · 1 个 archive 相关仓库（SIM，未联网）";
+        const result = "2 repositories · 1 个 archive 相关仓库（演示数据，未联网）";
         mutateTask(task.id, (item) => ({
           ...item,
           toolCalls: item.toolCalls.map((entry) =>
@@ -2653,11 +3033,11 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             ...item.messages,
             message(
               "agent",
-              `工具结果已批准进入会话（SIM）：${result}。外部内容一律视为 UNTRUSTED，不作为 claim 证据。`
+              `工具结果已批准进入会话（演示数据）：${result}。外部内容一律视为 UNTRUSTED，不作为 claim 证据。`
             )
           ]
         }));
-        notify("已批准本次只读调用（SIM）");
+        notify("已批准本次只读调用（演示数据）");
       },
       denyToolCall: (id) => {
         const task = currentTask();
@@ -2694,8 +3074,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         });
       },
       notify,
-      dismissToast: () => set({ toast: null }),
-      agentReply: (taskId, text, card) => agentReply(taskId, text, card)
+      dismissToast: () => set({ toast: null })
     }
   };
 });

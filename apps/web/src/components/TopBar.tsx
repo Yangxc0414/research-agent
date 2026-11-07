@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { formatShortcutLabel } from "../domain/shortcuts";
+import { NARROW_LAYOUT_QUERY } from "../domain/breakpoints";
+import { probeRuntime } from "../adapters/runtimeApi";
 import { usePreviewStore } from "../state/previewStore";
 import { selectCurrentTask, useWorkspaceStore } from "../state/workspaceStore";
 import { Icon } from "./Icon";
 
 function useNarrowLayout(): boolean {
-  const [narrow, setNarrow] = useState(() => window.matchMedia("(max-width: 1150px)").matches);
+  const [narrow, setNarrow] = useState(() => window.matchMedia(NARROW_LAYOUT_QUERY).matches);
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 1150px)");
+    const query = window.matchMedia(NARROW_LAYOUT_QUERY);
     const update = () => setNarrow(query.matches);
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
@@ -26,7 +28,22 @@ export function TopBar() {
   const previewDock = usePreviewStore((state) => state.dock);
   const showPreview = usePreviewStore((state) => state.show);
   const closePreview = usePreviewStore((state) => state.close);
+  const [apiConnected, setApiConnected] = useState(false);
   const narrow = useNarrowLayout();
+
+  useEffect(() => {
+    let cancelled = false;
+    probeRuntime()
+      .then((health) => {
+        if (!cancelled) setApiConnected(health.status === "ok");
+      })
+      .catch(() => {
+        if (!cancelled) setApiConnected(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const contextActive = narrow ? contextOpen : !contextCollapsed;
   const contextLabel = narrow
     ? contextOpen
@@ -80,8 +97,21 @@ export function TopBar() {
       </div>
 
       <div className="top-actions">
-        <span className="sim-badge" title="静态适配器：不调用 API、不产生真实实验或 claim">
-          SIM · STATIC
+        <span
+          className={`sim-badge${apiConnected && !__STATIC_ONLY__ ? " is-live" : ""}`}
+          title={
+            __STATIC_ONLY__
+              ? "静态演示构建：runtime 已在编译时禁用，真实运行、人工签核与导出只在本地 CLI 可用"
+              : apiConnected
+                ? "本地 runtime API 已连接；工作台默认仍为本地会话，/live 运行才走真实 pipeline"
+                : "静态适配器：不调用 API、不产生真实实验或 claim"
+          }
+        >
+          {__STATIC_ONLY__
+            ? "静态演示 · RUNTIME 已禁用"
+            : apiConnected
+              ? "API · LOCAL"
+              : "演示数据 · 静态"}
         </span>
         <button
           type="button"

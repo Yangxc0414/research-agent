@@ -1,16 +1,150 @@
-import type { AutomationPlan, MemoryKind } from "../domain/types";
+import type { AutomationPlan, EvidencePackage, MemoryKind } from "../domain/types";
+import type { AutopilotSnapshot, ClosureInventory, ProjectExperimentInventory, ProjectSummary } from "../domain/types";
+
+import { authHeaders, describeAuthRefusal } from "./runtimeAuth";
 
 const runtimeBase = (import.meta.env.VITE_RUNTIME_URL ?? "").replace(/\/$/, "");
+
+export interface RunCreateInput {
+  topic: string;
+  task_type?: "" | "auto" | "literature_review" | "hypothesis_design" | "experiment_validation" | "full_research";
+  deliverable?: string;
+  language?: "" | "zh" | "en";
+  venue_type?: "zh_core_journal" | "en_conference" | "en_journal" | "zh_thesis";
+  grant_scheme?: "" | "nsfc" | "nssfc" | "generic";
+  figure_style?: "comic" | "roman" | "modern";
+  max_sources?: number;
+  real_corpus?: boolean;
+  local_corpus?: boolean;
+  openalex?: boolean;
+  mailto?: string;
+  planner?: string;
+  run_dataset?: "" | "iris" | "breast_cancer" | "chemlab";
+  run_seeds?: number;
+  flow_mode?: "" | "review" | "strict";
+  g1_decision_file?: string;
+  protocol_file?: string;
+  claim_file?: string;
+  bibliography_file?: string;
+  run_dir?: string;
+}
+
+export interface RunJob {
+  job_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  request: RunCreateInput;
+  events_count: number;
+  error: string;
+  events_url?: string;
+  stream_url?: string;
+  artifacts_url?: string;
+  result?: {
+    run_id?: string;
+    task_id?: string;
+    job_dir?: string;
+    status?: string;
+    route?: string;
+    deliverable?: string;
+    fixture_mode?: boolean;
+    warnings?: string[];
+    gates?: Array<{ gate: string; status: string; reason: string }>;
+    checks?: Array<{ name: string; status: string; detail: string }>;
+    modules?: Record<string, string | null>;
+    spec_versions?: Record<string, string>;
+    artifacts?: Record<string, string>;
+    evidence_packages?: EvidencePackage[];
+    support_audit?: {
+      status?: string;
+      method?: string;
+      counts?: Record<string, number>;
+      citation_modes?: Record<string, number>;
+      path?: string;
+    };
+    flow_mode?: "review" | "strict";
+    stopped_at?: string;
+    max_sources?: number;
+    run_seeds?: number;
+    requested_run_seeds?: number;
+    observation_id?: string;
+    active_policy?: { policy_id?: string; patch?: Record<string, unknown> } | null;
+    active_s5_lease?: { lease_id?: string; seeds?: number; scope?: string } | null;
+    error?: string;
+    failure?: {
+      schema_version?: string;
+      error_type?: string;
+      error?: string;
+      retryable?: boolean;
+      suggested_action?: string;
+      warnings?: string[];
+      boundary?: string;
+    };
+  };
+}
+
+export interface RunEvent {
+  seq: number;
+  ts: string;
+  type: string;
+  stage: string | null;
+  message: string;
+  data?: Record<string, unknown>;
+}
+
+export interface RunEvents {
+  job_id: string;
+  status: string;
+  terminal: boolean;
+  events: RunEvent[];
+}
+
+export interface RunArtifact {
+  path: string;
+  size: number;
+  kind: string;
+  url: string;
+}
+
+export interface ModelCallRecord {
+  at: string;
+  profile_id: string;
+  provider_id: string;
+  model: string;
+  thinking: Record<string, unknown>;
+  ok: boolean;
+  latency_ms: number;
+  usage: Record<string, number>;
+  request_id: string;
+  error: string;
+}
 
 export interface RuntimeHealth {
   status: string;
   service: string;
   mode: string;
+  research_mode?: "test" | "production";
+  production_ready?: boolean;
+  model_readiness?: {
+    required_modules: string[];
+    modules: Record<string, {
+      wired: boolean;
+      bound_profile: string;
+      provider: string;
+      key_configured: boolean;
+      consumer: string;
+    }>;
+    production_ready: boolean;
+    blocking: string[];
+    warnings?: string[];
+    boundary: string;
+  };
   version: string;
   human_sign: boolean;
   rsi_read_only: boolean;
   queue: { pending: number; max_pending: number };
   real_corpus: boolean;
+  local_corpus?: boolean;
   model_gateway: boolean;
   model_store?: string | null;
   default_rsi_ledger?: string | null;
@@ -46,7 +180,7 @@ export interface CommandRecord {
   label: string;
   syntax: string;
   description: string;
-  safety: "read_only" | "local_write" | "network_opt_in" | "human_gate";
+  safety: "read_only" | "local_write" | "network_opt_in" | "human_gate" | "catalog_only";
 }
 
 export interface CommandCatalogSnapshot {
@@ -285,6 +419,51 @@ export interface RuntimeSkillSnapshot {
   boundary: string;
 }
 
+export interface SkillUsageSnapshot {
+  schema_version: string;
+  updated_at: string;
+  count: number;
+  skills: Record<string, {
+    total: number;
+    pass: number;
+    warn: number;
+    fail: number;
+    blocked: number;
+    needs_input: number;
+    last_at: string;
+  }>;
+  entries: Array<{
+    usage_id: string;
+    skill_id: string;
+    version: string;
+    task_id: string;
+    status: string;
+    recorded_at: string;
+  }>;
+  boundary: string;
+}
+
+export interface SignerSnapshot {
+  schema_version: string;
+  count: number;
+  signers: Array<{
+    signer_id: string;
+    name: string;
+    key_id: string;
+    created_at: string;
+    active: boolean;
+  }>;
+  boundary: string;
+}
+
+export interface SkillVersionSnapshot {
+  schema_version: string;
+  active: Record<string, string>;
+  available: Record<string, string[]>;
+  history: Array<Record<string, unknown>>;
+  boundary: string;
+}
+
 export interface OrchestrationRunSnapshot {
   run_id: string;
   topic: string;
@@ -338,7 +517,27 @@ export interface OrchestrationRunSnapshot {
       source_count: number;
       novelty_status: string;
       testability: string;
+      prior_art_scope?: string;
+      prior_art_delta?: string;
+      kill_criteria?: string;
+      contrast_refs?: string[];
     }>;
+    shortlist?: {
+      ranked: Array<{
+        rank: number;
+        idea_id: string;
+        evidence_count: number;
+        source_count: number;
+        prior_art_scope: string;
+        novelty_status: string;
+        testability: string;
+        has_kill_criteria: boolean;
+        has_contrast: boolean;
+      }>;
+      selection: string;
+      criteria: string[];
+      boundary: string;
+    } | null;
     brief: {
       candidate_count: number;
       source_count: number;
@@ -452,12 +651,14 @@ async function request<T>(path: string, init?: RequestInit, timeoutMs = 2600): P
       headers: {
         Accept: "application/json",
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
+        ...authHeaders(),
         ...(init?.headers ?? {})
       }
     });
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      throw new Error(`${response.status} ${detail.slice(0, 160)}`.trim());
+      const refusal = describeAuthRefusal(response.status, detail);
+      throw new Error(refusal || `${response.status} ${detail.slice(0, 160)}`.trim());
     }
     return (await response.json()) as T;
   } finally {
@@ -547,6 +748,18 @@ export async function updateEvolutionPolicy(input: {
 
 export async function loadRuntimeSkills(): Promise<RuntimeSkillSnapshot> {
   return request<RuntimeSkillSnapshot>("/api/skills");
+}
+
+export async function loadSkillUsage(): Promise<SkillUsageSnapshot> {
+  return request<SkillUsageSnapshot>("/api/skills/usage");
+}
+
+export async function loadSkillVersions(): Promise<SkillVersionSnapshot> {
+  return request<SkillVersionSnapshot>("/api/skills/versions");
+}
+
+export async function loadSigners(): Promise<SignerSnapshot> {
+  return request<SignerSnapshot>("/api/signers");
 }
 
 export async function importRuntimeSkills(
@@ -648,6 +861,140 @@ export function runtimeBaseLabel(): string {
   return runtimeBase || "same-origin /api";
 }
 
+export function runtimeUrl(path: string): string {
+  return `${runtimeBase}${path}`;
+}
+
+export async function createRun(input: RunCreateInput): Promise<RunJob> {
+  return request<RunJob>("/api/runs", {
+    method: "POST",
+    body: JSON.stringify(input)
+  });
+}
+
+export async function getRun(jobId: string): Promise<RunJob> {
+  return request<RunJob>(`/api/runs/${encodeURIComponent(jobId)}`);
+}
+
+export async function loadRunArtifacts(jobId: string): Promise<RunArtifact[]> {
+  const body = await request<{ job_id: string; artifacts: RunArtifact[] }>(
+    `/api/runs/${encodeURIComponent(jobId)}/artifacts`,
+    undefined,
+    8000
+  );
+  return body.artifacts;
+}
+
+export interface EvolutionObservation {
+  observation_id?: string;
+  topic?: string;
+  status?: string;
+  q0_status?: string;
+  max_sources?: number;
+  route?: string;
+  fixture_mode?: boolean;
+  created_at?: string;
+  observation_error?: string;
+}
+
+export interface EvolutionObservations {
+  summary: {
+    count?: number;
+    fixture_count?: number;
+    by_status?: Record<string, number>;
+    by_q0?: Record<string, number>;
+    recent?: EvolutionObservation[];
+  };
+  observations: EvolutionObservation[];
+  boundary: string;
+}
+
+export interface EvolutionActive {
+  active: {
+    policy_id?: string;
+    target?: string;
+    patch?: Record<string, unknown>;
+    expires_at?: string;
+    human_reason?: string;
+    source_eval?: Record<string, unknown>;
+    /** Re-read of the source lease on every consumption; revocation reaches the runtime here. */
+    lease_state?: string;
+  } | null;
+  expired: boolean;
+  history_count?: number;
+  /** Times an active policy was dropped because its lease no longer held. Demotion is automatic. */
+  auto_deactivations?: number;
+  boundary: string;
+}
+
+export async function loadEvolutionObservations(limit = 10): Promise<EvolutionObservations> {
+  return request<EvolutionObservations>(
+    `/api/evolution/observations?limit=${encodeURIComponent(String(limit))}`,
+    undefined,
+    5000
+  );
+}
+
+export async function loadEvolutionActive(): Promise<EvolutionActive> {
+  return request<EvolutionActive>("/api/evolution/active", undefined, 5000);
+}
+
+export async function loadRuns(limit = 20): Promise<RunJob[]> {
+  const body = await request<{ jobs: RunJob[] }>(
+    `/api/runs?limit=${encodeURIComponent(String(limit))}`
+  );
+  return body.jobs;
+}
+
+export async function loadProjects(): Promise<ProjectSummary[]> {
+  const body = await request<{ projects: ProjectSummary[] }>("/api/projects", undefined, 8000);
+  return body.projects;
+}
+
+export async function loadProjectExperiments(
+  projectDir: string
+): Promise<ProjectExperimentInventory> {
+  return request<ProjectExperimentInventory>(
+    `/api/project-experiments?project_dir=${encodeURIComponent(projectDir)}`,
+    undefined,
+    15000
+  );
+}
+
+export async function loadProjectClosures(projectDir: string): Promise<ClosureInventory> {
+  return request<ClosureInventory>(
+    `/api/project-closures?project_dir=${encodeURIComponent(projectDir)}`,
+    undefined,
+    15000
+  );
+}
+
+export async function loadAutopilotStatus(projectDir: string): Promise<AutopilotSnapshot> {
+  return request<AutopilotSnapshot>(
+    `/api/autopilot-status?project_dir=${encodeURIComponent(projectDir)}`,
+    undefined,
+    15000
+  );
+}
+
+export async function loadModelCalls(): Promise<ModelCallRecord[]> {  const body = await request<{ calls: ModelCallRecord[] }>("/api/models/calls");
+  return body.calls;
+}
+
+export async function loadRunEvents(jobId: string, after = 0): Promise<RunEvents> {
+  return request<RunEvents>(
+    `/api/runs/${encodeURIComponent(jobId)}/events?after=${encodeURIComponent(String(after))}`,
+    undefined,
+    6000
+  );
+}
+
+export async function loadRunArtifactJson<T>(artifactUrl: string): Promise<T> {
+  const response = await fetch(runtimeUrl(artifactUrl), { headers: { Accept: "application/json" } });
+  if (!response.ok) throw new Error(`artifact ${response.status}`);
+  return (await response.json()) as T;
+}
+
 export interface RsiEvalStory {
   split: string;
   status: string;
@@ -699,6 +1046,9 @@ export interface RsiStory {
   generated_at: string;
   read_only: boolean;
   ledger_path?: string;
+  source_fingerprint?: string;
+  base?: string;
+  provenance?: { simulation_episodes?: number; episodes?: number; source?: string };
   summary: {
     headline: string;
     episodes: number;
@@ -710,6 +1060,10 @@ export interface RsiStory {
     regressed: number;
     capability_claims: number;
     calibration: string;
+    decided?: number;
+    rejection_rate?: number | null;
+    gate_verdict?: string;
+    simulation_episodes?: number;
   };
   selected_episode_id: string | null;
   timeline: Array<{ id: string; label: string; state: string; detail: string }>;
@@ -732,6 +1086,23 @@ export interface RsiStory {
   warnings: string[];
   next_questions: string[];
   boundary: string;
+}
+
+export interface GovernancePreflight {
+  schema_version: string;
+  status: string;
+  blockers: string[];
+  checks: {
+    spec_self_consistency: { checked: number; stale: Array<{ spec: string; problem: string }> };
+    registry: { status: string; agents_exported?: number; agents_live?: number; changed?: Array<{ id: string; exported?: string; live?: string }> };
+    tool_surfaces: { status: string; tools: number; problems: string[] };
+  };
+  faces: { mcp_tools: number; http_tools: number; cli_commands: number };
+  boundary: string;
+}
+
+export async function loadGovernancePreflight(): Promise<GovernancePreflight> {
+  return request<GovernancePreflight>("/api/research/preflight");
 }
 
 export async function fetchRsiStory(): Promise<SnapshotResult<RsiStory>> {

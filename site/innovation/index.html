@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Research Agent · 创新点演示</title>
-<meta name="description" content="Research Agent 创新点演示：四个判定（资格 / 完成 / 失效 / 供给）、28 模块 SPEC、人签导出硬门、lineage 失效传播；静态六幕 + 接线实测。" />
+<meta name="description" content="Research Agent 创新点演示：SPEC 驱动模块、证据 span、AstraDraw SVG provenance、论文/基金待证据槽位；纯静态、无 API、fixture。" />
 <meta name="theme-color" content="#0b1220" />
 <meta property="og:title" content="Research Agent · 让每个结论有出处" />
-<meta property="og:description" content="证据闭合科研运行时：别人优化生成得多快，我们优化变更之后哪一句还成立。28 SPEC · 119 测试 · 0 签核端点。" />
+<meta property="og:description" content="六模块 SPEC / artifact / gate 的可复核科研运行时；静态五幕演示。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=20261114" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 <a class="skip" href="#demo">跳到演示舞台</a>
@@ -24,16 +24,9 @@
     <div class="top-meta">
       <span class="pill">STATIC</span><span class="pill">NO API</span><span class="pill amber">SIM</span>
     </div>
-    <nav class="nav-menu" aria-label="页面分节">
-      <a href="#demo" data-section="demo">六幕推演</a>
-      <a href="#judgments" data-section="judgments">四个判定</a>
-      <a href="#architecture" data-section="architecture">架构</a>
-      <a href="#wiring" data-section="wiring">接线实测</a>
-      <a href="#proof" data-section="proof">技术证据</a>
-      <a href="#cite" data-section="cite">引用</a>
-    </nav>
     <div class="top-actions">
-      <a class="quiet-link" href="../">返回工作台 ↗</a>
+      <a class="quiet-link" href="../app/">工作台 ↗</a>
+      <a class="quiet-link" href="../demo/">控制台演示 ↗</a>
       <button type="button" class="present-btn" id="present-btn">演示模式</button>
     </div>
   </header>
@@ -42,172 +35,63 @@
     <section class="hero" id="top">
       <div class="hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME · 六幕推演 + 真实接线实测</p>
-          <h1>不是把论文写长，<br/><span>而是让每个结论，都有出处可查。</span></h1>
-          <p class="lede">生成能力到处都有，<b>判定能力没有</b>。这套运行时对每句结论回答四个问题：这句话有资格写吗（span-only）、这次运行能签吗（closure 11 项检查 + 作者签署）、输入变了谁失效（lineage stale 传播）、模型草稿能信到哪一步（host 只供草稿不给资格）。28 个模块共用同一套 <b>SPEC / artifact / gate</b>。</p>
+          <p class="eyebrow">EVIDENCE-CLOSED RESEARCH RUNTIME / 毕设创新点演示</p>
+          <h1>不是把论文写长，<br/><span>而是让每个结论有出处。</span></h1>
+          <p class="lede">六个演示模块共享同一套 <b>SPEC / artifact / gate</b>：文献留下 span，实验设计只产草稿，图表留下 provenance，论文结果槽在 EA 到达前保持 pending。不是“全自动写完”，而是把科研过程做成可复核、可阻断、可维护的运行时。最新 64 种子预注册扩样把创新点收敛为<b>度量有效性</b>：raw 交互 4/4，AUC 交互 0/4，且三个环境的 AUC 上界低于 raw 效应量级——不把 event-count 产物写成效率或机制发现。</p>
           <div class="hero-actions">
-            <button type="button" class="primary-btn" id="start-btn">播放六幕推演 <span aria-hidden="true">→</span></button>
+            <button type="button" class="primary-btn" id="start-btn">开始 90 秒演示 <span aria-hidden="true">→</span></button>
             <a class="ghost-btn" href="#proof">看技术证据</a>
           </div>
           <div class="hero-facts" aria-label="实现事实">
-            <span><b>28</b> 模块 SPEC</span>
-            <span><b>119</b> 个测试文件</span>
-            <span><b>32</b> 数据契约</span>
-            <span title="sign / approve / freeze / publish 都不在 MCP 工具表里"><b>0</b> MCP 签核端点</span>
+            <span><b id="fact-specs">6</b> 模块 SPEC</span>
+            <span><b id="fact-tests">—</b> 自动测试</span>
+            <span><b>0</b> API 调用</span>
+            <span><b>6</b> 幕演示</span>
+            <span><b>MCP</b> Qoder 接入</span>
           </div>
         </div>
 
         <div class="hero-visual" aria-hidden="true">
           <div class="board-glow"></div>
           <div class="board">
-            <svg class="board-lines" viewBox="0 0 520 430" fill="none" aria-hidden="true">
-              <path id="bp1" d="M74 92 C160 92 170 190 245 190" />
-              <path id="bp2" d="M74 300 C160 300 170 215 245 215" />
-              <path id="bp3" d="M300 190 C370 190 380 118 442 118" />
-              <path id="bp4" d="M300 215 C370 215 380 300 442 300" />
-              <path id="bp5" class="dash" d="M300 202 C380 202 390 360 442 360" />
-              <circle class="pulse p1" r="2.6" />
-              <circle class="pulse p2" r="2.6" />
-              <circle class="pulse p3 p-cyan" r="2.6" />
-              <circle class="pulse p4 p-cyan" r="2.6" />
-              <circle class="pulse p5" r="2.2" />
+            <svg class="board-lines" viewBox="0 0 520 430" fill="none">
+              <path d="M74 92 C160 92 170 190 245 190" />
+              <path d="M74 300 C160 300 170 215 245 215" />
+              <path d="M300 190 C370 190 380 118 442 118" />
+              <path d="M300 215 C370 215 380 300 442 300" />
+              <path class="dash" d="M300 202 C380 202 390 360 442 360" />
+              <path d="M245 60 C245 90 245 120 245 150" />
             </svg>
-            <span class="orbit-node n1" data-act="0" title="跳到第一幕 · 证据"><i></i>文献</span>
-            <span class="orbit-node n2" data-act="0" title="跳到第一幕 · 证据"><i></i>假设</span>
-            <span class="orbit-node n3" data-act="3" title="跳到第四幕 · 契约"><i></i>设计</span>
-            <span class="orbit-node n4" data-act="2" title="跳到第三幕 · 图"><i></i>图</span>
-            <span class="orbit-node n5" data-act="1" title="跳到第二幕 · 稿件"><i></i>论文</span>
-            <span class="orbit-node n6" data-act="1" title="跳到第二幕 · 稿件"><i></i>基金</span>
+            <span class="orbit-node n1"><i></i>文献</span>
+            <span class="orbit-node n2"><i></i>假设</span>
+            <span class="orbit-node n3"><i></i>设计</span>
+            <span class="orbit-node n4"><i></i>图</span>
+            <span class="orbit-node n5"><i></i>论文</span>
+            <span class="orbit-node n6"><i></i>基金</span>
             <div class="board-core">
               <span class="mono">CORE / INVARIANT</span>
               <b>证据闭合</b>
-              <small>claim 只由 Evidence 创建<br/>export 只由 Closure 执行<br/>输入变更 → lineage stale 传播</small>
+              <small>claim 只由 Evidence 创建<br/>export 只由 Closure 执行</small>
             </div>
-            <div class="board-tag tag-a">28 SPEC · 119 TESTS</div>
-            <div class="board-tag tag-b">0 SIGN ENDPOINTS</div>
+            <div class="board-tag tag-a">SPEC VERSIONED</div>
+            <div class="board-tag tag-b">SVG AUDITED</div>
           </div>
           <div class="hero-caption"><span class="live-dot"></span>FIXTURE · 全部状态可复核</div>
         </div>
       </div>
-      <div class="scroll-cue"><span></span>往下看五个场景</div>
-    </section>
-
-    <section class="judgments" id="judgments">
-      <div class="judgments-head">
-        <div>
-          <p class="eyebrow">THE FOUR JUDGMENTS / 运行时说“不”的四种方式</p>
-          <h2>科研智能体缺的不是生成，是判定。</h2>
-        </div>
-        <p>生成能力到处都有，判定能力没有。全部设计文档把差异收敛为三个判定加一个供给口径——下面每张卡都能在代码里找到对应物，系统地图与六幕推演就是它们逐个发生的样子。</p>
-      </div>
-      <div class="judgments-grid">
-        <article class="judge-card reveal" style="--rd:60ms"><span class="mono">J1 / SPAN-ONLY · 资格判定</span><p class="q">这句话，有资格写吗？</p><p>摘要只是线索；全文定位到句才成为 span，[REF-xx] 逐句绑定写作包——没有证据的句子进不了稿件。</p><div class="anchor">contracts.py · SourceHit → Span → CoverageReceipt</div></article>
-        <article class="judge-card reveal" style="--rd:130ms"><span class="mono">J2 / RUN-BOUND · 完成判定</span><p class="q">这次运行，能签吗？</p><p>Claim 只能引用 EA，EA 绑定 RunCapsule；closure 11 项检查全过、再由作者签署，导出才放行。</p><div class="anchor">run.py · closure.py · ClosureReport / SignatureRecord</div></article>
-        <article class="judge-card reveal" style="--rd:200ms"><span class="mono">J3 / LINEAGE · 失效判定</span><p class="q">输入变了，谁失效？</p><p>数据与代码哈希进依赖图；一处变更沿图传播 stale，旧签名作废、导出锁死——系统比人先发现。</p><div class="anchor">lineage.py · lineage impact --fail-on-stale</div></article>
-        <article class="judge-card reveal" style="--rd:270ms"><span class="mono">J4 / HOST-AS-MODEL · 供给判定</span><p class="q">模型草稿，能信到哪一步？</p><p>宿主模型只提供草稿：引用白名单、结果数字锁定、门禁照常。生成能力可移植，证据资格不可移植。</p><div class="anchor">mcp_server.py · 41 只读工具 / 0 签核入口</div></article>
-      </div>
-      <div class="sysmap reveal" style="--rd:340ms">
-        <p class="sysmap-head"><span class="mono">SYSTEM MAP</span><span>判定发生在流水线的哪一步 · 一条链，四道判定</span></p>
-        <div class="flow-diagram sysmap-chain" data-flow>
-          <span class="flow-node ok"><b>S1 文献</b><small>span-only</small><i class="jbadge">J1 资格判定</i></span>
-          <span class="flow-node is-gate"><b>Q0</b><small>可否证？</small></span>
-          <span class="flow-node ok"><b>S2–S3 假设</b><small>host 起草</small><i class="jbadge">J4 供给判定</i></span>
-          <span class="flow-node is-gate"><b>G1</b><small>人工</small></span>
-          <span class="flow-node ok"><b>S4 设计</b><small>design-audit</small></span>
-          <span class="flow-node is-gate"><b>G2</b><small>人工</small></span>
-          <span class="flow-node ok"><b>S5 运行</b><small>RunCapsule → EA</small><i class="jbadge">J2 完成判定</i></span>
-          <span class="flow-node is-gate"><b>Claim</b><small>作者签署</small></span>
-          <span class="flow-node ok"><b>Closure</b><small>11 项检查</small></span>
-          <span class="flow-node is-blocked"><b>G5 Export</b><small>此前 blocked</small></span>
-        </div>
-        <p class="sysmap-j3"><b>J3 · 失效判定</b>横跨全链：任一节点的数据 / 代码变更沿 lineage 依赖图传播 stale——旧签名作废、导出锁死，系统比人先发现。</p>
-      </div>
-    </section>
-
-    <section class="arch" id="architecture">
-      <div class="arch-head reveal">
-        <p class="eyebrow">ARCHITECTURE / 四层架构 · 出处 ARCHITECTURE.md §2</p>
-        <h2>四层架构：Kernel 不信任任何模型。</h2>
-        <p>接入换客户端，不换约束；能力可插拔，写权限固定；治理面垂直贯穿。连线只走水平与折弯——架构里没有斜线可走。</p>
-      </div>
-      <div class="arch-board reveal" id="arch-board">
-        <svg class="arch-svg" id="arch-svg" aria-hidden="true"></svg>
-        <div class="arch-main">
-          <div class="arch-band" data-band="adapters">
-            <span class="arch-band-label"><i class="pl pl-a">a</i>ADAPTERS 接入 · 人工门只在此层 <b class="inn inn-2" title="创新点 ②">②</b><em>人工门在架构外：签核动作不存在于任何接入面</em></span>
-            <div class="arch-row cols-4">
-              <div class="arch-box b"><b>CLI</b><small>claim / freeze / sign 在此执行</small></div>
-              <div class="arch-box b"><b>MCP stdio</b><small>41 工具 · 0 签核入口</small></div>
-              <div class="arch-box b"><b>HTTP runtime</b><small>127.0.0.1:8787 · SSE</small></div>
-              <div class="arch-box b"><b>Python SDK</b><small>client.py · 本地嵌入</small></div>
-            </div>
-          </div>
-          <div class="arch-band" data-band="skills">
-            <span class="arch-band-label"><i class="pl pl-a">b</i>SKILLS 流程与策略 · S0→S16 · 门禁串起全链</span>
-            <div class="lineage-strip"><b class="inn inn-3">③</b><span>lineage 失效回环：交付后任何输入变更沿依赖图传播 stale，对应结论拉回重签</span><em>S13-S16 ⟶ S0</em></div>
-            <div class="arch-row cols-9">
-              <div class="arch-box b"><b>S0</b><small>task-agent 问题框定</small></div>
-              <div class="arch-box b"><i class="inn inn-1" title="创新点 ①">①</i><b>S1</b><small>literature 检索与全文</small><span class="gate machine">Q0</span></div>
-              <div class="arch-box b"><b>S1b</b><small>synthesis 综合矩阵</small></div>
-              <div class="arch-box b"><b>S2-S3</b><small>idea 创新评审</small><span class="gate">G1</span></div>
-              <div class="arch-box b"><b>S4</b><small>experiment 设计审计</small><span class="gate">G2</span></div>
-              <div class="arch-box b"><b>S5</b><small>run · search-study</small></div>
-              <div class="arch-box b"><b>S6</b><small>figure · G3</small></div>
-              <div class="arch-box b"><b>S8-S12</b><small>writing · paper · revision · grant</small></div>
-              <div class="arch-box b"><b>S13-S16</b><small>closure · bibliography · judge</small><span class="gate">G5</span></div>
-            </div>
-            <p class="arch-span-note"><b class="inn inn-1">①</b><span><b>span-only</b>：摘要只是线索，全文定位到句才成证据——S1 的入口检查，摘要-only 永远不变证据。</span></p>
-          </div>
-          <div class="arch-band" data-band="capabilities">
-            <span class="arch-band-label"><i class="pl pl-a">c</i>CAPABILITIES 可插拔能力 · 换实现不换约束</span>
-            <div class="arch-row cols-4">
-              <div class="arch-chip">retriever · OpenAlex / local / fixture</div>
-              <div class="arch-chip">parser</div>
-              <div class="arch-chip">local runner · iris / breast_cancer / chemlab</div>
-              <div class="arch-chip">writer</div>
-              <div class="arch-chip">figure renderer · AstraDraw*</div>
-              <div class="arch-chip">citation verifier · GB/T 7714</div>
-              <div class="arch-chip">journal template</div>
-            </div>
-          </div>
-          <div class="arch-band" data-band="kernel">
-            <span class="arch-band-label"><i class="pl pl-g">d</i>KERNEL 稳定内核 · 不允许绕过</span>
-            <div class="arch-kernel">
-              <span>Span-only 证据</span><span>Claim/EA/Gate/Signature 写权限</span><span>human gates Q0 · G1 · G2 · S5b · G5</span><span>artifact hash · RunCapsule · allowlist</span><span>路径越界校验</span><span>审计</span>
-              <em>目标：不信任任何模型或外部 Skill。</em>
-            </div>
-          </div>
-          <div class="arch-legend">
-            <span class="lg lg-b">流程与策略（可插拔）</span>
-            <span class="lg lg-g">固定内核：验证与写权限</span>
-            <span class="lg lg-o">治理面 META（垂直贯穿）</span>
-            <span class="lg lg-line">实线 = 调用与数据流（水平 / 折弯）</span>
-            <span class="lg lg-dash">虚线 = 治理 / 反馈</span>
-            <span class="lg lg-inn">① span-only ② 人工门在架构外 ③ lineage 回环 ④ 租约门控自改进</span>
-          </div>
-        </div>
-        <aside class="arch-rail" id="arch-rail">
-          <span class="arch-band-label"><i class="pl pl-o">e</i>GOVERNANCE 治理面 META · 垂直贯穿</span>
-          <div class="arch-box o"><i class="inn inn-4" title="创新点 ④">④</i><b>RSI 租约门控自改进</b><small>propose → dry-run → 四套评测 → 人签 → TTL 租约 → 消费复查</small></div>
-          <div class="arch-box o"><b>autopilot 委托</b><small>人写一次策略 · 每步带策略 SHA-256 · 越界即停</small></div>
-          <div class="arch-box o"><b>host-model · waitpoints</b><small>宿主只供草稿 · S4 设计挂起等人作答</small></div>
-          <div class="arch-box o"><b>skills registry</b><small>蒸馏候选默认 disabled</small></div>
-          <div class="arch-box o"><b>guideline-memory · mandate</b><small>经验块准入 · 委托状态</small></div>
-        </aside>
-      </div>
-      <p class="arch-note">* AstraDraw 为 vendored 第三方，发行包不含（DISTRIBUTION.md）。28 个模块全清单见 modules/README.md；human gates 的唯一入口是本地 CLI。结构出处：ARCHITECTURE.md §2。</p>
+      <div class="scroll-cue"><span></span>往下看六个场景</div>
     </section>
 
     <section class="stage-section" id="demo">
-      <div class="section-intro reveal">
+      <div class="section-intro">
         <div>
-          <p class="eyebrow">MECHANISM TOUR / 机制走读</p>
-          <h2>六段机制，一条证据链。</h2>
+          <p class="eyebrow">THE 90-SECOND WALKTHROUGH</p>
+          <h2>把“创新点”变成六个可看见的状态。</h2>
         </div>
         <p>不是流程图。每一幕都对应仓库里真实存在的 SPEC、artifact 或 audit；数字来自 fixture，不冒充实验结果。</p>
       </div>
 
-      <div class="stage-frame reveal" id="stage">
+      <div class="stage-frame" id="stage">
         <div class="stage-top">
           <div class="stage-heading">
             <span class="eyebrow">INNOVATION STAGE / <span id="stage-act-label">01 / 06</span></span>
@@ -234,129 +118,39 @@
       </div>
     </section>
 
-    <section class="wiring" id="wiring">
-      <div class="proof-head reveal">
-        <p class="eyebrow">LIVE MODEL WIRING / 本地 runtime 实测 · 2026-10-31</p>
-        <h2>模型接进模块链路，<br/>但门禁没有让步。</h2>
-        <p>OpenAI 兼容端点 agnes-2.5-flash 经模型网关绑定到 literature 与 idea 模块；以下是在本地 127.0.0.1:8787 上的真实调用记录。六幕演示本体仍然零 API，本节是那次实测的静态快照。</p>
-      </div>
-      <div class="wiring-grid">
-        <article class="wiring-card reveal" style="--rd:70ms">
-          <span class="mono">S1 / QUERY PLANNER</span>
-          <h3>检索规划器直调模型</h3>
-          <p>规划器经网关真实调用，产出 13 条中英双语检索式，覆盖综述 / 方法 / 评测 / 局限 / 最新进展五个面向；检索落账 3 来源 · 5 spans · 3 gaps。</p>
-          <div class="chip-row">
-            <span class="chip">perovskite passivation humidity stability review</span>
-            <span class="chip">钙钛矿 界面钝化材料 湿热老化 机理</span>
-            <span class="chip">strategies for enhancing humidity stability</span>
-            <span class="chip">钙钛矿 界面工程 湿热稳定性 提升策略</span>
-            <span class="chip">评测 / 局限 / 最新进展 …</span>
-            <span class="chip chip-more">+8</span>
-          </div>
-          <div class="wiring-foot">agnes-2.5-flash · 6.5s · 471 tok · ok</div>
-        </article>
-        <article class="wiring-card reveal" style="--rd:150ms">
-          <span class="mono">S2–S3 / PROPOSER</span>
-          <h3>候选自带可否证声明</h3>
-          <p>账本记录 <code>model_proposed_candidates: 3 accepted</code>：每条候选附假设、可否证条件与 span 引用；评审层给出 1 advance / 2 revise，novelty 标记 unverified，G1 交回人工。</p>
-          <div class="wiring-quote">IDEA-03：「当前所有关于界面钝化对湿热稳定性影响的因果推断均超出了 Fixture 数据的有效范围……」——模型自己指出了数据边界，而不是编一个材料学结论。</div>
-          <div class="wiring-foot">candidates_need_human · G1 required</div>
-        </article>
-        <article class="wiring-card reveal" style="--rd:230ms">
-          <span class="mono">GATES / FALLBACK</span>
-          <h3>门禁没有让步</h3>
-          <p>Q0 / G1 / G2 全部 needs_human；paper 与 experiment 回退 host-agent——S4 设计挂起 host-model 轮次等待人工作答，而不是自动编一份设计；judge 使用确定性模板。</p>
-          <div class="wiring-quote">awaiting-host-model.json：「a host answer is capability output, not evidence: gates, audits and signature rules are unchanged」</div>
-          <div class="wiring-foot">调用审计只记 provider / model / usage / latency，不记 prompt</div>
-        </article>
-      </div>
-      <div class="intercept-grid">
-        <article class="intercept-card reveal" style="--rd:260ms">
-          <span class="mono">INTERCEPT 01 / 统计门槛</span>
-          <b>3 个种子不够——模型起草的研究被拒</b>
-          <p>模型草稿沿用 3 seeds，被统计门槛直接拒绝：配对种子 &lt;4 不写任何文件；区间跨零只能如实报“不可判定”，不能靠调阈值圆过去。</p>
-        </article>
-        <article class="intercept-card reveal" style="--rd:340ms">
-          <span class="mono">INTERCEPT 02 / 设计审计</span>
-          <b>缺预算字段——S4 设计草稿被退回</b>
-          <p>模型起草的实验设计漏了 stopping budget，design-audit 以 blocker 拦截、退回人工补齐。模型可以起草，资格检查在运行时。</p>
-        </article>
-      </div>
-      <div class="wiring-loop reveal">
-        <div class="wiring-loop-head"><span class="mono">CLOSED LOOP / 完整闭环实测 · PIPE-20261031T163234Z</span><b>一条命令跑完整链路，终点停在人工门。</b></div>
-        <div class="loop-chain flow-diagram" data-flow>
-          <span class="flow-node ok"><b>literature</b><small>Agnes 规划</small></span>
-          <span class="flow-node ok"><b>q0</b><small>pass</small></span>
-          <span class="flow-node ok"><b>synthesis</b><small>synthesized</small></span>
-          <span class="flow-node warn"><b>idea</b><small>G1 待人</small></span>
-          <span class="flow-node warn"><b>experiment</b><small>G2 待人</small></span>
-          <span class="flow-node ok"><b>study</b><small>executed · verified</small></span>
-          <span class="flow-node ok"><b>figure</b><small>schematic</small></span>
-          <span class="flow-node warn"><b>paper</b><small>结果锁定</small></span>
-        </div>
-        <p class="fig-caption">图 4 · PIPE-20261031T163234Z 的闭环快照：warn 即停在人工门，ok 走完执行与验证。</p>
-        <p>iris 研究臂 4 配对种子真实执行：CI95 [-0.41, 0.51] 跨零如实上报为“不可判定”，并附 power note——同效应要 80% 功效需 263 个种子。S8 非结果章节经 host-model 轮次完成：Agnes 起草、host 校验引用白名单与禁语后提交——答案只是能力输出，不签任何东西。终态 needs_human：结果槽锁定，等待作者签署 claim。</p>
-      </div>
-      <p class="wiring-note reveal">边界：fixture 来源仅用于流程验证、不可引用（运行时原样给出该警告）；API 密钥只存在于本地 runtime 内存，不落盘、不进浏览器、不进本仓库；本节是实测记录的静态快照，不构成能力增益声明。</p>
-    </section>
-
     <section class="proof" id="proof">
-      <div class="proof-head reveal">
-        <p class="eyebrow">INNOVATION LEDGER / 六条创新点 · 每条带锚点</p>
-        <h2>创新点不在形容词里，<br/>在“拒绝”的记录里。</h2>
-        <p>对照口径一句话：别人优化生成得多快；这套系统优化变更之后哪一句还成立、哪个导出必须被拦。每条都给机制名与可运行的 CLI 锚点。</p>
+      <div class="proof-head">
+        <p class="eyebrow">WHY THIS IS DIFFERENT / 可检验的工程差异</p>
+        <h2>不是“又一个写作 Agent”，<br/>而是把证据约束做成底座。</h2>
+        <p>下面每一条都能在代码、SPEC 或测试里找到对应物；没有效果数字，也不宣称通用能力。</p>
       </div>
       <div class="proof-grid">
-        <article class="proof-card reveal" style="--rd:60ms"><span class="mono">01 / RUN-BOUND CLAIM</span><h3>结果槽等人签</h3><p>无 EA、未人签、closure 检查不过，G5 导出在运行时层被拦——不是提示词劝阻，是代码拒绝。</p><div class="proof-foot">run claim · closure check <span>→</span></div></article>
-        <article class="proof-card reveal" style="--rd:130ms"><span class="mono">02 / LINEAGE STALE</span><h3>改一行，下游全失效</h3><p>数据集哈希变更沿依赖图传播，14 个下游节点判 stale、EXPORT BLOCKED；旧签名不能复用。</p><div class="proof-foot">lineage build / impact --fail-on-stale <span>→</span></div></article>
-        <article class="proof-card reveal" style="--rd:200ms"><span class="mono">03 / LEASE-GATED RSI</span><h3>改进先领租约</h3><p>候选改进领 scope+TTL 租约、禁写 Claim / evidence / gate；降级自动撤销，升级必须人签准入。</p><div class="proof-foot">rsi propose / admit · StepLedger <span>→</span></div></article>
-        <article class="proof-card reveal" style="--rd:270ms"><span class="mono">04 / SIGNING OUTSIDE AGENT</span><h3>签核入口不存在</h3><p>41 个 MCP 工具全部只读；sign / approve / freeze / publish 不在工具表里，Agent 想代签连入口都没有。</p><div class="proof-foot">mcp_server.py · framework_api.py <span>→</span></div></article>
-        <article class="proof-card reveal" style="--rd:340ms"><span class="mono">05 / SENTENCE SUPPORT</span><h3>逐句三态判定</h3><p>[REF-xx] 每句判 supported / partial / unsupported，多票投票加缓存；写作包哈希漂移即审计失败。</p><div class="proof-foot">writing audit --strict-support <span>→</span></div></article>
-        <article class="proof-card reveal" style="--rd:410ms"><span class="mono">06 / SPEC-DRIVEN CORE</span><h3>契约被测试锁死</h3><p>28 份 SPEC.md 是唯一事实源；直建 Claim、绕过导出的路径各有专门的拒绝测试。</p><div class="proof-foot">modules/*/SPEC.md · specs.py <span>→</span></div></article>
+        <article class="proof-card"><span class="mono">01 / SPEC</span><h3>模块先有契约</h3><p>每个演示模块各有一份 SPEC.md；CLI 只做最小更新，改一个模块不必理解全部代码。</p><div class="proof-foot"><span id="proof-spec-foot">6 SPEC · 版本化</span> <span>→</span></div></article>
+        <article class="proof-card"><span class="mono">02 / ARTIFACT</span><h3>证据不是聊天记录</h3><p>模块交换 QueryPlan、Span、DesignCard、PaperContract；摘要-only 永远不能变成 span。</p><div class="proof-foot">span / coverage / gap <span>→</span></div></article>
+        <article class="proof-card"><span class="mono">03 / SVG</span><h3>图也有 provenance</h3><p>AstraDraw scene → SVG；审计 XML、ID、文本、外部引用与 aria；结果图和示意图分开。</p><div class="proof-foot">scene hash / svg hash <span>→</span></div></article>
+        <article class="proof-card"><span class="mono">04 / BOUNDARY</span><h3>结果槽保持 pending</h3><p>论文和基金只产骨架；没有 EA/Closure，G5 导出一直 blocked。这不是“不能做”，是“不乱做”。</p><div class="proof-foot">5 slots pending <span>→</span></div></article>
       </div>
-      <div class="comparison reveal">
+      <div class="comparison">
         <div class="comparison-head"><span class="mono">POSITION / 工程口径</span><b>与常见科研 Agent 的差异</b></div>
-        <div class="comparison-row"><b>DeepScientist</b><span>强在本地工作区 / skills / UI</span><em>我们补 run 之后的资格 / 完成 / 失效三判定</em></div>
-        <div class="comparison-row"><b>AI-Scientist-v3</b><span>强在 Docker / run / rubric 单轮</span><em>我们补闭合后的 lineage 失效传播与人签导出</em></div>
-        <div class="comparison-row"><b>ARIS / AutoResearchClaw</b><span>强在评审与技能演化</span><em>我们的改进要先领租约，禁写证据核心</em></div>
-        <div class="comparison-row"><b>AstraDraw</b><span>强在参考图 → scene → SVG/PPTX</span><em>我们加 SVG 审计与结果图 / 示意图强制分离</em></div>
+        <div class="comparison-row"><b>DeepScientist</b><span>强在本地工作区/skills/UI</span><em>我们补 SPEC→artifact/gate 的可读约束</em></div>
+        <div class="comparison-row"><b>AI-Scientist-v3</b><span>强在 Docker/run/rubric 单轮</span><em>我们补 run 之后的证据、claim、稿件槽链</em></div>
+        <div class="comparison-row"><b>ARIS / AutoResearchClaw</b><span>强在评审与技能演化</span><em>我们把审计放进模块契约与工作台</em></div>
+        <div class="comparison-row"><b>AstraDraw</b><span>强在参考图→scene→SVG/PPTX</span><em>我们加 SVG 审计与证据边界</em></div>
       </div>
-      <p class="proof-note reveal">边界如实写：六幕演示本体是 fixture + 冻结 CC-BY 语料；RSI 控制面已实现、只在两个 scope 闭合，不宣称能力增益；<b>submission_ready 恒为 false</b>。完整事实基线见仓库 README 的“当前事实基线”一节。</p>
+      <p class="proof-note">边界：当前是 fixture + CC-BY 论文正文 probe 的纵切；没有真实检索 API、用户研究或论文效果。H1–H4 仍是待验证假设。受治理 RSI 控制面（StepLedger / pending / lease / MetaTracker）已实现；S1 compare 选中 MiniLM+budget3 并回灌 pipeline；S5 iris 选 seeds3、breast_cancer 选 seeds2，均被 run 消费并通过新协议 sealed 复核；pipeline 用 S5 lease 跑真实 run，产出 EA + claim draft，人签 claim 后才把 paper.result.primary 标为 bound_claim；ChemLab 真实反应数据做受控 baseline（Ridge R²0.193 vs mean −0.048），人签 claim + 数据图后绑定；protocol 冻结 + 数据图 + 4 条 DataCite 元数据后 closure 11/11 ready，人签 export manifest（submission=false）（协议验证，非新发现）。本地 Qwen2.5-0.5B 的 3-prompt 审计 1/3 eligible。**仍无可靠开放式 proposer、peer-review benchmark、真实研究实验，不宣称 RSI**；详见仓库内 <b>24- 工程反思</b> 与 <b>25- 受治理的 RSI</b>。</p>
     </section>
-
-    <section class="cite" id="cite">
-      <div class="cite-inner">
-        <div class="cite-head">
-          <p class="eyebrow">CITE / 引用本仓库</p>
-          <h2>如果这个运行时帮到了你的研究，请引用它。</h2>
-          <p class="lede-note">可复核是双向的：SPEC、账本与测试都在仓库里，任何一条结论都能被打开检查；引用请以下面的条目为准。</p>
-        </div>
-        <div class="bib reveal">
-          <div class="bib-head"><span class="mono">BIBTEX</span>
-            <button type="button" class="copy-btn" id="copy-bib" aria-label="复制 BibTeX 条目">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 3.5h-7a1 1 0 0 0-1 1v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              <span>复制</span>
-            </button>
-          </div>
-          <pre id="bib-text">@misc{yangxc0414_2026_research_agent,
-  title        = {Research Agent: 一个证据闭合的科研智能体运行时},
-  author       = {Yangxc0414},
-  year         = {2026},
-  howpublished = {\url{https://github.com/Yangxc0414/research-agent}},
-  note         = {28 SPEC modules; span evidence chain; human-signed claims}
-}</pre>
-        </div>
-      </div>
-    </section>
+  </main>
 
   <footer class="footer">
-    <span>RESEARCH AGENT · 毕业设计 · INNOVATION DEMO</span>
+    <span>RESEARCH AGENT · INNOVATION DEMO</span>
+    <nav class="footer-nav" aria-label="站点子页面">
+      <a href="../">主页</a><a href="../demo/">控制台演示</a><a href="../app/">工作台</a><a href="../docs/README.md">文档</a>
+    </nav>
     <span class="mono">STATIC / FIXTURE / NO API / SIM</span>
-    <a href="../">返回主页 ↗</a>
   </footer>
 </div>
 
 <div class="present-hint" id="present-hint">演示模式 · Esc 退出</div>
-<script src="app.js?v=20261114"></script>
+<script src="app.js"></script>
 </body>
 </html>

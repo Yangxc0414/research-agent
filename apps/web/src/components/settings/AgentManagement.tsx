@@ -14,8 +14,8 @@ import type {
 } from "../../adapters/runtimeApi";
 import { Card } from "./SettingsSections";
 import { AGENT_TEMPLATES, type AgentPreset, type AgentTemplate } from "../../domain/agentTemplates";
+import { SourcePill, type SourceKind } from "../SourcePill";
 
-type SourceKind = "runtime" | "snapshot" | "local";
 type CheckMeta = CustomAgentSnapshot["checks"][number];
 type RoleMeta = CustomAgentSnapshot["roles"][number];
 
@@ -104,15 +104,6 @@ function localAgent(
     created_at: stamp,
     updated_at: stamp
   };
-}
-
-function SourcePill({ source }: { source: SourceKind | null }) {
-  if (!source) return <span className="settings-source">STATIC</span>;
-  return (
-    <span className={`settings-source${source === "runtime" ? " is-live" : ""}`}>
-      {source === "runtime" ? "LIVE RUNTIME" : source === "local" ? "LOCAL DRAFT" : "SNAPSHOT"}
-    </span>
-  );
 }
 
 function Switch({

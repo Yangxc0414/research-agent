@@ -10,6 +10,8 @@ import type {
   SnapshotResult
 } from "../../adapters/runtimeApi";
 import { Card } from "./SettingsSections";
+import { SourcePill } from "../SourcePill";
+import { gateChainLabel } from "../../domain/rsiSemantics";
 
 const FACET_ORDER = ["core", "survey", "method", "evaluation", "limitation", "recent"];
 const FACET_LABELS: Record<string, string> = {
@@ -74,15 +76,6 @@ function useStaticResource<T>(loader: () => Promise<T>) {
     };
   }, [loader]);
   return state;
-}
-
-function SourcePill({ source }: { source: "runtime" | "snapshot" | null }) {
-  if (!source) return <span className="settings-source">STATIC</span>;
-  return (
-    <span className={`settings-source${source === "runtime" ? " is-live" : ""}`}>
-      {source === "runtime" ? "LIVE RUNTIME" : "SNAPSHOT"}
-    </span>
-  );
 }
 
 function facetNames(facets: string[] | undefined): string {
@@ -165,7 +158,7 @@ function SkillCandidateCard({ candidate }: { candidate: OrchestrationRunSnapshot
         <span>{candidate.candidate_id}</span>
         <span>{candidate.scope}</span>
         <span>auto_admitted=false</span>
-        <span>dry-run → public → hidden → regression → human</span>
+        <span>{gateChainLabel()}</span>
         <span>immutable: Claim · EA · gate</span>
       </div>
     </div>
@@ -192,7 +185,9 @@ export function OrchestrationOverview() {
   );
   const rsi = (plan?.roles ?? []).find((role) => role.id === "rsi-governor");
   const topic = memory.result?.data.topics?.[0] ?? null;
-  const autoEvolve = plan?.evolution_policy?.enabled ?? true;
+  // A missing topology snapshot is not evidence for 3 scouts / 8 handoffs / 4 gates.
+  // Show an explicit unknown instead of substituting plausible-looking numbers.
+  const autoEvolve = plan ? Boolean(plan.evolution_policy?.enabled) : null;
 
   return (
     <div className="orchestration-overview">
@@ -202,19 +197,30 @@ export function OrchestrationOverview() {
       >
         <div className="orchestration-toolbar">
           <SourcePill source={topology.result?.source ?? null} />
-          <span className="orchestration-metric">{scouts.length || 3} SCOUTS · FAN-OUT</span>
-          <span className="orchestration-metric">{customRoles.length} ADVISORY</span>
-          <span className="orchestration-metric">{plan?.handoffs.length ?? 8} TYPED HANDOFFS</span>
-          <span className="orchestration-metric">{plan?.human_gates.length ?? 4} HUMAN GATES</span>
-          <span className="settings-state" data-state={autoEvolve ? "active" : "needs_human"}>
-            {autoEvolve ? "AUTO-EVOLVE ON" : "AUTO-EVOLVE PAUSED"}
+          <span className="orchestration-metric">{plan ? scouts.length : "—"} SCOUTS · FAN-OUT</span>
+          <span className="orchestration-metric">{plan ? customRoles.length : "—"} ADVISORY</span>
+          <span className="orchestration-metric">{plan ? plan.handoffs.length : "—"} TYPED HANDOFFS</span>
+          <span className="orchestration-metric">{plan ? plan.human_gates.length : "—"} HUMAN GATES</span>
+          <span
+            className="settings-state"
+            data-state={autoEvolve === null ? "idle" : autoEvolve ? "active" : "needs_human"}
+          >
+            {autoEvolve === null
+              ? "AUTO-EVOLVE UNKNOWN"
+              : autoEvolve
+                ? "AUTO-EVOLVE ON"
+                : "AUTO-EVOLVE PAUSED"}
           </span>
         </div>
         {topology.loading && <p className="settings-empty">读取协作拓扑…</p>}
         {topology.error && <p className="settings-empty">拓扑读取失败：{topology.error}</p>}
         {plan && (
           <>
-            <div className="orchestration-flow">
+            <div
+              className="orchestration-flow"
+              role="img"
+              aria-label="S1 文献扇出,汇入 S1 覆盖审计,再到 S2 至 S3 假设收敛,最后停在人工门 G1;候选不自动通过,门后流程见 RSI 面板"
+            >
               <div className="orchestration-stage is-fanout">
                 <small>S1 · FAN-OUT</small>
                 <b>文献侦察 · {scouts.length} 路</b>
@@ -385,9 +391,30 @@ export function OrchestrationOverview() {
               {run.data.idea.candidates.slice(0, 2).map((candidate) => (
                 <div className="orchestration-idea-row" key={candidate.idea_id}>
                   <b>{candidate.title}</b>
-                  <span>{candidate.evidence_count} refs / {candidate.source_count} sources · {candidate.lens}</span>
+                  <span>
+                    {candidate.evidence_count} refs / {candidate.source_count} sources · {candidate.lens}
+                    {candidate.prior_art_scope ? ` · prior-art ${candidate.prior_art_scope}` : ""}
+                    {candidate.contrast_refs?.length ? " · A/B contrast" : ""}
+                  </span>
                 </div>
               ))}
+              {run.data.idea.shortlist && run.data.idea.shortlist.ranked.length > 0 && (
+                <div className="orchestration-shortlist">
+                  <div className="orchestration-idea-head">
+                    <b>Advisory shortlist</b>
+                    <span>{run.data.idea.shortlist.selection} · 不自动选 · novelty unverified</span>
+                  </div>
+                  {run.data.idea.shortlist.ranked.slice(0, 3).map((item) => (
+                    <div className="orchestration-idea-row" key={item.idea_id}>
+                      <b>#{item.rank} {item.idea_id}</b>
+                      <span>
+                        {item.evidence_count} refs / {item.source_count} sources · {item.prior_art_scope}
+                        {item.has_contrast ? " · contrast" : ""}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <p className="settings-note">{run.data.boundary}</p>
           </>

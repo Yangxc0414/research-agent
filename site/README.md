@@ -25,7 +25,8 @@ python -m http.server 8000 --directory site
 
 前端没有 approve/claim/sign 按钮；人工门禁仍在 CLI。GitHub Pages 不能运行
 Python，且 HTTPS 页面调用本地 HTTP 会被 mixed content 拦截；Pages 上的 live
-页只会在连接失败时显示启动说明。runtime 文档在主项目仓库的 `research_agent/runtime/` 目录。
+页只会在连接失败时显示启动说明。runtime 文档见
+[`research_agent/runtime/README.md`](../research_agent/runtime/README.md)。
 
 ## 本地模型接入
 
@@ -42,7 +43,7 @@ runtime session 内存读取，不写仓库、不回传浏览器。页面可配�
 ModelProfile（含 thinking/max_tokens/extra_body）、模块 Binding，并发一条真实
 Probe 查看文本/usage/latency；调用日志不含 prompt/response/key。当前只有
 `rsi` 是 WIRED，其他模块标 CONFIG ONLY；接入 API 不等于 pipeline 已使用模型。
-设计与威胁模型见主项目仓库的模型接入设计文档。
+设计与威胁模型见 [`29-多模型接入-OpenAI-Anthropic-API密钥与思考参数设计.md`](../29-多模型接入-OpenAI-Anthropic-API密钥与思考参数设计.md)。
 
 ## 本地预览
 
@@ -65,15 +66,19 @@ python -m http.server 8000 --directory site
 3. 推送 `site/`、`demo/` 或手动运行 **Deploy site to GitHub Pages** 工作流。
 4. 站点地址为 **https://yangxc0414.github.io/research-agent/**。
 
-`build-site.mjs` 会把 `demo/index.html` 复制到 `site/demo/index.html`，并在本地主项目存在时把 `research_agent/web/data` 同步到 `site/innovation/data`；不要直接编辑复制产物。内部调研/实现设计文档不随 Pages 发布，只保留在主项目仓库。
+`build-site.mjs` 会把 `demo/index.html` 复制到 `site/demo/index.html`，把 `research_agent/web/data` 同步到 `site/innovation/data`，并把关键设计文档复制到 `site/docs/`；不要直接编辑复制产物。`19–26` 中的内部调研/实现设计文档不随 Pages 发布，只在仓库内作为推进依据。
 
 ## 数据与模式
 
-- `LIVE PUBLIC`：浏览器直连 OpenAlex 公共 API；只取公开元数据，不调用 LLM。
-- `CACHED`：`site/data/digest.json`，主项目本地生成后人工提交的快照。
+- `LIVE PUBLIC`：仅指 lab 页浏览器直连 OpenAlex 公共 API；只取公开元数据，不调用 LLM，不代表整套流水线在线。
+- `CACHED`：`site/data/digest.json`，由 `refresh-digest.yml` 定时生成，或人工快照。当前线上文件是 2026-10-23 的手工快照，不是定时任务的实时产物；精确计数只反映 OpenAlex 当时的索引状态，不是本研究结论。
 - `SIM`：研究运行、证据工作台、自进化与技能状态均为交互演示，不是实测结果；动效由阶段/对象/租约状态驱动，不做无含义装饰。
+- `STATIC`（主入口 `/app/`）：`vite build --mode static` 产物，构建期注入 `__STATIC_ONLY__`，`runtimeApi.request()` 直接抛错，所有数据回退到随包分发的 `site/app/*.json` 快照。工作台顶部有可见的静态模式说明条。
+- 人工门：G1 / G2 / claim / closure / export 只在本地 CLI；本站与工作台都没有 sign / approve / freeze / publish 入口。页面里的「已签署」文案来自打包快照，不是本站产生的签名。
 
-镜像仓库不运行定时任务；刷新 digest 时在主项目本地重新生成 `site/data/digest.json` 后提交。
+`refresh-digest.yml` 默认每天 01:17 UTC 运行，读取 `site/data/queries.json`，写入 `site/data/digest.json` 并提交；但**前端镜像仓库尚未启用该工作流**（见 `43-GitHub-Pages部署与前端镜像.md:105`），线上仍是手工 CACHED 快照。
+
+**镜像漂移提醒**：`site/app/` 是构建产物，不是源码。修改过 `apps/web/` 后必须重跑 `npm run build:site` 与 `node scripts/build-site.mjs`，否则 Pages 上仍是旧 bundle —— `43-…md:99` 已记录这个问题。部署前用 `node scripts/check-site.mjs` 确认静态模式与本地资源引用。
 
 ## 安全边界
 

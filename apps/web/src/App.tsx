@@ -1,23 +1,42 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import type { CSSProperties } from "react";
 import { AUTO_TICK_MS } from "./domain/catalog";
+import { NARROW_LAYOUT_QUERY } from "./domain/breakpoints";
 import { SHORTCUT_ACTIONS, shortcutFromEvent } from "./domain/shortcuts";
 import { selectCurrentTask, useWorkspaceStore } from "./state/workspaceStore";
-import { CommandPalette } from "./components/CommandPalette";
 import { ContextPanel } from "./components/ContextPanel";
 import { Conversation } from "./components/Conversation";
-import { ModelDialog } from "./components/ModelDialog";
-import { NewTaskDialog } from "./components/NewTaskDialog";
-import { PermissionDialog } from "./components/PermissionDialog";
-import { PluginsDrawer } from "./components/PluginsDrawer";
 import { PreviewWindow } from "./components/PreviewWindow";
-import { SettingsPage } from "./components/settings/SettingsPage";
 import { Sidebar } from "./components/Sidebar";
-import { SkillsDrawer } from "./components/SkillsDrawer";
 import { Toast } from "./components/Toast";
 import { TopBar } from "./components/TopBar";
+import { StaticModeNotice } from "./components/StaticModeNotice";
 import { WelcomeHome } from "./components/WelcomeHome";
-import { WorkspaceFilesDialog } from "./components/WorkspaceFilesDialog";
+const SettingsPage = lazy(() =>
+  import("./components/settings/SettingsPage").then((module) => ({ default: module.SettingsPage }))
+);
+const CommandPalette = lazy(() =>
+  import("./components/CommandPalette").then((module) => ({ default: module.CommandPalette }))
+);
+const ModelDialog = lazy(() =>
+  import("./components/ModelDialog").then((module) => ({ default: module.ModelDialog }))
+);
+const NewTaskDialog = lazy(() =>
+  import("./components/NewTaskDialog").then((module) => ({ default: module.NewTaskDialog }))
+);
+const PermissionDialog = lazy(() =>
+  import("./components/PermissionDialog").then((module) => ({ default: module.PermissionDialog }))
+);
+const PluginsDrawer = lazy(() =>
+  import("./components/PluginsDrawer").then((module) => ({ default: module.PluginsDrawer }))
+);
+const SkillsDrawer = lazy(() =>
+  import("./components/SkillsDrawer").then((module) => ({ default: module.SkillsDrawer }))
+);
+const WorkspaceFilesDialog = lazy(() =>
+  import("./components/WorkspaceFilesDialog").then((module) => ({ default: module.WorkspaceFilesDialog }))
+);
+
 import { folderStorage } from "./adapters/folderStorage";
 import { usePreviewStore } from "./state/previewStore";
 
@@ -127,7 +146,7 @@ export default function App() {
           actions.openSettings("general");
           break;
         case "toggleContext": {
-          const narrow = window.matchMedia("(max-width: 1150px)").matches;
+          const narrow = window.matchMedia(NARROW_LAYOUT_QUERY).matches;
           if (narrow) actions.setUI({ contextOpen: !ui.contextOpen });
           else actions.setUI({ contextCollapsed: !ui.contextCollapsed });
           break;
@@ -157,6 +176,7 @@ export default function App() {
     >
       <a className="skip-link" href="#thread">跳到会话</a>
       <TopBar />
+      <StaticModeNotice />
       <div className={`app-grid${ui.contextCollapsed ? " is-context-collapsed" : ""}${ui.welcomeOpen ? " is-welcome" : ""}${previewOpen && previewDock && !ui.welcomeOpen ? " is-preview-docked" : ""}`}>
         {ui.sidebarOpen && (
           <button
@@ -180,14 +200,16 @@ export default function App() {
         {previewOpen && !ui.settingsOpen && <PreviewWindow />}
       </div>
 
-      {ui.settingsOpen && <SettingsPage />}
-      {ui.newTaskOpen && <NewTaskDialog />}
-      {ui.modelOpen && <ModelDialog />}
-      {ui.pluginsOpen && <PluginsDrawer />}
-      {ui.skillsOpen && <SkillsDrawer />}
-      {ui.filesOpen && <WorkspaceFilesDialog />}
-      {ui.permissionRequest && <PermissionDialog />}
-      {ui.paletteOpen && <CommandPalette />}
+      <Suspense fallback={<div className="overlay-loading" role="status">正在载入面板…</div>}>
+        {ui.settingsOpen && <SettingsPage />}
+        {ui.newTaskOpen && <NewTaskDialog />}
+        {ui.modelOpen && <ModelDialog />}
+        {ui.pluginsOpen && <PluginsDrawer />}
+        {ui.skillsOpen && <SkillsDrawer />}
+        {ui.filesOpen && <WorkspaceFilesDialog />}
+        {ui.permissionRequest && <PermissionDialog />}
+        {ui.paletteOpen && <CommandPalette />}
+      </Suspense>
       <Toast />
     </div>
   );

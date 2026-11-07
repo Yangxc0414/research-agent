@@ -6,8 +6,11 @@ import {
   modelSettingsForProfile,
   thinkingLabel
 } from "../domain/catalog";
-import { siteHref } from "../domain/links";
 import type { ModelSettings, ModelStop } from "../domain/types";
+import {
+  loadRuntimeModelSnapshot,
+  type RuntimeModelSnapshot
+} from "../adapters/modelRuntime";
 import { useAllModelProfiles } from "../state/modelStore";
 import { Icon } from "./Icon";
 
@@ -37,6 +40,7 @@ export function ModelPicker({
   onAdvanced?: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [runtime, setRuntime] = useState<RuntimeModelSnapshot | null>(null);
   const profiles = useAllModelProfiles();
   const rootRef = useRef<HTMLDivElement>(null);
   const current = settings ?? modelSettingsForProfile(value);
@@ -58,6 +62,21 @@ export function ModelPicker({
   const progress = allowedStops.length > 1
     ? (stopIndex / (allowedStops.length - 1)) * 100
     : 0;
+
+  useEffect(() => {
+    if (!open || runtime) return;
+    let cancelled = false;
+    loadRuntimeModelSnapshot()
+      .then((snapshot) => {
+        if (!cancelled) setRuntime(snapshot);
+      })
+      .catch(() => {
+        /* runtime offline: keep the local model catalog */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, runtime]);
 
   useEffect(() => {
     if (!open) return;
@@ -83,11 +102,12 @@ export function ModelPicker({
         onClick={() => setOpen((currentOpen) => !currentOpen)}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={`${profile.name} · ${thinking}`}
+        disabled={__STATIC_ONLY__}
+        title={__STATIC_ONLY__ ? "静态演示模式：模型不可运行，选择器已禁用" : `${profile.name} · ${thinking}`}
       >
         <span className="model-trigger-dot" />
         <span className="model-trigger-name">{profile.short}</span>
-        <em>{thinking}</em>
+        <em>{__STATIC_ONLY__ ? "演示态" : thinking}</em>
         <span className={`model-trigger-chevron${open ? " is-open" : ""}`}>
           <Icon name="chevron" size={9} />
         </span>
@@ -99,6 +119,27 @@ export function ModelPicker({
             <span>MODEL</span>
             <em>能力来自 Profile</em>
           </div>
+          <p className="model-menu-note">
+            <Icon name="info" size={11} />
+            此处仅影响本地模拟；真实 runtime 绑定与 key 在“设置 → 模型设置”。
+          </p>
+          {runtime && (
+            <div className="model-runtime-note">
+              <span>RUNTIME BINDINGS</span>
+              <b>
+                {runtime.readiness?.production_ready
+                  ? "production ready"
+                  : "test / fallback"}
+              </b>
+              <em>
+                {Object.entries(runtime.readiness?.modules ?? {})
+                  .slice(0, 5)
+                  .map(([id, item]) => `${id}:${item.bound_profile || "fallback"}`)
+                  .join(" · ")}
+              </em>
+              <small>选择上面的模型不会改变这些绑定。</small>
+            </div>
+          )}
           {profiles.map((item) => (
             <button
               key={item.id}
@@ -158,7 +199,7 @@ export function ModelPicker({
                 : activeStop?.detail ?? "思考关闭"}
             </small>
           </div>
-          {onAdvanced && (
+          {onAdvanced ? (
             <button
               type="button"
               className="model-advanced"
@@ -171,17 +212,12 @@ export function ModelPicker({
               上下文、回复长度与压缩设置
               <Icon name="arrow" size={11} />
             </button>
+          ) : (
+            <p className="model-menu-note">
+              <Icon name="info" size={11} />
+              思考强度会随新会话保存；上下文、回复长度与压缩在会话内细调。
+            </p>
           )}
-          <a
-            className="model-provider-link"
-            href={siteHref("models/")}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
-          >
-            <Icon name="external" size={10} />
-            Provider / API 接入配置
-          </a>
         </div>
       )}
     </div>

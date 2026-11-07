@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Research Agent — 可核验的科研智能体</title>
-<meta name="description" content="Research Agent：证据闭合的科研运行时。每句结论过四个判定——资格（span-only）、完成（closure 人签）、失效（lineage stale）、供给（host 只供草稿）；28 SPEC · 119 测试 · 0 签核端点。" />
+<meta name="description" content="Research Agent：把检索、复现、写作、核验接成一条可核验的证据链。公开工作台支持 OpenAlex 真实检索、证据卡、门禁与案例回放；LLM 与实验执行留在本地运行时。" />
 <meta name="keywords" content="科研智能体,证据链,科研自动化,RWMT,证据运营,Research Agent" />
 <meta name="author" content="YXC" />
 <meta name="color-scheme" content="light" />
@@ -14,20 +14,26 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Research Agent" />
 <meta property="og:title" content="Research Agent — 可核验的科研智能体" />
-<meta property="og:description" content="别人优化生成得多快；这套运行时优化变更之后哪一句还成立、哪个导出必须被拦。28 SPEC · 119 测试 · 0 MCP 签核端点。" />
+<meta property="og:description" content="把科研自动化，做成一条可核验的证据链。真实 OpenAlex 检索、证据卡、导出门禁与变更回放。" />
 <meta property="og:url" content="https://yangxc0414.github.io/research-agent/" />
 <meta property="og:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Research Agent — 可核验的科研智能体" />
-<meta name="twitter:description" content="别人优化生成得多快；我们优化变更之后哪一句还成立、哪个导出必须被拦。" />
+<meta name="twitter:description" content="把科研自动化，做成一条可核验的证据链。" />
 <meta name="twitter:image" content="https://yangxc0414.github.io/research-agent/assets/og.png" />
 <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
 <link rel="manifest" href="./manifest.webmanifest" />
 <link rel="stylesheet" href="./assets/base.css" />
 <link rel="stylesheet" href="./assets/theme.css" />
 <link rel="stylesheet" href="./assets/custom.css" />
+<style>
+.site-mode-banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid #e6d7b4;background:#fff8e7;color:#6b5010;font-size:12px;line-height:1.55}
+.site-mode-banner strong{flex:none;font-weight:600;letter-spacing:.03em}
+.site-mode-banner span{color:#7a5f22}
+@media (max-width:760px){.site-mode-banner{padding:8px 12px;font-size:11px}}
+</style>
 <noscript><style>.frame-loading,.app-loader,.boot-cover{display:none!important}</style></noscript>
 </head>
 <body class="app">
@@ -59,14 +65,19 @@
   <div class="appbar-actions">
     <a class="nav-cta" href="./app/" style="border-color:rgba(37,99,235,.42);background:var(--accent-dim);">Agent 工作台 ↗</a>
     <a class="nav-cta innovation-link" href="./innovation/">创新演示 ↗</a>
-    <span class="ghost-link live-chip"><i class="dot dot-live"></i>LIVE PUBLIC</span>
+    <a class="nav-cta" href="./qoder/" style="border-color:rgba(15,159,143,.38);background:rgba(15,159,143,.07);">Qoder 接入 ↗</a>
+    <span class="ghost-link live-chip" title="公开静态原型：仅 lab 页直连 OpenAlex 公共元数据；runtime 已禁用"><i class="dot dot-live"></i>PUBLIC · STATIC</span>
     <button class="present-btn" id="present-btn" type="button" title="演示模式：隐藏外壳并自动进入一屏聚焦"><span aria-hidden="true">▶</span> 演示模式</button>
     <a class="nav-cta" id="app-full-link" href="./demo/#console" target="_blank" rel="noopener">全屏打开 ↗</a>
   </div>
 </header>
 <div class="app-loader" id="app-loader" aria-hidden="true"><i></i></div>
 
-<div class="present-brand" id="present-brand"><span>RESEARCH AGENT</span><b>LIVE RUN · SIM</b></div>
+<div class="site-mode-banner" role="status">
+  <strong>静态前端镜像 · STATIC</strong>
+  <span>本页是公开原型：runtime 在构建时已禁用，没有真实 LLM、实验执行、claim 签名或 runtime job；页面数值来自 CACHED 快照或 SIM 演示，不是实测结果。人工门（G1 / G2 / claim / closure / export）只在本地 CLI。站内的 “LIVE PUBLIC” 仅指浏览器直连 OpenAlex 公开元数据。</span>
+</div>
+<div class="present-brand" id="present-brand"><span>RESEARCH AGENT</span><b>STATIC DEMO · SIM</b></div>
 <button class="present-exit" id="present-exit" type="button">退出演示 <kbd>Esc</kbd></button>
 <div class="app-layout">
   <aside class="app-sidebar" aria-label="工作区导航">
@@ -77,7 +88,7 @@
       <button type="button" class="side-item" data-view="demo" data-mode="console"><em>01</em><b>研究运行</b><small>9 阶段 · 对象流 · 指令流</small></button>
       <button type="button" class="side-item" data-view="demo" data-mode="workbench"><em>02</em><b>证据工作台</b><small>7 视图 · 体检 / 变更 / 签署</small></button>
       <button type="button" class="side-item" data-view="demo" data-mode="evolution"><em>03</em><b>自进化</b><small>EV1–EV4 · 租约 · 过程反馈</small></button>
-      <a class="side-item" href="./models/" title="OpenAI / Anthropic / 兼容端点与思考参数"><em>05</em><b>模型接入</b><small>高级子页面 · Provider / Profile</small></a>
+      <a class="side-item" href="./models/" title="模型配置说明；真实调用需本地 runtime"><em>05</em><b>模型接入</b><small>配置说明 · 调用需本地 runtime</small></a>
     </div>
     <div class="side-group">
       <span>系统</span>
@@ -91,19 +102,14 @@
       <span>资源</span>
       <button type="button" class="side-item" data-view="lab"><em>LIVE</em><b>真实检索</b><small>OpenAlex 公共元数据</small></button>
       <button type="button" class="side-item" data-view="deploy"><em>03</em><b>部署</b><small>Pages / Actions / Runtime</small></button>
-      <button type="button" class="side-item" data-view="docs"><em>10</em><b>文档与边界</b><small>能力摘要 · 不可宣称</small></button>
-      <a class="side-item" href="./live/"><em>LIVE</em><b>本地运行时</b><small>真实 pipeline · API</small></a>
-      <a class="side-item" href="./innovation/"><em>NEW</em><b>创新演示</b><small>四个判定 · 静态 + 实测快照</small></a>
+      <button type="button" class="side-item" data-view="docs"><em>19</em><b>文档</b><small>设计与限制</small></button>
+      <a class="side-item" href="./live/" title="需本地 Python runtime；Pages 上只能显示连接说明"><em>LOCAL</em><b>本地运行时</b><small>需本地 runtime · Pages 上不可用</small></a>
+      <a class="side-item" href="./innovation/"><em>NEW</em><b>创新演示</b><small>6 幕 · 静态 / 无 API</small></a>
+      <a class="side-item" href="./qoder/"><em>MCP</em><b>Qoder 接入</b><small>40 tools · host-model · 人工门</small></a>
     </div>
-    <div class="side-foot"><span class="live">SIM</span><small>Research Agent · 2026-10-31</small></div>
+    <div class="side-foot"><span class="live">SIM</span><small>Research Agent · 2026-10-23</small></div>
   </aside>
   <main class="app-main" id="main">
-  <div class="claim-strip" role="note">
-    <span class="cs-kicker">RUNTIME RULE</span>
-    <p>每句结论过四个判定：<b>资格</b>（span-only 证据）· <b>完成</b>（closure 人签）· <b>失效</b>（lineage stale 传播）· <b>供给</b>（host 只供草稿，不给资格）</p>
-    <a href="./innovation/">看判定如何拦下模型 →</a>
-  </div>
-
   <section class="section view" id="functions">
     <div class="section-head">
       <div>
@@ -477,7 +483,7 @@
 
     <div class="lab-lower">
       <div class="panel">
-        <div class="panel-head"><span class="panel-kicker">03 / COVERAGE</span><span class="badge cached">CACHED / LIVE</span></div>
+        <div class="panel-head"><span class="panel-kicker">03 / COVERAGE</span><span class="badge cached">CACHED SNAPSHOT</span></div>
         <div id="coverage-card" class="coverage">
           <div class="empty small"><b>尚未生成</b><p>覆盖回执记录 query、检索时间、来源、记录数、去重数、纳入/排除数与过滤条件。</p></div>
         </div>
@@ -779,7 +785,7 @@
     <div class="digest-panel panel" id="digest-panel">
       <div class="panel-head"><span class="panel-kicker">ACTIONS / DIGEST</span><span class="badge cached">CACHED</span></div>
       <div id="digest-body" class="digest-body">
-        <span class="digest-empty">尚未生成 digest.json。在主项目本地刷新并提交快照后，这里会出现带时间戳的公开检索结果；没有运行时不伪造数据。</span>
+        <span class="digest-empty">尚未生成 digest.json。启用 <code>refresh-digest.yml</code> 后，这里会出现带时间戳的公开检索结果；没有运行时不伪造数据。</span>
       </div>
     </div>
 
@@ -828,15 +834,15 @@ python -m http.server 8000 --directory site</code></pre>
     <div class="section-head">
       <div>
         <p class="index">10 / DOCS</p>
-        <h2>能力摘要在这里，设计细节留在主项目仓库。</h2>
+        <h2>设计、部署与反思都在仓库里。</h2>
       </div>
-      <p class="section-note">内部设计文档不随前端镜像发布；站点只呈现能力摘要、部署方式与不可宣称边界。</p>
+      <p class="section-note">19 份文档。站点只呈现摘要；原始 Markdown 以副本形式放在 <code>site/docs/</code>。</p>
     </div>
     <div class="doc-grid">
-      <a class="doc-card" href="https://github.com/Yangxc0414/research-agent#readme" target="_blank" rel="noopener"><span>00</span><b>项目总览</b><small>仓库 README：结构、静态边界、本地预览与部署</small></a>
-      <a class="doc-card" href="./innovation/"><span>01</span><b>创新演示</b><small>四个判定 + 六幕推演 + 两次真实拦截；六条创新点带 CLI 锚点</small></a>
-      <a class="doc-card" href="./app/"><span>02</span><b>工作台导览</b><small>门禁、证据链、评估隔离与受治理自进化的交互视图</small></a>
-      <a class="doc-card" href="./live/"><span>03</span><b>本地运行时</b><small>真实 pipeline / API / OpenAlex 公开检索</small></a>
+      <a class="doc-card" href="./docs/17-上层微服务架构.md"><span>17</span><b>上层微服务架构</b><small>服务 ≠ 模块 ≠ 插件；五个端口；三 deployable MVP</small></a>
+      <a class="doc-card" href="./docs/18-GitHub Pages部署与多智能体Skill设计.md"><span>18</span><b>Pages 部署与多智能体 Skill</b><small>三平面、前端 IA、1+4+人 拓扑、交接契约</small></a>
+      <a class="doc-card" href="./docs/16-科研Skill生态调研.md"><span>16</span><b>科研 Skill 生态调研</b><small>高 star skill 的渐进加载、固定 recipe 与缺口</small></a>
+      <a class="doc-card" href="./docs/README.md"><span>00</span><b>项目总览</b><small>19 份文档的阅读路径、证据等级与限制</small></a>
     </div>
     <div class="limits">
       <h3>边界与不可宣称</h3>

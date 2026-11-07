@@ -293,7 +293,10 @@
     "status": "clean",
     "changed": [],
     "staleNodeIds": [],
-    "exportAllowed": true
+    "exportAllowed": true,
+    "dispositions": [],
+    "actionCounts": {},
+    "nextSteps": []
   },
   "simulatedChange": {
     "label": "数据集哈希变更（SIM）",
@@ -333,6 +336,126 @@
     ],
     "requiresReclosure": true,
     "requiresResign": true,
-    "exportAllowed": false
+    "exportAllowed": false,
+    "dispositions": [
+      {
+        "node_id": "claim:CLM-ea8ae63df2",
+        "kind": "claim",
+        "label": "CLM-ea8ae63df2",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "closure:CLR-3ea12fd8c2",
+        "kind": "closure",
+        "label": "CLR-3ea12fd8c2",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "dataset:4a7fc0034798",
+        "kind": "dataset",
+        "label": "chemlab:morgan:418train+22test:v2",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "dataset:9c644ed6b469",
+        "kind": "dataset",
+        "label": "chemlab:morgan:418train+22test",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "ea:EA-71b8c57e0ee5",
+        "kind": "evidence",
+        "label": "EA-71b8c57e0ee5",
+        "action": "rerun",
+        "detail": "rerun S5 with the changed dataset/code and emit a new capsule/EA"
+      },
+      {
+        "node_id": "export:manifest",
+        "kind": "export_manifest",
+        "label": "export manifest",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "figure:PIPE-20261024T100950Z-921d80-result",
+        "kind": "figure",
+        "label": "PIPE-20261024T100950Z-921d80-result",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      },
+      {
+        "node_id": "paper:manuscript",
+        "kind": "paper",
+        "label": "工作稿：ChemLab reaction conversion baseline",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      },
+      {
+        "node_id": "protocol:PROT-faf2643a88",
+        "kind": "protocol",
+        "label": "PROT-faf2643a88",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "run:RUN-20261024T100951Z-af9680",
+        "kind": "run",
+        "label": "RUN-20261024T100951Z-af9680",
+        "action": "rerun",
+        "detail": "rerun S5 with the changed dataset/code and emit a new capsule/EA"
+      },
+      {
+        "node_id": "signature:SIG-0cb474f152",
+        "kind": "signature",
+        "label": "SIG-0cb474f152",
+        "action": "recheck",
+        "detail": "recheck this artifact; closure and signature must be refreshed after reruns"
+      },
+      {
+        "node_id": "slot:limitation",
+        "kind": "paper_slot",
+        "label": "limitation",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      },
+      {
+        "node_id": "slot:method.protocol",
+        "kind": "paper_slot",
+        "label": "method.protocol",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      },
+      {
+        "node_id": "slot:result.figure",
+        "kind": "paper_slot",
+        "label": "result.figure",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      },
+      {
+        "node_id": "slot:result.primary",
+        "kind": "paper_slot",
+        "label": "result.primary",
+        "action": "rewrite",
+        "detail": "regenerate or rebind this figure / manuscript slot to the new evidence"
+      }
+    ],
+    "actionCounts": {
+      "recheck": 7,
+      "rerun": 2,
+      "rewrite": 6
+    },
+    "nextSteps": [
+      "rerun S5 with the changed dataset/code; write a new capsule and EA",
+      "recheck claim/protocol/bibliography; rerun closure after the new run",
+      "regenerate/rebind the affected figure and paper slots",
+      "rerun closure checks and confirm all stale nodes are cleared",
+      "request a fresh human signature; the old signature is stale",
+      "keep export blocked until reclosure and re-signing complete"
+    ]
   }
 }

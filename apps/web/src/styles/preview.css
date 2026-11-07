@@ -46,7 +46,7 @@
 .preview-window-title b {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 0.08em;
 }
 
@@ -143,7 +143,7 @@
   background: transparent;
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   text-overflow: ellipsis;
 }
 
@@ -170,7 +170,7 @@
   background: transparent;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .preview-tab.is-on {
@@ -192,7 +192,7 @@
   padding: 12px 14px;
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(9.3px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   line-height: 1.65;
   tab-size: 2;
   white-space: pre-wrap;
@@ -261,7 +261,7 @@
 .preview-empty p {
   max-width: 300px;
   margin: 0;
-  font-size: calc(9.5px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   line-height: 1.6;
 }
 
@@ -274,7 +274,7 @@
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--muted);
-  font-size: calc(9px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   text-decoration: none;
 }
 
@@ -302,7 +302,7 @@
   border-top: 1px solid rgba(154, 107, 30, 0.18);
   background: var(--amber-dim);
   color: var(--amber);
-  font-size: calc(8px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
 }
 
 .preview-foot {
@@ -316,7 +316,7 @@
   background: rgba(248, 251, 255, 0.92);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--font-scale, 1));
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 0.03em;
 }
 

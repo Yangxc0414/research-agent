@@ -216,7 +216,7 @@ export function PluginsDrawer() {
                   className="text-button"
                   onClick={() => actions.notify("连接测试为静态模拟：未发送网络请求")}
                 >
-                  测试连接（SIM）
+                  测试连接（静态）
                 </button>
                 <button type="submit" className="solid-button">{task ? "保存并启用" : "保存（会话内启用）"}</button>
               </div>

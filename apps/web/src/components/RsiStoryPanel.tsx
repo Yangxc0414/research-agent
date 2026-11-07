@@ -3,13 +3,7 @@ import { fetchRsiStory } from "../adapters/runtimeApi";
 import type { RsiEpisodeStory, RsiStory } from "../adapters/runtimeApi";
 import type { SnapshotResult } from "../adapters/runtimeApi";
 import { Icon } from "./Icon";
-
-function tone(state: string): "ok" | "warn" | "bad" | "idle" {
-  if (["passed", "approved", "active", "confirmed", "recorded", "done"].includes(state)) return "ok";
-  if (["failed", "rejected", "regressed", "revoked", "expired"].includes(state)) return "bad";
-  if (["pending", "pending_human", "missing", "not_recorded", "unsupported"].includes(state)) return "warn";
-  return "idle";
-}
+import { snapshotDateLabel, tone, verdictTone } from "../domain/rsiSemantics";
 
 function formatNumber(value: number | undefined): string {
   if (value === undefined || Number.isNaN(value)) return "—";
@@ -77,7 +71,7 @@ export function RsiStoryPanel() {
         </div>
         <p className="rsi-headline">{story.summary.headline}</p>
         {selected && (
-          <div className="rsi-lane"><Icon name="branch" size={10} />独立证据臂 · {selected.scope} · 与当前任务 SIM 候选分开</div>
+          <div className="rsi-lane"><Icon name="branch" size={10} />独立证据臂 · {selected.scope} · 与当前任务的演示候选分开</div>
         )}
         <div className="rsi-kpis">
           <span><b>{story.summary.episodes}</b>EPISODES</span>
@@ -88,6 +82,22 @@ export function RsiStoryPanel() {
           <span><b>{story.summary.capability_claims}</b>CLAIMS</span>
         </div>
         {story.ledger_path && <code className="rsi-ledger-path">{story.ledger_path}</code>}
+        <div className="rsi-verdict">
+          <span className={`rsi-state ${verdictTone(story.summary.gate_verdict)}`}>
+            {story.summary.gate_verdict ?? "verdict 未记录"}
+          </span>
+          <span>
+            decided {story.summary.decided ?? "—"} · rejection{" "}
+            {story.summary.rejection_rate == null ? "—" : story.summary.rejection_rate}
+          </span>
+          {(story.provenance?.simulation_episodes ?? story.summary.simulation_episodes ?? 0) > 0 && (
+            <span className="rsi-state warn">
+              含 {story.provenance?.simulation_episodes ?? story.summary.simulation_episodes} 条演练
+              episode · 非真实改进证据
+            </span>
+          )}
+          <span>{snapshotDateLabel(story.generated_at)}</span>
+        </div>
       </section>
 
       {selected && (
@@ -117,6 +127,27 @@ export function RsiStoryPanel() {
               <GateRow episode={selected} id="confirmation" />
             </div>
           </section>
+
+          {selected.confirmation && (
+            <section className="context-section">
+              <div className="section-title">
+                <span>CONFIRMATION / DELTA</span>
+                <em>{selected.confirmation.status} · {selected.confirmation.split}</em>
+              </div>
+              <div className="rsi-tracking">
+                {Object.entries(selected.confirmation.delta).map(([key, value]) => (
+                  <div className="rsi-metric" key={key}>
+                    <b>{key.replaceAll("_", " ")}</b>
+                    <span>{formatNumber(value)}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="rsi-note">
+                {selected.confirmation.note || "sealed confirmation 只记录配对结果，不是能力结论。"}
+                这不是人工签核，也不自动写入下一轮准入。
+              </p>
+            </section>
+          )}
 
           <section className="context-section">
             <div className="section-title"><span>PREDICTION AUDIT</span><em>{story.tracking.status.toUpperCase()}</em></div>

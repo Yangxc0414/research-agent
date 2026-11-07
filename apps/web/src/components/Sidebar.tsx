@@ -370,7 +370,7 @@ export function Sidebar() {
           <span className="profile-avatar"><Icon name="logo" size={15} /></span>
           <span className="profile-copy">
             <b>本地研究者</b>
-            <small>v{APP_VERSION} · LOCAL · SIM</small>
+            <small>v{APP_VERSION} · LOCAL · 演示数据</small>
           </span>
         </button>
         <a className="profile-icon profile-link" href={siteHref()} title="返回站点" aria-label="返回站点">

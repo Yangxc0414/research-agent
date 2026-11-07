@@ -772,7 +772,8 @@
             return '<li>' + link + ' <span class="mono">' + escapeHtml(w.year || "") + '</span></li>';
           }).join("") + '</ul></div></div>';
       }).join("");
-      body.innerHTML = '<div class="digest-meta"><span>generated_at: ' + escapeHtml(whenText) + '</span><span>queries: ' + fmt(queries.length) + '</span><span>works: ' + fmt(total) + '</span><span>source: ' + escapeHtml(digest.source || "OpenAlex") + '</span></div>' +
+      body.innerHTML = '<div class="digest-meta"><span>generated_at: ' + escapeHtml(whenText) + '</span><span>mode: ' + escapeHtml(digest.mode || "CACHED") + '</span><span>queries: ' + fmt(queries.length) + '</span><span>works: ' + fmt(total) + '</span><span>source: ' + escapeHtml(digest.source || "OpenAlex") + '</span></div>' +
+        '<div class="digest-empty">以上为随站点打包的公开元数据快照，不是实时检索，也不是本研究产出的结论；精确计数只反映 OpenAlex 当时的索引状态。</div>' +
         (rows || '<span class="digest-empty">digest 中没有查询结果。</span>') +
         (Array.isArray(digest.errors) && digest.errors.length ? '<div class="digest-empty">部分查询失败：' + digest.errors.map((e) => escapeHtml(e.id + " — " + e.message)).join("；") + '</div>' : "") +
         '<div><a class="doi-link" href="./data/digest.json" target="_blank" rel="noopener noreferrer">查看 digest.json</a></div>';

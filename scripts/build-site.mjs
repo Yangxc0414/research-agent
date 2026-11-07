@@ -7,6 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const site = path.join(root, "site");
 const demoSource = path.join(root, "demo", "index.html");
 const demoDir = path.join(site, "demo");
+const docsDir = path.join(site, "docs");
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
@@ -20,6 +21,27 @@ function copyDemo() {
   fs.copyFileSync(demoSource, path.join(demoDir, "index.html"));
   const hash = crypto.createHash("sha256").update(fs.readFileSync(demoSource)).digest("hex").slice(0, 16);
   return hash;
+}
+
+function copyDocs() {
+  ensureDir(docsDir);
+  const docs = [
+    ["README.md", "README.md"],
+    ["16-科研Skill生态调研与动态流程编排.md", "16-科研Skill生态调研.md"],
+    ["17-基于Skill契约的上层微服务架构.md", "17-上层微服务架构.md"],
+    ["18-GitHub Pages部署与多智能体Skill设计.md", "18-GitHub Pages部署与多智能体Skill设计.md"]
+  ];
+  const copied = [];
+  for (const [source, target] of docs) {
+    const sourcePath = path.join(root, source);
+    if (!fs.existsSync(sourcePath)) {
+      console.warn("skip missing doc:", source);
+      continue;
+    }
+    fs.copyFileSync(sourcePath, path.join(docsDir, target));
+    copied.push(target);
+  }
+  return copied;
 }
 
 function copyInnovationData() {
@@ -49,6 +71,29 @@ function copyInnovationData() {
   return copied;
 }
 
+function copyStats() {
+  // The showcase must not hard-code a test count that rots. Pull the recorded verdict (which
+  // carries the code fingerprint it covers) so the page can show a number with a provenance, or
+  // honestly show "—" when no verdict exists.
+  const source = path.join(root, "runtime_data", "test-verdict.json");
+  const targetDir = path.join(site, "innovation", "data");
+  if (!fs.existsSync(source)) return null;
+  try {
+    const verdict = JSON.parse(fs.readFileSync(source, "utf8"));
+    ensureDir(targetDir);
+    const stats = {
+      tests_run: verdict.tests_run ?? null,
+      ok: verdict.ok ?? false,
+      source_fingerprint: verdict.source_fingerprint ?? "",
+      finished_at: verdict.finished_at ?? "",
+    };
+    fs.writeFileSync(path.join(targetDir, "stats.json"), JSON.stringify(stats, null, 2) + "\n");
+    return stats;
+  } catch {
+    return null;
+  }
+}
+
 function validateJsonDir(dir) {
   if (!fs.existsSync(dir)) return [];
   const files = fs.readdirSync(dir).filter((name) => name.endsWith(".json"));
@@ -64,20 +109,24 @@ function validateJsonDir(dir) {
 }
 
 const demoHash = copyDemo();
+const docs = copyDocs();
 const innovationData = copyInnovationData();
+const stats = copyStats();
 const jsonFiles = validateJsonDir(path.join(site, "data"));
 
 const buildInfo = {
   built_at: new Date().toISOString(),
   demo_sha256_16: demoHash,
-  docs: [],
+  docs,
   data_files: jsonFiles,
-  innovation_data: innovationData
+  innovation_data: innovationData,
+  stats
 };
 fs.writeFileSync(path.join(site, "data", "build.json"), JSON.stringify(buildInfo, null, 2) + "\n");
 
 console.log("site build ok");
 console.log("  demo:", "site/demo/index.html", "sha256:" + demoHash);
+console.log("  docs:", docs.length ? docs.join(", ") : "(none)");
 console.log("  data:", jsonFiles.length ? jsonFiles.join(", ") : "(none)");
 console.log("  innovation data:", innovationData.length ? innovationData.join(", ") : "(none)");
 console.log("  preview: npx serve site");

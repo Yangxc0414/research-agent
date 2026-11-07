@@ -7,7 +7,7 @@
   --surface-3: #eaf3ff;
   --text: #0e1b2e;
   --muted: #53657d;
-  --faint: #7e8fa6;
+  --faint: #8b9bb0;
   --line: rgba(23, 58, 102, 0.09);
   --line-strong: rgba(23, 58, 102, 0.17);
   --accent: #2563eb;
@@ -21,11 +21,10 @@
   --amber-dim: #fdf7e9;
   --coral: #d92d55;
   --coral-dim: rgba(217, 45, 85, 0.07);
-  /* doc-41 语义角色别名：证据=teal / 人工门=amber / 阻断=coral / SIM=灰 */
-  --evidence: var(--teal);
-  --human: var(--amber);
-  --blocked: var(--coral);
-  --sim: #64748b;
+  --violet: #6d28d9;
+  /* settings.css / lineage.css reference this in 228 calc() expressions, but it was
+     never declared, so all of those font sizes silently fell back to inheritance. */
+  --settings-font-scale: 1.15;
   --gradient: linear-gradient(128deg, #2563eb 0%, #38bdf8 62%, #7dd3fc 100%);
   --serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "STSong", "SimSun", serif;
   --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, -apple-system, sans-serif;
@@ -38,4 +37,6 @@
   --topbar: 48px;
   --sidebar: 280px;
   --context: 352px;
+  /* Layout breakpoints (keep in sync with src/domain/breakpoints.ts):
+     1150 / 960 / 760 / 620. JS uses 1150 for the context-panel drawer. */
 }

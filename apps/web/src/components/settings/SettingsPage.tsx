@@ -81,7 +81,7 @@ const SECTION_META: Record<SettingsSection, { group: string; label: string }> = 
   {} as Record<SettingsSection, { group: string; label: string }>
 );
 
-const TASK_SECTIONS = new Set<SettingsSection>(["model", "plugins", "evolution"]);
+const TASK_SECTIONS = new Set<SettingsSection>(["plugins", "evolution"]);
 
 function SectionContent({ section }: { section: SettingsSection }) {
   switch (section) {

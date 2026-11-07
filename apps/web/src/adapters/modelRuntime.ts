@@ -2,7 +2,53 @@ import type { ModelProfile } from "../domain/types";
 import type { ApiFormat } from "../domain/modelCatalog";
 import type { ModelProviderEntry } from "../state/modelStore";
 
+import { authHeaders, describeAuthRefusal } from "./runtimeAuth";
+
 const runtimeBase = (import.meta.env.VITE_RUNTIME_URL ?? "").replace(/\/$/, "");
+
+export interface RuntimeModelProvider {
+  provider_id: string;
+  label: string;
+  kind: string;
+  base_url: string;
+  api_key_env: string;
+  models: string[];
+  configured: boolean;
+  key_source: string;
+  masked_key: string;
+}
+
+export interface RuntimeModelProfile {
+  profile_id: string;
+  provider_id: string;
+  model: string;
+  label: string;
+  context_window: number;
+  max_output_tokens: number;
+}
+
+export interface RuntimeModelReadiness {
+  required_modules: string[];
+  modules: Record<string, {
+    wired: boolean;
+    bound_profile: string;
+    provider: string;
+    key_configured: boolean;
+    consumer: string;
+  }>;
+  production_ready: boolean;
+  blocking: string[];
+  warnings: string[];
+  boundary: string;
+}
+
+export interface RuntimeModelSnapshot {
+  providers: RuntimeModelProvider[];
+  profiles: RuntimeModelProfile[];
+  bindings: Record<string, string>;
+  wired: Record<string, { wired: boolean; consumer?: string; note?: string }>;
+  readiness: RuntimeModelReadiness;
+}
 
 function kindFor(provider: ModelProviderEntry): string {
   if (provider.apiFormat === "anthropic_messages") return "anthropic";
@@ -14,23 +60,76 @@ function kindFor(provider: ModelProviderEntry): string {
 }
 
 async function request(path: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return requestJson("POST", path, body);
+}
+
+async function requestJson(
+  method: "POST" | "DELETE",
+  path: string,
+  body?: Record<string, unknown>
+): Promise<Record<string, unknown>> {
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), 3200);
   try {
     const response = await fetch(runtimeBase + path, {
-      method: "POST",
+      method,
       signal: controller.signal,
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify(body)
+      headers: { "Content-Type": "application/json", Accept: "application/json", ...authHeaders() },
+      body: body === undefined ? undefined : JSON.stringify(body)
     });
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      throw new Error(`${response.status} ${detail.slice(0, 160)}`.trim());
+      const refusal = describeAuthRefusal(response.status, detail);
+      throw new Error(refusal || `${response.status} ${detail.slice(0, 160)}`.trim());
     }
     return (await response.json()) as Record<string, unknown>;
   } finally {
     window.clearTimeout(timer);
   }
+}
+
+async function getJson(path: string): Promise<Record<string, unknown>> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(runtimeBase + path, {
+      signal: controller.signal,
+      headers: { Accept: "application/json", ...authHeaders() }
+    });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => "");
+      const refusal = describeAuthRefusal(response.status, detail);
+      throw new Error(refusal || `${response.status} ${detail.slice(0, 160)}`.trim());
+    }
+    return (await response.json()) as Record<string, unknown>;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+export async function loadRuntimeModelSnapshot(): Promise<RuntimeModelSnapshot> {
+  return (await getJson("/api/models")) as unknown as RuntimeModelSnapshot;
+}
+
+export async function bindRuntimeModule(module: string, profileId: string): Promise<RuntimeModelSnapshot> {
+  return (await request("/api/models/bindings", { module, profile_id: profileId })) as unknown as RuntimeModelSnapshot;
+}
+
+export async function setRuntimeProviderKey(
+  providerId: string,
+  apiKey: string
+): Promise<RuntimeModelSnapshot> {
+  return (await request(
+    `/api/models/providers/${encodeURIComponent(providerId)}/key`,
+    { api_key: apiKey }
+  )) as unknown as RuntimeModelSnapshot;
+}
+
+export async function clearRuntimeProviderKey(providerId: string): Promise<RuntimeModelSnapshot> {
+  return (await requestJson(
+    "DELETE",
+    `/api/models/providers/${encodeURIComponent(providerId)}/key`
+  )) as unknown as RuntimeModelSnapshot;
 }
 
 export async function syncProviderToRuntime(

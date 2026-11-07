@@ -36,8 +36,8 @@ export const MODE_META: Record<Mode, { label: string; kicker: string; hint: stri
 
 export const AUTO_STAGE_CATALOG: AutoStage[] = [
   { id: "S1", label: "文献检索", cmd: "retrieval.query", output: "3 sources / 12 spans · 1 abstract-only gap", status: "pending" },
-  { id: "S2–S3", label: "假设收敛", cmd: "idea.frame", output: "2 candidates · G1 policy-checked (SIM)", status: "pending" },
-  { id: "S4", label: "设计冻结", cmd: "design.freeze", output: "G2 pass (SIM) · protocol frozen", status: "pending" },
+  { id: "S2–S3", label: "假设收敛", cmd: "idea.frame", output: "2 candidates · G1 演示推进，真实收敛需 CLI", status: "pending" },
+  { id: "S4", label: "设计冻结", cmd: "design.freeze", output: "G2 待人工冻结 · 协议草案已生成", status: "pending" },
   { id: "S5a", label: "复现执行", cmd: "run.work", output: "RUN-014 · 3 seeds · R² 0.164 vs baseline −0.048", status: "pending" },
   { id: "S5b", label: "证据判定", cmd: "judge.verify", output: "EA sealed · claim 等待人工签署", status: "pending", gate: true },
   { id: "S6", label: "结果图", cmd: "figure.render", output: "SVG + manifest · bound to EA", status: "pending" },
@@ -340,7 +340,7 @@ export function seedGithubPlugin(): Plugin {
     readonly: true,
     toolsets: ["repos", "issues", "pull_requests"],
     status: "ready",
-    note: "SIM · 未真实连接；OAuth/token 由 runtime 保管"
+    note: "演示数据 · 未真实连接；OAuth/token 由 runtime 保管"
   };
 }
 

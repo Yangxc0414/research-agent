@@ -35,6 +35,14 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     available: (task) => !isRunning(task) && !heldoutUsed(task) && !readOnly(task)
   },
   {
+    id: "live",
+    name: "运行真实 pipeline",
+    description: "提交本地 runtime 任务（SSE + 轮询），只生成待审包，不自动签 claim",
+    hint: "/live <研究问题>",
+    group: "run",
+    available: (task) => !isRunning(task) && !readOnly(task)
+  },
+  {
     id: "pause",
     name: "暂停",
     description: "暂停当前运行，保留未完成阶段",
@@ -92,8 +100,8 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   },
   {
     id: "freeze",
-    name: "冻结协议",
-    description: "人工冻结协议，锁定主指标、对照与 seeds",
+    name: "G2 冻结命令",
+    description: "显示终端里的人工冻结命令；网页不冻结协议",
     hint: "需已有协议草案",
     group: "work",
     available: (task) => !isRunning(task) && !readOnly(task) && hasProtocol(task) && !protocolFrozen(task)
@@ -116,8 +124,8 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   },
   {
     id: "sign",
-    name: "签署 claim",
-    description: "人工签署待签 claim，不自动写结论",
+    name: "claim 人签命令",
+    description: "显示终端里的人签命令；claim 保持待签，签名不经过浏览器",
     hint: "需已有 EA",
     group: "work",
     aliases: ["claim"],

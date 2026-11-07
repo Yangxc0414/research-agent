@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadModelCalls } from "../../adapters/runtimeApi";
+import type { ModelCallRecord } from "../../adapters/runtimeApi";
 import { formatUsageTokens } from "../../domain/catalog";
 import { useAllModelProfiles } from "../../state/modelStore";
 import type { TokenUsage } from "../../domain/types";
@@ -84,7 +86,27 @@ export function UsageStats() {
   const currentTask = useWorkspaceStore(selectCurrentTask);
   const profiles = useAllModelProfiles();
   const [range, setRange] = useState<7 | 30>(7);
+  const [runtimeCalls, setRuntimeCalls] = useState<ModelCallRecord[]>([]);
+  const [runtimeCallError, setRuntimeCallError] = useState("");
   const todayKey = isoDateOffset(0);
+
+  useEffect(() => {
+    loadModelCalls()
+      .then((calls) => {
+        setRuntimeCalls(calls);
+        setRuntimeCallError("");
+      })
+      .catch((error: unknown) => {
+        setRuntimeCalls([]);
+        setRuntimeCallError(error instanceof Error ? error.message : String(error));
+      });
+  }, []);
+
+  const callTokens = (call: ModelCallRecord) =>
+    Object.values(call.usage ?? {}).reduce(
+      (sum, value) => sum + (typeof value === "number" ? value : 0),
+      0
+    );
 
   const aggregate = useMemo(() => {
     const totals: Record<string, TokenUsage> = {};
@@ -478,8 +500,32 @@ export function UsageStats() {
         </div>
       </section>
 
+      <section className="settings-card">
+        <div className="settings-card-head">
+          <div>
+            <h2>Runtime 模型调用</h2>
+            <p>来自 <code>/api/models/calls</code> · 最近 100 条元数据 · 不含 prompt / response / key</p>
+          </div>
+          <span className="quiet-chip">{runtimeCalls.length} calls</span>
+        </div>
+        {runtimeCallError ? (
+          <p className="settings-empty">runtime 未连接；当前只显示本地估算。{runtimeCallError}</p>
+        ) : runtimeCalls.length ? (
+          <div className="settings-kv-list">
+            {runtimeCalls.slice(0, 8).map((call, index) => (
+              <div key={`${call.at}-${call.request_id}-${index}`}>
+                <span>{call.ok ? "OK" : "FAIL"} · {call.latency_ms} ms</span>
+                <b>{call.model || call.profile_id} · {formatUsageTokens(callTokens(call))} tokens</b>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="settings-empty">还没有真实模型调用；Probe 或绑定后的 runtime pipeline（planner / writer / idea / experiment / judge）调用后会出现在这里。</p>
+        )}
+      </section>
+
       <p className="settings-inline-note">
-        统计由本地 <code>usage</code> / <code>usageDays</code> 汇总；新消息与卡片按字符数估算 token，切换模型后只累加到该模型。真实 API usage 需在接入 runtime 后读取响应字段。
+        本地用量由 <code>usage</code> / <code>usageDays</code> 估算；Runtime 调用是网关返回的真实 usage 元数据。两者分开展示，避免把估算值当成 API 账单。
       </p>
     </div>
   );

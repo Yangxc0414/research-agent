@@ -246,7 +246,7 @@
   .composer-foot {
     align-items: flex-end;
     gap: 6px;
-    font-size: calc(6px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .composer-hints {
@@ -296,7 +296,7 @@
 
   .toast {
     bottom: 96px;
-    font-size: calc(9px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .context-panel {
@@ -345,7 +345,7 @@
   }
 
   .task-kicker {
-    font-size: calc(6.5px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .task-kicker > span:first-child {
@@ -367,7 +367,7 @@
   }
 
   .task-tag {
-    font-size: calc(6.5px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .task-goal {
@@ -384,7 +384,7 @@
   }
 
   .suggestions button {
-    font-size: calc(8px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
     padding: 3px 5px;
   }
 
@@ -394,7 +394,7 @@
 
   .send-button {
     padding: 0 8px;
-    font-size: calc(9px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .composer-foot {
@@ -405,7 +405,7 @@
 
   .sim-note {
     max-width: 100%;
-    font-size: calc(5.8px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .mode-menu {
@@ -421,7 +421,7 @@
   }
 
   .profile-option b {
-    font-size: calc(9px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .profile-option span {
@@ -644,7 +644,7 @@
   }
 
   .model-trigger-name {
-    font-size: calc(8.5px * var(--font-scale, 1));
+    font-size: calc(10px * var(--font-scale, 1));
   }
 
   .composer-foot {
@@ -685,7 +685,7 @@
   }
 
   .welcome-art-sub {
-    font-size: 5.6px;
+    font-size: 10px;
     letter-spacing: 0.22em;
   }
 }
@@ -702,7 +702,7 @@
 
   .welcome-art-word {
     bottom: 9px;
-    font-size: 8px;
+    font-size: 10px;
   }
 
   .welcome-art-sub {

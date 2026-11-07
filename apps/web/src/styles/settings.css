@@ -87,7 +87,7 @@
 .settings-titlebar-brand em {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
   letter-spacing: 0.08em;
   white-space: nowrap;
@@ -171,7 +171,7 @@
   padding: 1px 8px 4px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.06em;
 }
 
@@ -238,14 +238,14 @@
 .settings-nav-foot small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
 .settings-nav-foot b {
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
 }
 
@@ -276,7 +276,7 @@
   gap: 5px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
@@ -292,11 +292,11 @@
 }
 
 .settings-page .eyebrow {
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-page .badge {
-  font-size: calc(7.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-page .switch-row b {
@@ -304,7 +304,7 @@
 }
 
 .settings-page .switch-row small {
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-page-head {
@@ -349,7 +349,7 @@
   background: var(--accent-dim);
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -361,7 +361,7 @@
   background: var(--teal-dim);
   color: var(--teal);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -391,7 +391,7 @@
 .settings-card-head p {
   margin-top: 2px;
   color: var(--faint);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -416,7 +416,7 @@
 }
 
 .settings-switch-row small {
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-lock-row {
@@ -444,13 +444,13 @@
 }
 
 .settings-lock-row b {
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .settings-lock-row small {
   color: var(--faint);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -474,13 +474,13 @@
 
 .settings-kv-list span {
   color: var(--muted);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-kv-list b {
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   text-align: right;
 }
@@ -504,13 +504,13 @@
 .settings-kv-grid span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-kv-grid b {
   overflow-wrap: anywhere;
   color: var(--text);
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   line-height: 1.45;
 }
@@ -518,7 +518,7 @@
 .settings-note {
   margin-top: 6px;
   color: var(--faint);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
 }
 
@@ -543,7 +543,7 @@
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--muted);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.35;
 }
 
@@ -578,7 +578,7 @@
   padding: 15px;
   border: 1px dashed var(--line);
   color: var(--faint);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
   text-align: center;
 }
@@ -596,14 +596,14 @@
 
 .settings-empty-card p {
   max-width: 440px;
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
 }
 
 .settings-inline-note {
   padding: 0 2px;
   color: var(--faint);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
 }
 
@@ -621,7 +621,7 @@
 
 .settings-font-control .font-size-options button {
   padding: 7px 3px;
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-font-control .font-size-head {
@@ -634,7 +634,7 @@
 }
 
 .settings-font-control > small {
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-theme-row {
@@ -662,13 +662,13 @@
 }
 
 .settings-theme-row b {
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .settings-theme-row small {
   color: var(--faint);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .quiet-chip {
@@ -679,7 +679,7 @@
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -727,14 +727,14 @@
 .settings-profile-name em {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
   letter-spacing: 0.04em;
 }
 
 .settings-profile-card small {
   color: var(--faint);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-profile-meta {
@@ -743,13 +743,13 @@
   white-space: nowrap;
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-profile-usage {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-boundary {
@@ -760,7 +760,7 @@
   border: 1px dashed rgba(15, 138, 158, 0.22);
   background: var(--teal-dim);
   color: var(--muted);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
 }
 
@@ -809,14 +809,14 @@
 }
 
 .settings-plugin-copy b {
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .settings-plugin-copy small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-plugin-toolsets {
@@ -832,7 +832,7 @@
   background: var(--surface);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -863,7 +863,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-toolcall-head code {
@@ -877,7 +877,7 @@
   margin-top: 3px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   overflow-wrap: anywhere;
 }
 
@@ -887,7 +887,7 @@
   border: 1px dashed var(--line);
   background: var(--surface);
   color: var(--muted);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 /* Evolution section */
@@ -905,7 +905,7 @@
 .settings-evo-head b {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
 }
 
@@ -923,7 +923,7 @@
   border: 1px dashed var(--line);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-surface-list svg {
@@ -958,7 +958,7 @@
 .settings-stat-row span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-boundary-list {
@@ -967,7 +967,7 @@
   padding-left: 14px;
   list-style: disc;
   color: var(--muted);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.55;
 }
 
@@ -1006,7 +1006,7 @@
 
 .guide-copy small {
   color: var(--muted);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -1041,13 +1041,13 @@
 
 .settings-link-grid b {
   color: var(--text);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .settings-link-grid small {
   color: var(--faint);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 /* Usage statistics */
@@ -1092,13 +1092,13 @@
 
 .summary-card > span {
   color: var(--text);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .summary-card > small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .heatmap-card,
@@ -1123,7 +1123,7 @@
   padding-top: 18px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 14px;
   text-align: right;
 }
@@ -1148,7 +1148,7 @@
   height: 16px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .heatmap-months span {
@@ -1206,7 +1206,7 @@
   margin-top: 7px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .heatmap-legend .heatmap-cell {
@@ -1228,7 +1228,7 @@
   padding: 1px 2px 0;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(8.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .range-switch {
@@ -1245,7 +1245,7 @@
   padding: 3px 7px;
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .range-switch button:last-child {
@@ -1263,7 +1263,7 @@
   gap: 10px;
   margin: 7px 0 4px;
   color: var(--muted);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .chart-legend span {
@@ -1300,7 +1300,7 @@
 .chart-axis-label {
   fill: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .model-usage-panel {
@@ -1345,7 +1345,7 @@
 .donut-caption {
   fill: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
@@ -1390,7 +1390,7 @@
 
 .model-legend-name b {
   color: var(--text);
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
@@ -1400,13 +1400,13 @@
   white-space: nowrap;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .model-legend-share {
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -1417,7 +1417,7 @@
 .model-legend-note {
   margin-top: 7px;
   color: var(--faint);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -1462,7 +1462,7 @@
     flex: none;
     height: 28px;
     padding: 0 8px;
-    font-size: calc(9px * var(--settings-font-scale));
+    font-size: calc(10px * var(--settings-font-scale));
   }
 
   .settings-nav-scroll {
@@ -1666,7 +1666,7 @@
   }
 
   .settings-badge {
-    font-size: calc(6.3px * var(--settings-font-scale));
+    font-size: calc(10px * var(--settings-font-scale));
   }
 }
 
@@ -1685,7 +1685,7 @@
   padding: 2px 0 5px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.08em;
 }
 
@@ -1724,7 +1724,7 @@
   background: var(--accent-dim);
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
   font-weight: 500;
   letter-spacing: 0.03em;
@@ -1732,7 +1732,7 @@
 
 .shortcut-copy small {
   color: var(--faint);
-  font-size: calc(8.5px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -1764,13 +1764,13 @@
   background: #fff;
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(8.5px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   box-shadow: 0 1px 0 rgba(15, 35, 70, 0.06);
 }
 
 .shortcut-key-button > span:last-child {
   color: var(--faint);
-  font-size: calc(7.5px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .shortcut-key-button.is-recording {
@@ -1787,7 +1787,7 @@
 .shortcut-key-button.is-recording small {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -1804,7 +1804,7 @@
   min-height: 18px;
   margin-top: 10px;
   color: var(--faint);
-  font-size: calc(8.2px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .shortcut-feedback span {
@@ -1836,7 +1836,7 @@
   align-items: center;
   gap: 4px;
   color: var(--faint);
-  font-size: calc(7.8px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -1855,7 +1855,7 @@
   border-radius: 4px;
   background: var(--surface-2);
   color: var(--muted);
-  font-size: calc(8.5px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .shortcut-fixed kbd {
@@ -1865,7 +1865,7 @@
   background: #fff;
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(7.5px * var(--settings-font-scale, 1));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 @media (max-width: 620px) {
@@ -1933,7 +1933,7 @@
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -1972,7 +1972,7 @@
   border: 1px dashed var(--line);
   border-radius: var(--radius);
   color: var(--faint);
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.6;
 }
 
@@ -1980,7 +1980,7 @@
   margin: 10px 0 5px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.05em;
 }
 
@@ -2021,7 +2021,7 @@
   margin-top: 1px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-meta {
@@ -2030,20 +2030,20 @@
   gap: 3px 8px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-card p {
   margin: 0;
   color: var(--muted);
-  font-size: calc(8.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
 .agent-card small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   overflow-wrap: anywhere;
 }
 
@@ -2068,7 +2068,7 @@
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -2117,18 +2117,18 @@
 .orchestration-stage small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.06em;
 }
 
 .orchestration-stage > b {
-  font-size: calc(9.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .orchestration-stage > span {
   color: var(--muted);
-  font-size: calc(7.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.4;
 }
 
@@ -2148,19 +2148,19 @@
 }
 
 .orchestration-scout b {
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .orchestration-scout span {
   color: var(--muted);
-  font-size: calc(7.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-scout em {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.1px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -2178,7 +2178,7 @@
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-gate-chip.is-rsi {
@@ -2213,7 +2213,7 @@
 
 .orchestration-memory-head b {
   display: block;
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.35;
 }
 
@@ -2222,7 +2222,7 @@
   margin-top: 1px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .facet-grid {
@@ -2250,13 +2250,13 @@
   justify-content: space-between;
   gap: 4px;
   color: var(--muted);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .facet-cell-head b {
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .facet-bar {
@@ -2276,7 +2276,7 @@
 .facet-cell small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .gap-chips {
@@ -2293,7 +2293,7 @@
   background: var(--amber-dim);
   color: var(--amber);
   font-family: var(--mono);
-  font-size: calc(6.1px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .skill-candidate {
@@ -2315,26 +2315,26 @@
 .skill-candidate-head b {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.06em;
 }
 
 .skill-candidate code {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .skill-candidate p {
   margin: 0;
   color: var(--text);
-  font-size: calc(8.9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
 .skill-candidate small {
   color: var(--muted);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -2344,7 +2344,7 @@
   gap: 2px 6px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .candidate-governance span + span::before {
@@ -2362,12 +2362,12 @@
 }
 
 .candidate-empty b {
-  font-size: calc(8.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .candidate-empty span {
   color: var(--muted);
-  font-size: calc(7.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -2384,13 +2384,13 @@
 .orchestration-next b {
   color: var(--teal);
   font-family: var(--mono);
-  font-size: calc(6.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.05em;
 }
 
 .orchestration-next span {
   color: var(--muted);
-  font-size: calc(7.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.4;
 }
 
@@ -2414,7 +2414,7 @@
 .orchestration-run-head code {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-run-topic {
@@ -2422,7 +2422,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--text);
-  font-size: calc(8.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2450,7 +2450,7 @@
 .orchestration-stats span {
   display: block;
   color: var(--faint);
-  font-size: calc(6.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -2472,20 +2472,20 @@
 
 .orchestration-run-scout span {
   color: var(--muted);
-  font-size: calc(7.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-run-scout b {
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(6.9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
 }
 
 .orchestration-run-scout em {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -2495,6 +2495,14 @@
   margin-top: 7px;
   padding-top: 7px;
   border-top: 1px solid var(--line);
+}
+
+.orchestration-shortlist {
+  display: grid;
+  gap: 4px;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line);
 }
 
 .orchestration-advisories {
@@ -2518,7 +2526,7 @@
 
 .orchestration-advisory-row b {
   overflow: hidden;
-  font-size: calc(7.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2527,7 +2535,7 @@
 .orchestration-advisory-row span {
   overflow: hidden;
   color: var(--muted);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2535,7 +2543,7 @@
 .orchestration-advisory-row em {
   color: var(--teal);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -2556,13 +2564,13 @@
 }
 
 .orchestration-idea-head b {
-  font-size: calc(8.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-idea-head span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .orchestration-idea-row {
@@ -2577,7 +2585,7 @@
 .orchestration-idea-row b {
   display: -webkit-box;
   overflow: hidden;
-  font-size: calc(7.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   line-height: 1.4;
   -webkit-box-orient: vertical;
@@ -2587,7 +2595,7 @@
 .orchestration-idea-row span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.1px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 @media (max-width: 1000px) {
@@ -2596,7 +2604,10 @@
   }
 
   .orchestration-arrow {
-    display: none;
+    /* keep the relation when the flow stacks: a vertical arrow, not a deleted one */
+    display: grid;
+    height: 18px;
+    transform: rotate(90deg);
   }
 
   .orchestration-stage {
@@ -2649,7 +2660,7 @@
 .settings-field > span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
@@ -2664,7 +2675,7 @@
   outline: 0;
   background: #fff;
   color: var(--text);
-  font-size: calc(8.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-field textarea {
@@ -2696,12 +2707,12 @@
 }
 
 .custom-agent-form-head b {
-  font-size: calc(9.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .custom-agent-form-head span {
   color: var(--faint);
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.4;
 }
 
@@ -2730,7 +2741,7 @@
 .agent-batch-intro {
   margin: 0;
   color: var(--muted);
-  font-size: calc(8.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -2762,24 +2773,24 @@
 }
 
 .agent-template-head b {
-  font-size: calc(9.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-template-head span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-template p {
   margin: 0;
   color: var(--muted);
-  font-size: calc(8.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
 .agent-template .check-pill {
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-template-actions {
@@ -2790,7 +2801,7 @@
 
 .agent-template .settings-mini-btn {
   padding: 4px 8px;
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-template .settings-mini-btn:disabled {
@@ -2813,12 +2824,12 @@
 }
 
 .agent-batch-head b {
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-batch-head span {
   color: var(--faint);
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-batch-row {
@@ -2841,7 +2852,7 @@
   outline: 0;
   background: #fff;
   color: var(--text);
-  font-size: calc(8.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .agent-batch-row input:focus {
@@ -2851,13 +2862,13 @@
 .agent-batch-row span {
   overflow: hidden;
   color: var(--muted);
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.4;
   text-overflow: ellipsis;
 }
 
 .agent-batch-row .settings-mini-btn {
-  font-size: calc(7.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .check-pill-row {
@@ -2894,7 +2905,7 @@
 
 .custom-agent-head b {
   display: block;
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .custom-agent-head span {
@@ -2902,7 +2913,7 @@
   margin-top: 1px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .custom-agent-actions {
@@ -2915,14 +2926,14 @@
 .custom-agent-card p {
   margin: 0;
   color: var(--muted);
-  font-size: calc(7.9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
 .custom-agent-card small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   overflow-wrap: anywhere;
 }
 
@@ -2933,7 +2944,7 @@
   background: var(--surface);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(6.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .settings-mini-btn:hover {
@@ -2990,7 +3001,7 @@
 
 .policy-master b {
   display: block;
-  font-size: calc(9.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .policy-master span {
@@ -2998,7 +3009,7 @@
   max-width: 570px;
   margin-top: 2px;
   color: var(--muted);
-  font-size: calc(7.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -3022,14 +3033,14 @@
 
 .policy-scope-row b {
   display: block;
-  font-size: calc(8.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .policy-scope-row b code {
   margin-left: 4px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 400;
 }
 
@@ -3037,7 +3048,7 @@
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font-size: calc(7.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -3061,7 +3072,7 @@
 .policy-locked > b {
   color: var(--amber);
   font-family: var(--mono);
-  font-size: calc(6.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.05em;
 }
 
@@ -3118,7 +3129,7 @@
   gap: 3px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .memory-compose-row input,
@@ -3130,7 +3141,7 @@
   outline: 0;
   background: #fff;
   color: var(--text);
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .memory-list,
@@ -3160,7 +3171,7 @@
 
 .memory-row b,
 .memory-candidate b {
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   line-height: 1.45;
 }
@@ -3169,7 +3180,7 @@
 .memory-candidate small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .memory-kind {
@@ -3180,7 +3191,7 @@
   background: var(--surface-2);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -3227,20 +3238,20 @@
 }
 
 .command-row b {
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .command-row code {
   color: var(--accent);
   font-family: var(--mono);
-  font-size: calc(6.7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   overflow-wrap: anywhere;
 }
 
 .command-row small {
   color: var(--faint);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.4;
 }
 
@@ -3252,7 +3263,7 @@
   background: var(--surface-2);
   color: var(--text);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -3287,14 +3298,14 @@
 }
 
 .archive-row b {
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .archive-row small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .archive-actions {
@@ -3357,13 +3368,13 @@
 }
 
 .storage-option b {
-  font-size: calc(9.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
 }
 
 .storage-option small {
   color: var(--faint);
-  font-size: calc(7.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .storage-kv {
@@ -3388,13 +3399,13 @@
 .storage-kv span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
 .storage-kv b {
   color: var(--text);
-  font-size: calc(8.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 500;
   text-align: right;
 }
@@ -3411,7 +3422,7 @@
   border-radius: var(--radius);
   background: var(--coral-dim);
   color: var(--coral);
-  font-size: calc(8.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -3493,7 +3504,7 @@
 
 .provider-row b {
   overflow: hidden;
-  font-size: calc(9.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3503,7 +3514,7 @@
   overflow: hidden;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.3px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3512,7 +3523,7 @@
   flex: none;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(5.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -3555,7 +3566,7 @@
 .provider-editor-head span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .provider-editor .field {
@@ -3600,7 +3611,7 @@
 
 .provider-model-row b {
   overflow: hidden;
-  font-size: calc(9px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3608,7 +3619,7 @@
 .provider-model-row small {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.1px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .model-add-modal {
@@ -3626,7 +3637,7 @@
   border-radius: var(--radius);
   background: var(--accent-dim);
   color: var(--accent);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -3646,7 +3657,7 @@
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--muted);
-  font-size: calc(8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .check-pill.is-on {
@@ -3662,5 +3673,276 @@
 
   .provider-list {
     max-height: 210px;
+  }
+}
+
+/* Narrow settings: keep the close control and all section tabs reachable. */
+@media (max-width: 480px) {
+  .settings-titlebar {
+    gap: 6px;
+    padding: 0 8px;
+  }
+
+  .settings-titlebar-actions .settings-badge {
+    display: none;
+  }
+
+  .settings-nav {
+    flex-wrap: wrap;
+  }
+
+  .settings-nav-scroll {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .settings-nav-items {
+    flex-wrap: wrap;
+  }
+
+  .settings-nav-item {
+    height: 30px;
+  }
+}
+
+/* Narrow command catalog: the shortcut/status chip must wrap rather than
+   push the row 13px past the viewport. */
+@media (max-width: 480px) {
+  .command-row {
+    flex-wrap: wrap;
+  }
+
+  .command-row > div {
+    flex: 1 1 100%;
+  }
+
+  .command-row .settings-state {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .settings-group-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Runtime module -> model bindings */
+.model-binding-card {
+  overflow: visible;
+}
+
+.model-binding-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.model-binding-row {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.9fr) minmax(180px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.model-binding-label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 7px;
+  align-items: center;
+}
+
+.model-binding-label b {
+  font-size: calc(10px * var(--settings-font-scale));
+  font-weight: 600;
+}
+
+.model-binding-label small {
+  grid-column: 1 / -1;
+  color: var(--faint);
+  font-size: calc(9px * var(--settings-font-scale));
+  line-height: 1.45;
+}
+
+.model-binding-meta {
+  display: grid;
+  gap: 5px;
+  justify-items: end;
+}
+
+.model-binding-meta > span {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--settings-font-scale));
+  white-space: nowrap;
+}
+
+.model-binding-meta > span[data-ok="true"] {
+  color: var(--teal);
+}
+
+.model-independence {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 8px;
+  padding: 10px 11px;
+  border: 1px dashed rgba(56, 130, 246, 0.28);
+  border-radius: var(--radius);
+  background: rgba(239, 246, 255, 0.7);
+  color: #2c5aa0;
+}
+
+.model-independence > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.model-independence b {
+  font-size: calc(10px * var(--settings-font-scale));
+}
+
+.model-independence small {
+  color: var(--muted);
+  font-size: calc(9px * var(--settings-font-scale));
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.runtime-key-panel {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.runtime-key-head b {
+  display: block;
+  font-size: calc(10px * var(--settings-font-scale));
+}
+
+.runtime-key-head small {
+  display: block;
+  margin-top: 2px;
+  color: var(--faint);
+  font-size: calc(9px * var(--settings-font-scale));
+  line-height: 1.5;
+}
+
+.runtime-key-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.8fr) auto minmax(220px, 1.2fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.runtime-key-label b {
+  display: block;
+  font-size: calc(10px * var(--settings-font-scale));
+}
+
+.runtime-key-label small {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--settings-font-scale));
+}
+
+.runtime-key-status {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--settings-font-scale));
+  white-space: nowrap;
+}
+
+.runtime-key-status[data-ok="true"] {
+  color: var(--teal);
+}
+
+.runtime-key-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.runtime-key-actions input {
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: calc(10px * var(--settings-font-scale));
+}
+
+.runtime-key-actions input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.model-readiness {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 11px;
+  border: 1px solid rgba(194, 120, 3, 0.22);
+  border-radius: var(--radius);
+  background: rgba(255, 247, 230, 0.7);
+  color: #9a6500;
+}
+
+.model-readiness.is-ready {
+  border-color: rgba(20, 130, 100, 0.22);
+  background: rgba(235, 250, 246, 0.75);
+  color: var(--teal);
+}
+
+.model-readiness > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.model-readiness b {
+  font-size: calc(10px * var(--settings-font-scale));
+}
+
+.model-readiness small {
+  color: var(--muted);
+  font-size: calc(9px * var(--settings-font-scale));
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .model-binding-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .model-binding-meta {
+    grid-template-columns: minmax(0, 1fr) auto;
+    justify-items: start;
+    align-items: center;
+  }
+
+  .runtime-key-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .runtime-key-actions {
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 }

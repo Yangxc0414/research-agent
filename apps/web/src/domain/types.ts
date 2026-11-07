@@ -1,6 +1,9 @@
 export type Mode = "research" | "experiment" | "writing" | "auto";
+export type RuntimeSource = "fixture" | "real_corpus" | "local" | "openalex";
+export type RuntimeTaskType = "auto" | "literature_review" | "hypothesis_design" | "experiment_validation" | "full_research";
+export type RuntimeFlowMode = "review" | "strict";
 export type AccessMode = "read_only" | "ask" | "full";
-export type ContextTab = "run" | "evidence" | "evolution" | "eval";
+export type ContextTab = "brief" | "run" | "evidence" | "projects" | "evolution" | "eval";
 export type SettingsSection =
   | "general"
   | "appearance"
@@ -131,6 +134,282 @@ export interface Coverage {
   abstractOnly: number;
 }
 
+export interface RuntimeLoop {
+  idea?: {
+    status?: string;
+    selection?: string;
+    candidates: Array<{
+      idea_id: string;
+      title: string;
+      hypothesis: string;
+      falsification?: string;
+      prior_art_scope?: string;
+      novelty_status?: string;
+    }>;
+    ranked?: Array<{
+      idea_id?: string;
+      rank?: number;
+      title?: string;
+      evidence_count?: number;
+      source_count?: number;
+      prior_art_scope?: string;
+      novelty_status?: string;
+      testability?: string;
+      has_kill_criteria?: boolean;
+      has_contrast?: boolean;
+    }>;
+  };
+  design?: {
+    status?: string;
+    idea_id?: string;
+    hypothesis?: string;
+    baseline?: string;
+    primary_metric?: string;
+    controls?: string[];
+    seeds?: number;
+    warnings?: string[];
+  };
+  paper?: {
+    status?: string;
+    section_count?: number;
+    slots: Array<{
+      slot_id: string;
+      section?: string;
+      status: string;
+      required_evidence?: string;
+    }>;
+  };
+  figure?: {
+    figure_id?: string;
+    kind?: string;
+    schematic?: boolean;
+    evidence_refs?: string[];
+  };
+  claimRegistry?: {
+    entries: number;
+    coverage_rate?: number;
+    verified_anchor_rows?: number;
+  };
+  closure?: {
+    status?: string;
+    unresolved?: string[];
+    checks?: number;
+  };
+  observationId?: string;
+  activePolicyId?: string;
+  appliedPolicy?: {
+    policy_id?: string;
+    patch?: Record<string, unknown>;
+  };
+  activeLease?: {
+    lease_id?: string;
+    seeds?: number;
+    scope?: string;
+  };
+  writing?: {
+    status?: string;
+    submission_ready?: boolean;
+    blockers?: string[];
+    externalGates?: Record<string, { status?: string; issue_count?: number }>;
+  };
+  experiments?: Array<{
+    experiment_id: string;
+    idea_id?: string;
+    next_action?: string;
+    stages?: Record<string, string>;
+  }>;
+  blockers?: string[];
+  nextActions?: Array<{
+    gate?: string;
+    owner?: string;
+    command: string;
+  }>;
+}
+
+export interface ProjectSummary {
+  project_id: string;
+  name: string;
+  project_dir: string;
+  experiment_count: number;
+}
+
+export interface ProjectExperiment {
+  experiment_id: string;
+  idea_id?: string;
+  run_id?: string;
+  design_status?: string;
+  package?: string;
+  stages?: Record<string, string>;
+  next_action?: string;
+  evidence_summary?: {
+    status?: string;
+    mean?: number | null;
+    std?: number | null;
+    cv_folds?: number | null;
+  };
+  error?: string;
+}
+
+export interface ProjectExperimentInventory {
+  schema_version?: string;
+  project_id?: string;
+  name?: string;
+  count: number;
+  experiments: ProjectExperiment[];
+  boundary?: string;
+}
+
+export interface ClaimDraftPrompt {
+  status: string;
+  statement: string;
+  scope: string;
+  /** Exact --assertion value proposed by the system; empty when the capsule had no per-seed metric. */
+  assertion: string;
+  reading: string;
+  command: string;
+  cwd: string;
+  boundary: string;
+}
+
+export interface ClosureRow {
+  profile: string;
+  closure_status: string;
+  next: string;
+  run_id?: string;
+  /** Present only while the run is unsigned: what a human would sign, and the exact command. */
+  claim_draft?: ClaimDraftPrompt | null;
+  experiment_id?: string;
+  study_dir?: string;
+  dataset?: string;
+  signed?: boolean;
+  underpowered?: boolean;
+  has_signed_claim?: boolean;
+  has_signature?: boolean;
+  /** True when the signature records a policy-bounded autopilot, not a human signer. */
+  delegated?: boolean;
+  study_design?: {
+    status: string;
+    ccfa_level: string;
+    blockers: string[];
+  } | null;
+  support_panel_status?: string;
+  verdict?: StudyVerdict;
+  origin?: "absent" | "bound" | "stale" | string;
+  idea_id?: string;
+  idea_title?: string;
+  falsification?: string;
+}
+
+export interface StudyComparison {
+  comparison: string;
+  state: "positive" | "negative" | "undecidable" | "unavailable" | string;
+  mean_diff: number | null;
+  ci95: [number, number] | null;
+  reason: string;
+  /** Seeds the same design would need at this effect size; null when the study cannot say. */
+  seeds_for_80pct?: number | null;
+}
+
+export interface StudyVerdict {
+  available: boolean;
+  comparisons: StudyComparison[];
+  counts: Record<string, number>;
+  decidable?: number;
+  undecidable?: number;
+}
+
+export interface ReplicationRow {
+  status: string;
+  direction?: string;
+  decided_in?: string[];
+  generalizes?: boolean;
+}
+
+export interface OverturnedAssertion {
+  design_key: string;
+  dataset: string;
+  comparison: string;
+  reason: string;
+  decided_at: { directory: string; seeds: number; state: string; mean_diff?: number; ci95?: (number | null)[] };
+  at_higher_power: { directory: string; seeds: number; state: string; mean_diff?: number; ci95?: (number | null)[] };
+}
+
+export interface ReplicationSummary {
+  packages?: number;
+  status_counts?: Record<string, number>;
+  warnings?: string[];
+  overturned?: OverturnedAssertion[];
+  power_ladders?: number;
+  power_audit?: {
+    ladders?: number;
+    decided_at_lower_power?: number;
+    overturned?: number;
+    reversal_rate?: number | null;
+    reading?: string;
+  };
+  groups?: {
+    design_key: string;
+    datasets: string[];
+    seed_counts?: Record<string, number>;
+    comparisons?: Record<string, ReplicationRow>;
+  }[];
+  unreplicated?: {
+    design_key: string;
+    datasets: string[];
+    reason: string;
+  }[];
+  boundary?: string;
+}
+
+export interface ClosureInventory {
+  schema_version?: string;
+  project_dir: string;
+  canonical_run: ClosureRow[];
+  local_experiment: ClosureRow[];
+  search_study: ClosureRow[];
+  replication?: ReplicationSummary | null;
+  present_profiles?: string[];
+  boundary?: string;
+}
+
+export interface AutopilotStep {
+  step: string;
+  status: string;
+  detail: string;
+}
+
+export interface AutopilotSnapshot {
+  schema_version: string;
+  policy: {
+    policy_id?: string;
+    policy_sha256?: string;
+    authorized_by?: string;
+    expires_at?: string;
+    endpoint?: string;
+  };
+  run_id: string;
+  status: "completed" | "stopped" | "missing" | string;
+  stopped_at: string;
+  reasons: string[];
+  created_at: string;
+  steps: AutopilotStep[];
+  claim: { claim_id?: string; sha256?: string; assertion?: string };
+  signature: { signature_id?: string; report_id?: string; submission?: boolean };
+  bundle: { path: string; verified: boolean; signed: boolean; artifact_count: number };
+  lineage: { status?: string; verify?: string };
+  delegation: { delegated?: boolean; signer_id?: string; signer_name?: string; not_a_human_signature?: boolean };
+  history: Array<{
+    policy_id?: string;
+    run_id: string;
+    status: string;
+    claim_id?: string;
+    signature_id?: string;
+    bundle?: string;
+    created_at?: string;
+  }>;
+  boundary: string;
+}
+
 export interface EvidenceItem {
   id: string;
   kind: "gap" | "hypothesis" | "claim";
@@ -139,6 +418,16 @@ export interface EvidenceItem {
   scope: string;
   refs: string[];
   note?: string;
+}
+
+export interface EvidencePackage {
+  id: string;
+  stage: string;
+  label: string;
+  status: "ready" | "partial" | "needs_human" | "needs_signature" | "missing" | "blocked" | "not_run";
+  detail: string;
+  boundary: string;
+  refs: string[];
 }
 
 export interface Protocol {
@@ -155,7 +444,7 @@ export interface RunRecord {
   seeds: number;
   metric: string;
   mean: number;
-  baseline: number;
+  baseline: number | null;
   ea: string;
   status: string;
 }
@@ -319,12 +608,6 @@ export interface ModelSettings {
   summaryTokens: number;
 }
 
-/** 新会话默认预算（不含 profileId / thinkingStop，二者由 draftProfileId / draftThinkingStop 承担）。 */
-export type ModelBudget = Pick<
-  ModelSettings,
-  "contextLimit" | "maxReply" | "compression" | "threshold" | "keepRecent" | "summaryTokens"
->;
-
 export type MessageRole = "system" | "user" | "agent";
 
 export type Card =
@@ -389,6 +672,53 @@ export type Card =
         status: "done" | "pending" | "blocked";
         note: string;
       }>;
+      note: string;
+    }
+  | {
+      type: "runtime-run";
+      jobId: string;
+      jobDir?: string;
+      status: "queued" | "running" | "completed" | "failed";
+      events: number;
+      runId?: string;
+      fixtureMode?: boolean;
+      source?: RuntimeSource;
+      taskType?: RuntimeTaskType;
+      dataset?: string;
+      route?: string;
+      taskStatus?: string;
+      flowMode?: "review" | "strict";
+      stoppedAt?: string;
+      stage?: string;
+      lastEvent?: string;
+      eventLog?: Array<{
+        seq: number;
+        type: string;
+        stage?: string | null;
+        message: string;
+        ts?: string;
+      }>;
+      gates?: Array<{ gate: string; status: string; reason: string }>;
+      evidencePackages?: EvidencePackage[];
+      supportAudit?: {
+        status?: string;
+        method?: string;
+        counts?: Record<string, number>;
+        citation_modes?: Record<string, number>;
+        path?: string;
+      };
+      warnings: string[];
+      artifacts: Array<{ path: string; size: number; kind: string; url: string }>;
+      error?: string;
+      failure?: {
+        schema_version?: string;
+        error_type?: string;
+        error?: string;
+        retryable?: boolean;
+        suggested_action?: string;
+        warnings?: string[];
+        boundary?: string;
+      };
       note: string;
     }
   | ({ type: "review-pack" } & ReviewPackResult)
@@ -459,9 +789,12 @@ export interface ResearchTask {
   gates: Gate[];
   coverage: Coverage;
   evidence: EvidenceItem[];
+  evidencePackages?: EvidencePackage[];
   protocol: Protocol | null;
   protocolFrozen: boolean;
   run: RunRecord | null;
+  runtime?: { source: RuntimeSource; runId?: string; appliedAt: string };
+  runtimeLoop?: RuntimeLoop;
   autoPlan?: AutomationPlan | null;
   evaluation: EvaluationState;
   evolution: EvolutionState;
@@ -527,8 +860,6 @@ export interface UIState {
   skillsOpen: boolean;
   draftAccess: AccessMode;
   draftProfileId: string;
-  draftModelBudget: ModelBudget | null;
-  modelDialogScope: "task" | "draft";
   skillDraft: SkillDraft | null;
   permissionRequest: PermissionRequest | null;
   newTaskOpen: boolean;

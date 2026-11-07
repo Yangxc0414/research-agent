@@ -1,22 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  createRun,
   createRuntimeArchive,
   createRuntimeMemory,
   deleteRuntimeArchive,
   deleteRuntimeMemory,
+  getRun,
   loadAgents,
   loadCommands,
+  loadRunArtifacts,
+  loadRuns,
   loadRuntimeArchive,
   loadRuntimeMemory,
+  loadSigners,
   probeRuntime,
-  runtimeBaseLabel
+  runtimeBaseLabel,
+  runtimeUrl
 } from "../../adapters/runtimeApi";
 import type {
   AgentRegistrySnapshot,
   CommandCatalogSnapshot,
+  RunArtifact,
+  RunJob,
   RuntimeArchiveSnapshot,
   RuntimeHealth,
   RuntimeMemorySnapshot,
+  SignerSnapshot,
   SnapshotResult
 } from "../../adapters/runtimeApi";
 import { SHORTCUT_ACTIONS, formatShortcutLabel } from "../../domain/shortcuts";
@@ -24,6 +33,7 @@ import { siteHref } from "../../domain/links";
 import type { MemoryKind } from "../../domain/types";
 import { useWorkspaceStore } from "../../state/workspaceStore";
 import { Icon } from "../Icon";
+import { SourcePill } from "../SourcePill";
 import { AgentManagement } from "./AgentManagement";
 import { OrchestrationOverview } from "./OrchestrationOverview";
 import { Card, PageHead } from "./SettingsSections";
@@ -39,7 +49,8 @@ const SAFETY_LABEL = {
   read_only: "只读",
   local_write: "本地写入",
   network_opt_in: "显式联网",
-  human_gate: "人工门"
+  human_gate: "人工门",
+  catalog_only: "未分类"
 } as const;
 
 function shortTime(value: string): string {
@@ -98,12 +109,15 @@ function useCommandsResource() {
   return { ...state, reload: () => setTick((value) => value + 1) };
 }
 
+const SPEC_SOURCE_LABELS = { snapshot: "SPEC SNAPSHOT" };
+
 function SourceBadge({ source }: { source: "runtime" | "snapshot" | null }) {
-  if (!source) return <span className="settings-source">STATIC · NO SNAPSHOT</span>;
   return (
-    <span className={`settings-source${source === "runtime" ? " is-live" : ""}`}>
-      {source === "runtime" ? "LIVE RUNTIME" : "SPEC SNAPSHOT"}
-    </span>
+    <SourcePill
+      source={source}
+      labels={SPEC_SOURCE_LABELS}
+      emptyLabel="STATIC · NO SNAPSHOT"
+    />
   );
 }
 
@@ -464,6 +478,87 @@ export function CommandsSettingsPage() {
 export function RuntimeSettingsPage() {
   const [health, setHealth] = useState<RuntimeHealth | null>(null);
   const [loading, setLoading] = useState(true);
+  const [run, setRun] = useState<RunJob | null>(null);
+  const [artifacts, setArtifacts] = useState<RunArtifact[]>([]);
+  const [runBusy, setRunBusy] = useState(false);
+  const [runError, setRunError] = useState("");
+  const [recentRuns, setRecentRuns] = useState<RunJob[]>([]);
+  const [recentError, setRecentError] = useState("");
+  const [signers, setSigners] = useState<SignerSnapshot | null>(null);
+
+  const refreshRecent = () => {
+    loadRuns(8)
+      .then((jobs) => {
+        setRecentRuns(jobs);
+        setRecentError("");
+      })
+      .catch((error: unknown) => {
+        setRecentRuns([]);
+        setRecentError(error instanceof Error ? error.message : String(error));
+      });
+  };
+
+  useEffect(refreshRecent, []);
+  useEffect(() => {
+    if (run?.status === "completed" || run?.status === "failed") refreshRecent();
+  }, [run?.status]);
+
+  useEffect(() => {
+    if (!run || run.status === "completed" || run.status === "failed") return;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      getRun(run.job_id)
+        .then((next) => {
+          if (cancelled) return;
+          setRun(next);
+          if (next.status === "completed" || next.status === "failed") setRunBusy(false);
+        })
+        .catch((error: unknown) => {
+          if (cancelled) return;
+          setRunError(error instanceof Error ? error.message : String(error));
+          setRunBusy(false);
+        });
+    }, 1000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [run]);
+
+  useEffect(() => {
+    if (!run || run.status !== "completed") return;
+    let cancelled = false;
+    loadRunArtifacts(run.job_id)
+      .then((nextArtifacts) => {
+        if (!cancelled) setArtifacts(nextArtifacts);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setRunError(error instanceof Error ? error.message : String(error));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [run?.job_id, run?.status]);
+
+  const startRun = () => {
+    setRunBusy(true);
+    setRunError("");
+    setArtifacts([]);
+    createRun({
+      topic: "ChemLab reaction conversion baseline",
+      language: "en",
+      venue_type: "en_conference",
+      max_sources: 4,
+      real_corpus: true,
+      run_dataset: "chemlab",
+      run_seeds: 3
+    })
+      .then(setRun)
+      .catch((error: unknown) => {
+        setRunError(error instanceof Error ? error.message : String(error));
+        setRunBusy(false);
+      });
+  };
 
   const probe = () => {
     setLoading(true);
@@ -478,6 +573,11 @@ export function RuntimeSettingsPage() {
   };
 
   useEffect(probe, []);
+  useEffect(() => {
+    loadSigners()
+      .then(setSigners)
+      .catch(() => setSigners(null));
+  }, []);
 
   return (
     <div className="settings-section-body">
@@ -499,10 +599,12 @@ export function RuntimeSettingsPage() {
         {health ? (
           <div className="settings-kv-list">
             <div><span>service</span><b>{health.service} · v{health.version}</b></div>
-            <div><span>mode</span><b>{health.mode}</b></div>
+            <div><span>mode</span><b>{health.mode} · {health.research_mode ?? "test"}</b></div>
+            <div><span>production ready</span><b>{health.production_ready ? "yes" : "no"}</b></div>
             <div><span>queue</span><b>{health.queue.pending} pending / {health.queue.max_pending} max</b></div>
             <div><span>model gateway</span><b>{health.model_gateway ? "enabled" : "disabled"}</b></div>
             <div><span>real corpus</span><b>{health.real_corpus ? "available" : "missing"}</b></div>
+            <div><span>local corpus</span><b>{health.local_corpus ? "available" : "missing"}</b></div>
             <div><span>RSI</span><b>{health.rsi_read_only ? "read-only" : "unexpected"}</b></div>
             <div><span>human sign</span><b>{health.human_sign ? "exposed" : "not exposed"}</b></div>
             <div><span>model store</span><b>{health.model_store ?? "—"}</b></div>
@@ -514,6 +616,100 @@ export function RuntimeSettingsPage() {
           </div>
         )}
       </Card>
+      <Card title="Signer 身份" description="本地 HMAC signer；runtime 只读，创建与签核只在 CLI。">
+        {signers?.count ? (
+          <>
+            <div className="settings-kv-list">
+              {signers.signers.map((signer) => (
+                <div key={signer.signer_id}>
+                  <span>{signer.name}</span>
+                  <b>{signer.signer_id} · {signer.key_id}</b>
+                </div>
+              ))}
+            </div>
+            <p className="settings-note">{signers.boundary}</p>
+          </>
+        ) : (
+          <p className="settings-empty">
+            还没有本地 signer。终端运行：<code>python -m research_agent signer create --name "PI"</code>
+          </p>
+        )}
+      </Card>
+      {health?.research_mode === "production" && !health.production_ready && (
+        <Card title="生产模式被阻断" description="production 不允许规则模板静默兜底；必须先完成模型接线、绑定与 key 配置。">
+          <div className="settings-boundary">
+            <Icon name="alert" size={14} />
+            <span>{(health.model_readiness?.blocking ?? []).join(" · ") || "模型 readiness 未就绪"}</span>
+          </div>
+        </Card>
+      )}
+      {!__STATIC_ONLY__ && <Card title="本地任务 API · 集成测试" description="固定 ChemLab 协议验证；当前任务的真实运行在右侧 RUN 面板。">
+        <div className="settings-toolbar">
+          <button type="button" className="settings-btn primary" onClick={startRun} disabled={runBusy}>
+            <Icon name="play" size={12} />{runBusy ? "运行中…" : "运行 ChemLab 集成测试"}
+          </button>
+          <span className={`settings-source${run ? " is-live" : ""}`}>{run ? run.status : "idle"}</span>
+          {run && <code className="settings-code">{run.job_id}</code>}
+        </div>
+        {runError && <p className="storage-warning">{runError}</p>}
+        {run && (
+          <div className="settings-kv-list">
+            <div><span>job</span><b>{run.job_id}</b></div>
+            <div><span>status</span><b>{run.status}</b></div>
+            <div><span>fixture</span><b>{run.result?.fixture_mode ? "fixture" : run.result ? "real corpus / local run" : "—"}</b></div>
+            <div><span>events</span><b>{run.events_count}</b></div>
+            <div><span>run</span><b>{run.result?.run_id ?? "—"}</b></div>
+          </div>
+        )}
+        {run?.result?.warnings?.length ? (
+          <div className="settings-boundary">
+            <Icon name="alert" size={14} />
+            <span>{run.result.warnings.join(" · ")}</span>
+          </div>
+        ) : null}
+        {artifacts.length > 0 && (
+          <div className="settings-link-grid">
+            {artifacts.map((artifact) => (
+              <a key={artifact.path} href={runtimeUrl(artifact.url)} target="_blank" rel="noopener noreferrer">
+                <Icon name="download" size={14} />
+                <span><b>{artifact.path}</b><small>{artifact.kind} · {Math.round(artifact.size / 1024)} KB</small></span>
+                <Icon name="external" size={11} />
+              </a>
+            ))}
+          </div>
+        )}
+      </Card>}
+      {!__STATIC_ONLY__ && (
+        <Card title={`最近运行 · ${recentRuns.length}`} description="来自 /api/runs 的持久化记录；重启 runtime 后仍可读取状态与产物。">
+          {recentError ? (
+            <div className="settings-boundary">
+              <Icon name="alert" size={14} />
+              <span>runtime 未连接：{recentError}</span>
+            </div>
+          ) : recentRuns.length ? (
+            <div className="settings-kv-list">
+              {recentRuns.map((job) => (
+                <div key={job.job_id}>
+                  <span>{job.status}</span>
+                  <b title={job.request.topic}>{job.request.topic.slice(0, 42)}</b>
+                  <button
+                    type="button"
+                    className="settings-btn"
+                    onClick={() => {
+                      setRun(job);
+                      setArtifacts([]);
+                    }}
+                  >
+                    查看
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="settings-note">还没有持久化运行记录。</p>
+          )}
+        </Card>
+      )}
       <div className="settings-two-col">
         <Card title="启动本地 runtime" description="默认只绑定 127.0.0.1。">
           <pre className="settings-code">python -m research_agent.runtime --port 8787</pre>

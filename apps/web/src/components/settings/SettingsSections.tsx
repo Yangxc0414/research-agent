@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, ReactNode } from "react";
+import { probeRuntime } from "../../adapters/runtimeApi";
 import {
   APP_VERSION,
   BUILD_DATE,
@@ -18,6 +19,7 @@ import { useAllModelProfiles } from "../../state/modelStore";
 import { useFolderStorage } from "../../state/useFolderStorage";
 import { selectCurrentTask, useWorkspaceStore } from "../../state/workspaceStore";
 import { Icon } from "../Icon";
+import { ModelBindings } from "./ModelBindings";
 import { ModelProviderManager } from "./ModelProviderManager";
 
 export function PageHead({
@@ -189,11 +191,13 @@ export function ModelSettingsPage() {
   const task = useWorkspaceStore(selectCurrentTask);
   const actions = useWorkspaceStore((state) => state.actions);
   const profiles = useAllModelProfiles();
-  if (!task) return null;
-  const profile = modelProfile(task.model);
-  const usage = task.usage[profile.id] ?? { prompt: 0, completion: 0, requests: 0 };
+  const profile = task ? modelProfile(task.model) : null;
+  const usage = task && profile
+    ? task.usage[profile.id] ?? { prompt: 0, completion: 0, requests: 0 }
+    : { prompt: 0, completion: 0, requests: 0 };
 
   const selectProfile = (next: ModelProfile) => {
+    if (!task) return;
     const maxReply = Math.min(task.model.maxReply, next.maxOutput);
     actions.saveModel(clampModel({
       ...task.model,
@@ -213,7 +217,7 @@ export function ModelSettingsPage() {
         description="模型能力来自 Profile 声明；用量与上下文策略只保存在本地任务。"
       />
 
-      <Card title="当前任务模型" description={`${task.name} · 切换模型只影响之后的新消息`}>
+      {task && profile && <Card title="当前任务模型" description={`${task.name} · 切换模型只影响之后的新消息`}>
         <div className="settings-profile-grid">
           {profiles.map((item) => {
             const itemUsage = task.usage[item.id] ?? { prompt: 0, completion: 0, requests: 0 };
@@ -259,9 +263,11 @@ export function ModelSettingsPage() {
             Provider / Profile <Icon name="external" size={11} />
           </a>
         </div>
-      </Card>
+      </Card>}
 
       <ModelProviderManager />
+
+      <ModelBindings />
 
       <Card title="能力边界" description="模型设置不能突破服务端声明的能力。">
         <div className="settings-boundary">
@@ -606,7 +612,7 @@ export function DataSettingsPage() {
       <Card title="状态边界" description="存储位置的职责范围。">
         <div className="settings-boundary">
           <Icon name="shield" size={14} />
-          <span>工作区快照只写入 workspace.json；不包含 API 密钥，不读取文件夹中的其他文件。SIM 数据、模型设置与 usageDays 仍不调用 API、不生成真实 claim、不执行真实实验。</span>
+          <span>工作区快照只写入 workspace.json；不包含 API 密钥，不读取文件夹中的其他文件。演示数据、模型设置与 usageDays 仍不调用 API、不生成真实 claim、不执行真实实验。</span>
         </div>
       </Card>
     </div>
@@ -653,7 +659,7 @@ export function GuideSettingsPage() {
     },
     {
       title: "签署与回看",
-      text: "人工签署 claim、检查 closure，再到 EVOLUTION 批准或回滚候选。",
+      text: "claim 由人在终端签署；工作台只显示 CLI 命令、检查 closure，并在 EVOLUTION 批准或回滚候选。",
       action: "查看证据链",
       run: () => {
         if (!requireSession()) return;
@@ -711,12 +717,41 @@ export function GuideSettingsPage() {
           </div>
         ))}
       </div>
-      <p className="settings-inline-note">所有步骤是 SIM 示例；真实运行时的人工门在 CLI / 受控服务端，而不是浏览器。</p>
+      <p className="settings-inline-note">引导步骤使用本地演示状态；真实 pipeline 请用 /live 或 RUN 面板的「运行任务」。人工门只在本地 CLI 完成，浏览器不会代为签署。</p>
     </div>
   );
 }
 
 export function AboutSettingsPage() {
+  const [runtime, setRuntime] = useState<"checking" | "connected" | "offline" | "static">(
+    "checking"
+  );
+  useEffect(() => {
+    if (__STATIC_ONLY__) {
+      setRuntime("static");
+      return;
+    }
+    let cancelled = false;
+    probeRuntime()
+      .then(() => {
+        if (!cancelled) setRuntime("connected");
+      })
+      .catch(() => {
+        if (!cancelled) setRuntime("offline");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const runtimeLabel =
+    runtime === "connected"
+      ? "connected · local"
+      : runtime === "static"
+        ? "disabled in static build"
+        : runtime === "checking"
+          ? "checking…"
+          : "not connected";
+
   return (
     <div className="settings-section-body">
       <PageHead
@@ -730,15 +765,15 @@ export function AboutSettingsPage() {
           <div><span>Workspace</span><b>v{APP_VERSION}</b></div>
           <div><span>Build</span><b>{BUILD_DATE}</b></div>
           <div><span>Adapter</span><b>STATIC · localStorage</b></div>
-          <div><span>Runtime</span><b>not connected</b></div>
+          <div><span>Runtime</span><b>{runtimeLabel}</b></div>
         </div>
       </Card>
 
       <Card title="不可宣称" description="这个版本能演示什么，不能声称什么。">
         <ul className="settings-boundary-list">
-          <li>不调用 LLM / MCP transport / 实验执行器；token 为本地估算。</li>
-          <li>不产生真实 claim、EA 或 closure；签名按钮是 SIM 操作。</li>
-          <li>前端不提供 approve/claim/sign API；真实门禁留在 CLI / 受控后端。</li>
+          <li>人工门（approve / claim / sign / freeze / publish）不在浏览器执行；页面只显示终端命令。</li>
+          <li>fixture 与演示数值不构成研究证据；结果数值须来自 runtime 产物并经 CLI 人签。</li>
+          <li>静态构建在编译期禁用 runtime，页面只展示快照与本地状态（见顶部模式提示）。</li>
           <li>模型设置不改变服务端能力，也不会把密钥写入浏览器。</li>
         </ul>
       </Card>

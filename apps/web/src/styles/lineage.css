@@ -30,7 +30,7 @@
 .lineage-summary span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-toolbar {
@@ -48,7 +48,7 @@
   gap: 7px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-state {
@@ -105,7 +105,7 @@
 
 .lineage-alert p {
   margin-top: 2px;
-  font-size: calc(9.2px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.5;
 }
 
@@ -115,7 +115,7 @@
   border: 1px solid rgba(217, 45, 85, 0.25);
   color: var(--coral);
   font-family: var(--mono);
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   white-space: nowrap;
 }
 
@@ -145,7 +145,7 @@
   align-items: center;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-rail > span {
@@ -177,12 +177,12 @@
   padding: 2px 1px 5px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7.4px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-stage-head em {
   font-style: normal;
-  font-size: calc(6.5px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-node-grid {
@@ -229,14 +229,14 @@
   gap: 5px;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6.6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.03em;
 }
 
 .lineage-node-top em {
   color: var(--teal);
   font-style: normal;
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-node.is-stale .lineage-node-top em {
@@ -264,7 +264,7 @@
   text-overflow: ellipsis;
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-inspector {
@@ -299,14 +299,14 @@
 .lineage-deps-block > span {
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   letter-spacing: 0.04em;
 }
 
 .lineage-hash-row code {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
@@ -333,7 +333,7 @@
   background: var(--surface-2);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-dep-list button:hover {
@@ -349,7 +349,7 @@
 
 .lineage-dep-list em {
   color: var(--faint);
-  font-size: calc(7px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   font-style: normal;
 }
 
@@ -368,7 +368,7 @@
   align-items: baseline;
   gap: 6px;
   color: var(--muted);
-  font-size: calc(8.8px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
   line-height: 1.45;
 }
 
@@ -382,7 +382,7 @@
   border: 1px solid var(--line);
   color: var(--faint);
   font-family: var(--mono);
-  font-size: calc(6px * var(--settings-font-scale));
+  font-size: calc(10px * var(--settings-font-scale));
 }
 
 .lineage-action-list li.is-done {
@@ -450,4 +450,95 @@
   .lineage-node-grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* The inspector is a fixed-width rail on desktop and a single column on mobile.
+   Grid/flex children default to min-width:auto, which let long dependency labels
+   push the card past the page. Keep the card inside its track and wrap labels. */
+.lineage-inspector .settings-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.lineage-deps-block,
+.lineage-dep-list {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.lineage-dep-list button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.lineage-action-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 2px;
+}
+
+.lineage-action-counts span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(10px * var(--settings-font-scale));
+  text-transform: uppercase;
+}
+
+.lineage-action-counts b {
+  color: var(--text);
+  font-size: calc(11px * var(--settings-font-scale));
+}
+
+.lineage-action-counts .is-rerun {
+  border-color: rgba(217, 45, 85, 0.2);
+  color: var(--coral);
+}
+
+.lineage-action-counts .is-rewrite {
+  border-color: rgba(154, 107, 30, 0.2);
+  color: var(--amber);
+}
+
+.lineage-action-counts .is-recheck {
+  border-color: rgba(37, 99, 235, 0.2);
+  color: var(--accent);
+}
+
+.lineage-meta-list {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.lineage-meta-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+}
+
+.lineage-meta-row span {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: calc(9.5px * var(--settings-font-scale));
+}
+
+.lineage-meta-row code {
+  min-width: 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: calc(9.5px * var(--settings-font-scale));
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }

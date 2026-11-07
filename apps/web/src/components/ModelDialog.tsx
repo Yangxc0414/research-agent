@@ -4,8 +4,7 @@ import {
   compressionNote,
   formatTokens,
   formatUsageTokens,
-  modelProfile,
-  modelSettingsForProfile
+  modelProfile
 } from "../domain/catalog";
 import { siteHref } from "../domain/links";
 import type { ModelProfile, ModelSettings } from "../domain/types";
@@ -17,16 +16,18 @@ export function ModelDialog() {
   const task = useWorkspaceStore(selectCurrentTask);
   const actions = useWorkspaceStore((state) => state.actions);
   const profiles = useAllModelProfiles();
-  const draftProfileId = useWorkspaceStore((state) => state.ui.draftProfileId);
-  const draftBudget = useWorkspaceStore((state) => state.ui.draftModelBudget);
-  const dialogScope = useWorkspaceStore((state) => state.ui.modelDialogScope);
-  const welcomeMode = dialogScope === "draft" || !task;
-  const [draft, setDraft] = useState<ModelSettings>(() => clampModel(task ? { ...task.model } : {
-    ...modelSettingsForProfile(draftProfileId),
-    ...(draftBudget ?? {})
-  }));
-  const usageSource = task?.usage ?? {};
+  const [draft, setDraft] = useState<ModelSettings>(() => clampModel({ ...(task?.model ?? {
+    profileId: "gpt-5",
+    contextLimit: 128000,
+    maxReply: 8192,
+    thinkingStop: "medium",
+    compression: "auto",
+    threshold: 70,
+    keepRecent: 6,
+    summaryTokens: 512
+  }) }));
 
+  if (!task) return null;
   const profile = modelProfile(draft);
   const allowedStops = profile.kind === "budget"
     ? profile.stops.filter((stop) => Number(stop.value) < draft.maxReply)
@@ -65,18 +66,14 @@ export function ModelDialog() {
       <section className="modal model-modal" role="dialog" aria-modal="true" aria-label="模型设置">
         <header className="modal-head">
           <div>
-            <span className="eyebrow">{welcomeMode ? "MODEL SETTINGS / NEW SESSION" : "MODEL SETTINGS / STATIC"}</span>
-            <h2>{welcomeMode ? "模型与预算 · 新会话默认" : "模型与预算"}</h2>
+            <span className="eyebrow">MODEL SETTINGS / STATIC</span>
+            <h2>模型与预算</h2>
           </div>
           <button type="button" className="icon-button" onClick={close} aria-label="关闭模型设置">
             <Icon name="close" size={14} />
           </button>
         </header>
-        <p className="modal-lede">
-          {welcomeMode
-            ? "为新会话选择默认模型与用量预算；开始会话后按任务生效，可随时在会话内细调。所有设置只保存在本地。"
-            : "能力来自模型配置；这里只决定本次用量与压缩策略。所有设置只保存在本地。"}
-        </p>
+        <p className="modal-lede">能力来自模型配置；这里只决定本次用量与压缩策略。所有设置只保存在本地。</p>
 
         <div className="profile-grid">
           {profiles.map((item) => (
@@ -99,14 +96,13 @@ export function ModelDialog() {
           <b>{formatTokens(profile.contextWindow)} context · {formatTokens(profile.maxOutput)} output</b>
         </div>
 
-        {!welcomeMode && (
         <div className="usage-panel">
           <div className="usage-head">
             <span>TOKEN USAGE</span>
-            <em>SIM · 当前任务 · 各模型</em>
+            <em>演示数据 · 当前任务 · 各模型</em>
           </div>
           {profiles.map((item) => {
-            const usage = usageSource[item.id] ?? { prompt: 0, completion: 0, requests: 0 };
+            const usage = task.usage[item.id] ?? { prompt: 0, completion: 0, requests: 0 };
             const rawPercent = (usage.prompt / item.contextWindow) * 100;
             const percent = Math.min(rawPercent, 100);
             return (
@@ -129,7 +125,6 @@ export function ModelDialog() {
           })}
           <p className="usage-note">按本任务新增消息与卡片长度本地估算并累加；切换到某模型后，新用量只记到该模型。不读取真实 API usage。</p>
         </div>
-        )}
 
         <label className="range-field">
           <span>最大上下文 <b>{formatTokens(draft.contextLimit)}</b></span>
@@ -279,26 +274,11 @@ export function ModelDialog() {
             type="button"
             className="solid-button"
             onClick={() => {
-              if (welcomeMode) {
-                actions.setUI({
-                  draftProfileId: draft.profileId,
-                  draftModelBudget: {
-                    contextLimit: draft.contextLimit,
-                    maxReply: draft.maxReply,
-                    compression: draft.compression,
-                    threshold: draft.threshold,
-                    keepRecent: draft.keepRecent,
-                    summaryTokens: draft.summaryTokens
-                  }
-                });
-                actions.notify("已保存为新会话默认；开始会话后生效");
-              } else {
-                actions.saveModel(draft);
-              }
+              actions.saveModel(draft);
               close();
             }}
           >
-            {welcomeMode ? "保存为默认" : "应用"}
+            应用
           </button>
         </footer>
       </section>

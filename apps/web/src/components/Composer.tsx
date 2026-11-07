@@ -44,13 +44,13 @@ function suggestionsFor(task: ResearchTask): string[] {
     const signed = task.evidence.some((item) => item.kind === "claim" && item.status === "signed");
     if (task.evaluation.hiddenAccessCount > 0) return ["运行审阅包", "查看评估隔离", "查看证据链"];
     if (task.run && signed) return ["运行审阅包", "生成写作槽位", "查看证据链"];
-    if (task.run) return ["运行审阅包", "签署 claim", "查看证据链"];
+    if (task.run) return ["运行审阅包", "claim 人签命令", "查看证据链"];
     if (task.protocolFrozen) return ["运行 3 seeds", "查看 EA", "查看证据链"];
-    if (task.protocol) return ["冻结协议", "查看证据链"];
+    if (task.protocol) return ["G2 冻结命令", "查看证据链"];
     return ["送入实验设计", "查看证据链"];
   }
-  if (task.coverage.spans > 0) return ["运行审阅包", "把 gap 变成假设", "查看证据链"];
-  return ["开始检索", "查看证据链"];
+  if (task.coverage.spans > 0) return ["运行真实 pipeline", "运行审阅包", "查看证据链"];
+  return ["运行真实 pipeline", "开始检索", "查看证据链"];
 }
 
 export function Composer() {
@@ -123,6 +123,9 @@ export function Composer() {
 
   const handleSuggestion = (suggestion: string) => {
     switch (suggestion) {
+      case "运行真实 pipeline":
+        void actions.startLiveRun();
+        break;
       case "开始检索":
       case "扩展检索":
         actions.runResearch();
@@ -141,7 +144,7 @@ export function Composer() {
       case "查看评估隔离":
         actions.setContextTab("eval");
         break;
-      case "冻结协议":
+      case "G2 冻结命令":
         actions.freezeProtocol();
         break;
       case "运行 3 seeds":
@@ -150,7 +153,7 @@ export function Composer() {
       case "启动全自动":
         actions.startAuto();
         break;
-      case "签署 claim":
+      case "claim 人签命令":
         actions.signClaim();
         break;
       case "生成写作槽位":
@@ -352,10 +355,7 @@ export function Composer() {
             onThinkingChange={(stop) =>
               actions.saveModel({ ...task.model, thinkingStop: stop }, { silent: true })
             }
-            onAdvanced={() => {
-              actions.setUI({ modelDialogScope: "task" });
-              actions.openOverlay("modelOpen");
-            }}
+            onAdvanced={() => actions.openOverlay("modelOpen")}
           />
         </div>
       </div>
