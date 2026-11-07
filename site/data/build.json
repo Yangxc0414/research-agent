@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-11-07T16:24:20.805Z",
+  "built_at": "2026-11-07T16:45:40.480Z",
   "demo_sha256_16": "0658f279c87bc5da",
   "docs": [
     "README.md",
@@ -22,9 +22,9 @@
     "grant.json"
   ],
   "stats": {
-    "tests_run": 1304,
-    "ok": false,
+    "tests_run": 1307,
+    "ok": true,
     "source_fingerprint": "605f36cc0df98b1a",
-    "finished_at": "2026-11-07T16:16:51+00:00"
+    "finished_at": "2026-11-07T16:45:05+00:00"
   }
 }
