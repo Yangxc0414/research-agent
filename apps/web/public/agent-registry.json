@@ -1,14 +1,14 @@
 {
   "schema_version": "workspace-0.1",
   "source": "modules/*/SPEC.md",
-  "generated_at": "2026-11-07T15:42:48+00:00",
+  "generated_at": "2026-11-08T04:21:58+00:00",
   "count": 26,
   "agents": [
     {
       "id": "literature",
       "name": "文献调研",
       "stage": "S1",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "status": "pilot",
       "owner": "research-agent",
       "outputs": [
@@ -901,7 +901,7 @@
       "id": "rsi",
       "name": "受治理的递归改进",
       "stage": "META",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "status": "pilot",
       "owner": "research-agent",
       "outputs": [

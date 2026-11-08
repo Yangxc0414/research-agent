@@ -1,9 +1,9 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-07T15:42:48+00:00",
-  "count": 195,
+  "generated_at": "2026-11-08T04:21:58+00:00",
+  "count": 197,
   "curated": 51,
-  "derived": 144,
+  "derived": 146,
   "commands": [
     {
       "id": "study.baseline",
@@ -924,6 +924,15 @@
       "curated": false
     },
     {
+      "id": "literature.prescreen",
+      "group": "literature",
+      "label": "prescreen",
+      "syntax": "python -m research_agent literature prescreen",
+      "description": "usage: research_agent literature prescreen [-h] --input INPUT --query QUERY\n                                           [--abstracts ABSTRACTS]\n                                           [--min-hits MIN_HITS]\n                                           [--exclude-terms EXCLUDE_TERMS]\n                                           [--output OUTPUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
       "id": "mandate.status",
       "group": "mandate",
       "label": "status",
@@ -1082,6 +1091,15 @@
       "label": "show",
       "syntax": "python -m research_agent rsi active.show",
       "description": "usage: research_agent rsi active show [-h] [--active-path ACTIVE_PATH]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.actuals",
+      "group": "rsi",
+      "label": "actuals",
+      "syntax": "python -m research_agent rsi actuals",
+      "description": "usage: research_agent rsi actuals [-h] [--ledger LEDGER] --episode EPISODE\n                                  [--metric KEY=VALUE] [--note NOTE]",
       "safety": "catalog_only",
       "curated": false
     },
