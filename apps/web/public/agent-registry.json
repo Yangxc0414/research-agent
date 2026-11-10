@@ -1,7 +1,7 @@
 {
   "schema_version": "workspace-0.1",
   "source": "modules/*/SPEC.md",
-  "generated_at": "2026-11-08T04:21:58+00:00",
+  "generated_at": "2026-11-10T04:27:10+00:00",
   "count": 26,
   "agents": [
     {
@@ -142,7 +142,7 @@
       "id": "experiment",
       "name": "实验设计",
       "stage": "S4",
-      "version": "0.8.2",
+      "version": "0.9.0",
       "status": "pilot",
       "owner": "research-agent",
       "outputs": [
@@ -176,7 +176,11 @@
         "experiment.sweep-approve",
         "experiment.sweep-run",
         "experiment.sweep-ingest",
-        "experiment.sweep-status"
+        "experiment.sweep-status",
+        "experiment.local-init",
+        "experiment.local-approve",
+        "experiment.local-run",
+        "experiment.local-ingest"
       ],
       "gates": [
         "G2"
@@ -193,6 +197,8 @@
         "experiment codegen 只生成项目内自包含实验包；不执行、不安装依赖、不联网、不创建 EA/Claim/gate",
         "生成包必须带 data/spec/code SHA-256 与 README 边界；target 不得出现在 features；执行必须由用户在本地显式完成",
         "执行前必须有 approve 记录与 `--allow-execute`；MCP/HTTP 不执行训练，不自动安装依赖",
+        "local-exec（类 Codex 本地命令）仅 CLI：local-init 登记 argv/env_prefix/cwd/expected_outputs/timeout；local-approve 人签并绑定 spec 哈希；local-run 需 approve+--allow-execute、不用 shell、spec 批准后变更即拒绝",
+        "local-exec 记录 command/env_prefix/git commit/platform/stdout/stderr/产物哈希；local-ingest 校验哈希产 local-evidence（claim_eligible=false），失败/超时/缺产物保留为 incomplete；MCP/HTTP 不暴露 local-run",
         "ingest 必须校验 execution/receipt/metrics/artifact 哈希；evidence 不是 EA/Claim",
         "claim 只能由 CLI 人签，绑定 evidence hash；MCP 不暴露签核",
         "结果图只能从 verified evidence 生成，schematic 必须为 false；manifest 必须绑定 spec/execution/evidence/claim 哈希，缺 matplotlib 时跳过而不是安装依赖",

@@ -805,6 +805,7 @@
   }
   const VIEW_TITLES = {
     intake: "接入项目",
+    strategy: "策略流程图",
     functions: "功能地图",
     chain: "证据链",
     case: "变更回放",
@@ -843,6 +844,29 @@
       showAppView(brand.getAttribute("data-view"), brand.getAttribute("data-mode"));
     });
   });
+
+  $$(".flow-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.getAttribute("data-flow");
+      $$(".flow-tab").forEach((t) => {
+        const on = t.getAttribute("data-flow") === key;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      $$(".flow-pane").forEach((p) => p.classList.toggle("is-active", p.getAttribute("data-flow-pane") === key));
+    });
+  });
+
+  const smbToggle = $("#smb-toggle");
+  const smbDetail = $("#smb-detail");
+  if (smbToggle && smbDetail) {
+    smbToggle.addEventListener("click", () => {
+      const open = smbDetail.hidden;
+      smbDetail.hidden = !open;
+      smbToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      smbToggle.textContent = open ? "收起" : "详情";
+    });
+  }
 
   const presentBtn = $("#present-btn");
   const presentExit = $("#present-exit");

@@ -1,9 +1,9 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-08T04:21:58+00:00",
-  "count": 197,
+  "generated_at": "2026-11-10T04:27:10+00:00",
+  "count": 201,
   "curated": 51,
-  "derived": 146,
+  "derived": 150,
   "commands": [
     {
       "id": "study.baseline",
@@ -713,6 +713,42 @@
       "label": "figure",
       "syntax": "python -m research_agent experiment figure",
       "description": "usage: research_agent experiment figure [-h] --project PROJECT --experiment-id\n                                        EXPERIMENT_ID\n                                        [--output-dir OUTPUT_DIR] [--verify]\n                                        [--manifest MANIFEST]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-approve",
+      "group": "experiment",
+      "label": "local approve",
+      "syntax": "python -m research_agent experiment local-approve",
+      "description": "usage: research_agent experiment local-approve [-h] --project PROJECT\n                                               --experiment-id EXPERIMENT_ID\n                                               --human-reason HUMAN_REASON",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-ingest",
+      "group": "experiment",
+      "label": "local ingest",
+      "syntax": "python -m research_agent experiment local-ingest",
+      "description": "usage: research_agent experiment local-ingest [-h] --project PROJECT\n                                              --experiment-id EXPERIMENT_ID",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-init",
+      "group": "experiment",
+      "label": "local init",
+      "syntax": "python -m research_agent experiment local-init",
+      "description": "usage: research_agent experiment local-init [-h] --project PROJECT\n                                            --experiment-id EXPERIMENT_ID\n                                            --command COMMAND [--cwd CWD]\n                                            [--env-prefix ENV_PREFIX]\n                                            [--expect EXPECT]\n                                            [--timeout TIMEOUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-run",
+      "group": "experiment",
+      "label": "local run",
+      "syntax": "python -m research_agent experiment local-run",
+      "description": "usage: research_agent experiment local-run [-h] --project PROJECT\n                                           --experiment-id EXPERIMENT_ID\n                                           [--allow-execute]\n                                           [--timeout TIMEOUT]",
       "safety": "catalog_only",
       "curated": false
     },
