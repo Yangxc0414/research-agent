@@ -103,6 +103,24 @@
   .src{margin:12px 0 0;font-size:11px;line-height:1.7;color:var(--muted)}
   .src code{font-family:var(--mono);font-size:10.5px;background:#eef3fb;border:1px solid #dde6f4;border-radius:4px;padding:0 4px}
 
+
+  .gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .gen-track{border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px 16px}
+  .gen-track-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .gen-track-head b{font:700 10px/1 var(--mono);letter-spacing:.12em;color:var(--indigo)}
+  .gen-track-head span{font-size:10.5px;color:var(--muted)}
+  .gen-track p{margin:6px 0 12px;font-size:11px;line-height:1.65;color:var(--muted)}
+  .gen-node{position:relative;margin-left:7px;padding:9px 0 9px 20px;border-left:2px solid #e3e9f2}
+  .gen-node:last-child{border-left-color:transparent}
+  .gen-node::before{content:"";position:absolute;left:-6px;top:13px;width:10px;height:10px;border-radius:50%;background:#2563eb;border:2px solid #fff;box-shadow:0 0 0 1px #c7d7f5}
+  .gen-track.is-agent .gen-node::before{background:#0d7a6f;box-shadow:0 0 0 1px #a7f3d0}
+  .gen-node b{display:block;font-size:12.5px;letter-spacing:-.01em}
+  .gen-node code{display:block;margin-top:3px;font:10.5px/1.5 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+  .gen-node em{display:block;margin-top:3px;font-style:normal;font-size:10.5px;color:var(--muted)}
+  .gen-node .r-pill{margin-left:6px}
+  .gen-warn{margin-top:12px;border:1px solid #fecdd3;background:#fff7f8;border-radius:10px;padding:11px 14px}
+  .gen-warn b{display:block;font-size:11.5px;color:#9f1239;margin-bottom:4px}
+  .gen-warn li{font-size:11px;line-height:1.65;color:#7f1d1d;margin-left:16px}
   .table-scroll{overflow-x:auto}
   .table-scroll table{min-width:640px}
   .r-empty{border:1px dashed #cbd5e1;border-radius:12px;background:#fff;padding:18px;font-size:12.5px;line-height:1.75;color:var(--muted)}
@@ -111,6 +129,7 @@
     .run-grid{grid-template-columns:1fr 1fr}
     .surface{grid-template-columns:repeat(2,1fr)}
     .gov{grid-template-columns:1fr}
+    .gen-grid{grid-template-columns:1fr}
   }
   @media(max-width:560px){
     .wrap{padding:0 16px}
@@ -202,10 +221,34 @@
     </div>
   </section>
 
+
+  <section class="block" id="generations">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><p class="eyebrow">02 / GENERATIONS</p><h2>对自进化本身做版本管理</h2></div>
+        <p>两条轨道分开记账：<b>agent</b> 记被采纳的 harness 树与它依据的证据；<b>platform</b> 记平台代码指纹与提交。一条 harness 世代只有在记录它跑在哪版平台代码上之后，平台变更才能点名“哪些改进需要复验”。</p>
+      </div>
+      <div class="gen-grid">
+        <div class="gen-track" id="gen-platform">
+          <div class="gen-track-head"><b>PLATFORM · 平台代码</b><span id="gen-pf">指纹 —</span></div>
+          <p>版本 = <code>research_agent/**/*.py</code> 的内容哈希 + 提交。只覆盖 Python 源码，所以只改 SPEC 不移动指纹。</p>
+          <div id="gen-platform-nodes"><div class="r-empty">正在读取世代…</div></div>
+        </div>
+        <div class="gen-track is-agent" id="gen-agent">
+          <div class="gen-track-head"><b>AGENT · harness 树</b><span id="gen-af">世代 —</span></div>
+          <p>版本 = 采纳树的 SHA-256 + episode / claim-eligible 标记。树变了才算新世代，改名不算。</p>
+          <div id="gen-agent-nodes"><div class="r-empty">正在读取世代…</div></div>
+        </div>
+      </div>
+      <div id="gen-warn"></div>
+      <p class="src">这里记录的是“哪版代码 + 哪版 harness 产出了哪份证据”，不是“越跑越强”。回退与复验是人的动作，台账只负责让它可追溯。</p>
+    </div>
+  </section>
+
   <section class="block" id="surface">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="eyebrow">02 / EDITABLE SURFACE</p><h2>能被改的只有这八类</h2></div>
+        <div><p class="eyebrow">03 / EDITABLE SURFACE</p><h2>能被改的只有这八类</h2></div>
         <p>模型权重、claim、evidence、gate、rubric、closure、signature、export 都不在可编辑面里；组件路径命中这些词直接拒绝。</p>
       </div>
       <div class="surface" id="surface-body"><div class="r-empty">正在读取组件面…</div></div>
@@ -216,7 +259,7 @@
   <section class="block" id="adopted">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="eyebrow">03 / ADOPTED</p><h2>被采纳的改动长什么样</h2></div>
+        <div><p class="eyebrow">04 / ADOPTED</p><h2>被采纳的改动长什么样</h2></div>
         <p>同一个组件常常在多个任务、两种递归模式里被重复采纳；平台按 (路径, diff) 去重成一条候选，观察点写进理由，而不是刷成多条 episode。</p>
       </div>
       <div id="adopted-body"><div class="r-empty">正在读取采纳记录…</div></div>
@@ -226,7 +269,7 @@
   <section class="block" id="governance">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="eyebrow">04 / GOVERNANCE</p><h2>产物怎么变成一条待签记录</h2></div>
+        <div><p class="eyebrow">05 / GOVERNANCE</p><h2>产物怎么变成一条待签记录</h2></div>
         <p>右侧清单是本次运行的机器自检；左侧是它在平台里必须走完的路。任何一步缺失，episode 停在 <code>pending_human</code>。</p>
       </div>
       <div class="gov">
@@ -255,7 +298,7 @@
   <section class="block" id="interface">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="eyebrow">05 / INTERFACE CHECK</p><h2>接口算不算「正常」，按这五条判</h2></div>
+        <div><p class="eyebrow">06 / INTERFACE CHECK</p><h2>接口算不算「正常」，按这五条判</h2></div>
         <p>每条都有可复现的入口与可判定的输出；只看页面截图不算验收。命令在仓库根目录执行。</p>
       </div>
       <div class="table-scroll">
@@ -277,7 +320,7 @@
   <section class="block" id="boundary" style="border-bottom:0">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="eyebrow">06 / BOUNDARY</p><h2>这条证据能证明什么</h2></div>
+        <div><p class="eyebrow">07 / BOUNDARY</p><h2>这条证据能证明什么</h2></div>
         <p>把"接口通了"和"能力涨了"分开写，是这个项目唯一不能让步的地方。</p>
       </div>
       <div class="bound">
@@ -338,7 +381,7 @@
     var cells = [
       ["ADAPTER", run.adapter || "—", run.executor || ""],
       ["k / MODE", "k=" + (run.k || 0), (run.modes || []).join(" + ") || "—"],
-      ["WALL", (run.wall_s || 0) + " s", run.finished_at || ""],
+      ["WALL", (run.wall_s || 0) + " s", "platform " + String(story.platform_fingerprint || "—").slice(0, 8) + "…"],
       ["TASKS", tasks.filter(function (t) { return t.status === "ok"; }).length + " / " + tasks.length, "留出 " + (held.n ? held.passed + "/" + held.n : "—")]
     ];
     var rows = tasks.map(function (t) {
@@ -398,6 +441,51 @@
       el(id).innerHTML = '<div class="r-empty">' + esc(message) + "</div>";
     });
   }
+
+
+  function paintGenerations(data) {
+    if (!data || data.schema !== "evolution-story-0.1") return;
+    var current = data.current || {};
+    el("gen-pf").textContent = "指纹 " + (current.fingerprint || "—") + " · " + (current.source_files || 0) + " 文件";
+    var agentLatest = (data.agent || [])[data.agent.length - 1];
+    el("gen-af").textContent = "世代 " + (agentLatest ? agentLatest.generation_id : "—");
+
+    function nodes(items, isAgent) {
+      if (!items || !items.length) return '<div class="r-empty">还没有记录。先跑 <code>rsi gen snapshot</code> 或 <code>rsi harness2 record --generation</code>。</div>';
+      return items.slice().reverse().map(function (g) {
+        var pill = g.status === "adopted" ? "ok" : (g.status === "reverted" ? "miss" : "warn");
+        var meta = isAgent
+          ? "tree " + String(g.agent_tree_sha || "").slice(0, 12) + "… · " + (g.episode_ids || []).length + " episode · platform " + (g.platform_fingerprint || "—")
+          : (g.commit ? "commit " + String(g.commit).slice(0, 7) : "no commit") + " · " + (g.platform_fingerprint || "—");
+        return '<div class="gen-node"><b>' + esc(g.label) + '<span class="r-pill ' + pill + '">' + esc(g.status) + '</span></b>' +
+          "<code>" + esc(g.generation_id) + " · " + esc(meta) + "</code>" +
+          (g.note ? "<em>" + esc(g.note) + "</em>" : "") + "</div>";
+      }).join("");
+    }
+    el("gen-platform-nodes").innerHTML = nodes(data.platform, false);
+    el("gen-agent-nodes").innerHTML = nodes(data.agent, true);
+
+    var warnings = data.warnings || [];
+    el("gen-warn").innerHTML = warnings.length
+      ? '<div class="gen-warn"><b>需要人处理 ' + warnings.length + ' 项</b><ul>' + warnings.map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul></div>"
+      : "";
+    var badges = document.querySelectorAll("#generations .gen-track");
+    if (badges.length === 2) {
+      badges[0].dataset.ok = String(!!data.ok);
+    }
+  }
+
+  function loadGenerations() {
+    fetch("../data/evolution.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(paintGenerations)
+      .catch(function (error) {
+        el("gen-platform-nodes").innerHTML = '<div class="r-empty">没有世代台账（' + esc(error.message) + '）。</div>';
+        el("gen-agent-nodes").innerHTML = '<div class="r-empty">先跑 <code>rsi gen snapshot</code>。</div>';
+      });
+  }
+
+  loadGenerations();
 
   fetch("../data/harness2.json", { cache: "no-store" })
     .then(function (response) {

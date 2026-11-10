@@ -68,6 +68,26 @@ python -m research_agent.cli rsi harness2 record     # 只写 pending_human，�
 
 平台不导入 Harness²（它是 3.12-only）：`scripts/harness2_run.py` 在独立进程里跑，回传 `harness2-run-0.1`。Windows 上两个便携性补丁（`fcntl.flock`、`tree.read_tree` 的 POSIX 路径）会写进产物，跑出来的结果不会被误当成上游 POSIX 行为。
 
+### 自进化本身的版本管理（agent 轨 + platform 轨）
+
+自进化跑出来的东西也要能回滚、能对账，所以平台把「哪版代码 + 哪版 harness 产出了哪份证据」记成两条链：
+
+| 轨道 | 版本标识 | 记什么 | 命令 |
+| --- | --- | --- | --- |
+| agent | 采纳 harness 树的 SHA-256 | 树、episode、public/hidden 摘要、跑在哪版平台 | `rsi gen agent` / `rsi harness2 record --generation` |
+| platform | `research_agent/**/*.py` 的 16 位指纹 + commit/备注 | 平台代码状态；新状态自动把上一条标记 `superseded` | `rsi gen snapshot` |
+
+两条链靠 `platform_fingerprint` 关联：平台一变，旧 harness 世代会被 `rsi gen verify` 点名要求复验（`stale_agents`），但**不自动撤销租约、不改 claim**——降级与复验是人的动作。同一棵树在新平台上重测会自动把旧记录标成 `superseded`，所以"复验"不会被显示成"新改进"。
+
+```bash
+python -m research_agent.cli rsi gen list          # 两条链
+python -m research_agent.cli rsi gen verify        # 链完整性 + 跨轨耦合
+python -m research_agent.cli rsi gen snapshot --label "..." --commit <sha>
+python -m research_agent.cli rsi gen propose --label "..." --patch fix.patch  # 只记录，不应用
+```
+
+边界：指纹只覆盖 `research_agent/**/*.py`，只改 SPEC/文档不会移动它；台账不存源码、不 apply 补丁、不签名，`propose` 只记 `git apply --check` 的结果。
+
 不宣称：不把「内置最小 RSI 控制面」说成「已完成与 RSI 基础设施对接」；不训练模型权重；人签门始终在平台侧，不能由基础设施或模型代签。确定性夹具跑通只证明接口与治理映射，不证明能力增益；验证路线是小数据集 + DeepSeek 基座 + 论文投稿反馈场景，先证明「判定能改变下一步动作」，再谈能力增益。
 
 ## 当前事实基线

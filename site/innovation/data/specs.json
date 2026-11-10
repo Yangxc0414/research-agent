@@ -902,7 +902,7 @@
     "id": "rsi",
     "name": "受治理的递归改进",
     "stage": "META",
-    "version": "0.10.0",
+    "version": "0.11.0",
     "status": "pilot",
     "owner": "research-agent",
     "outputs": [
@@ -915,7 +915,9 @@
       "EvolutionPolicyState",
       "EvolutionObservation",
       "ActivePolicyState",
-      "Harness2Story"
+      "Harness2Story",
+      "GenerationLedger",
+      "EvolutionLineage"
     ],
     "tools": [
       "rsi.ledger",

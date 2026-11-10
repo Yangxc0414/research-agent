@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-11-10T10:12:43.941Z",
+  "built_at": "2026-11-10T10:54:42.340Z",
   "demo_sha256_16": "d72a37fc64e82138",
   "docs": [
     "README.md",
@@ -10,6 +10,7 @@
   "data_files": [
     "build.json",
     "digest.json",
+    "evolution.json",
     "harness2.json",
     "queries.json"
   ],
@@ -23,6 +24,7 @@
     "specs.json"
   ],
   "harness2_story": "copied",
+  "evolution_story": "copied",
   "stats": {
     "tests_run": 1320,
     "ok": true,

@@ -125,6 +125,28 @@ function copyHarness2Story() {
   return "copied";
 }
 
+function copyEvolutionStory() {
+  // Two-track lineage: adopted agent harness generations + platform code generations.
+  // Same rule as the Harness² story: a missing local file keeps the committed copy.
+  const source = path.join(root, "runtime_data", "evolution", "story.json");
+  const target = path.join(site, "data", "evolution.json");
+  if (!fs.existsSync(source)) {
+    return fs.existsSync(target) ? "kept committed copy" : "missing";
+  }
+  const raw = fs.readFileSync(source, "utf8");
+  try {
+    const story = JSON.parse(raw);
+    if (!story || story.schema !== "evolution-story-0.1") {
+      throw new Error("unexpected schema: " + (story && story.schema));
+    }
+  } catch (error) {
+    throw new Error("invalid evolution story: " + source + " — " + error.message);
+  }
+  ensureDir(path.dirname(target));
+  fs.writeFileSync(target, raw);
+  return "copied";
+}
+
 function validateJsonDir(dir) {
   if (!fs.existsSync(dir)) return [];
   const files = fs.readdirSync(dir).filter((name) => name.endsWith(".json"));
@@ -144,6 +166,7 @@ const docs = copyDocs();
 const innovationData = copyInnovationData();
 const stats = copyStats();
 const harness2Story = copyHarness2Story();
+const evolutionStory = copyEvolutionStory();
 const jsonFiles = validateJsonDir(path.join(site, "data"));
 
 const buildInfo = {
@@ -153,6 +176,7 @@ const buildInfo = {
   data_files: jsonFiles,
   innovation_data: innovationData,
   harness2_story: harness2Story,
+  evolution_story: evolutionStory,
   stats
 };
 fs.writeFileSync(path.join(site, "data", "build.json"), JSON.stringify(buildInfo, null, 2) + "\n");
@@ -163,4 +187,5 @@ console.log("  docs:", docs.length ? docs.join(", ") : "(none)");
 console.log("  data:", jsonFiles.length ? jsonFiles.join(", ") : "(none)");
 console.log("  innovation data:", innovationData.length ? innovationData.join(", ") : "(none)");
 console.log("  harness2 story:", harness2Story);
+console.log("  evolution story:", evolutionStory);
 console.log("  preview: npx serve site");
