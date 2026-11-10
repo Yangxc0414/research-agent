@@ -92,10 +92,10 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 40px 100px -40px rgba(0,0,0,.8);
   backdrop-filter: blur(18px); overflow: hidden;
 }
-.board::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 24px 24px; }
+.board::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(15,23,42,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,.05) 1px, transparent 1px); background-size: 24px 24px; }
 .board-lines { position: absolute; inset: 28px 10px; width: calc(100% - 20px); height: calc(100% - 56px); }
-.board-lines path { stroke: rgba(125,211,252,.36); stroke-width: 1.2; stroke-dasharray: 3 7; animation: dash 18s linear infinite; }
-.board-lines path.dash { stroke: rgba(167,139,250,.4); }
+.board-lines path { stroke: rgba(37,99,235,.3); stroke-width: 1.2; stroke-dasharray: 3 7; animation: dash 18s linear infinite; }
+.board-lines path.dash { stroke: rgba(124,58,237,.34); }
 @keyframes dash { to { stroke-dashoffset: -100; } }
 .orbit-node {
   position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 7px;
@@ -116,9 +116,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--cyan); outline-
   background: linear-gradient(145deg, rgba(79,70,229,.5), rgba(8,145,178,.28));
   box-shadow: 0 0 0 6px rgba(99,102,241,.08), 0 24px 60px -24px #000; text-align: center;
 }
-.board-core .mono { color: rgba(224,242,254,.7); font-size: 7px; }
+.board-core .mono { color: #1f2937; font-size: 7px; }
 .board-core b { display: block; margin: 6px 0 5px; font-family: var(--serif); font-size: 22px; font-weight: 500; }
-.board-core small { color: rgba(224,242,254,.68); font-size: 8.5px; line-height: 1.6; }
+.board-core small { color: #1f2937; font-size: 8.5px; line-height: 1.6; }
 .board-tag { position: absolute; z-index: 4; font-family: var(--mono); font-size: 7px; letter-spacing: .12em; color: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 4px 6px; background: rgba(15,23,42,.7); }
 .board-tag.tag-a { left: 18px; bottom: 20px; }
 .board-tag.tag-b { right: 18px; bottom: 20px; }

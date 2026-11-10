@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Research Agent · 证据闭合的科研自动化</title>
+<meta name="description" content="Research Agent 运行回放：9 阶段运行台、18 阶段主链、证据工作台与自进化演示；全部为 SIM，不调用模型、不产生真实 claim。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='white' stroke-width='1.8'/%3E%3C/svg%3E" />
 <style>
   :root{
@@ -11,7 +12,7 @@
     --surface:#ffffff;
     --ink:#0b1220;
     --muted:#5b677a;
-    --faint:#8b96a8;
+    --faint:#5f6d80;
     --line:#e4e9f2;
     --line-strong:#d3dbe8;
     --indigo:#4f46e5;
@@ -1797,7 +1798,7 @@
   .pstat.active{color:var(--cx-teal);background:rgba(13,148,136,.06);border-color:rgba(13,148,136,.16)}
   .pstat.pilot{color:#b45309;background:var(--amber-soft);border-color:rgba(217,119,6,.16)}
   .pstat.rejected{color:var(--cx-rose);background:rgba(225,29,72,.055);border-color:rgba(225,29,72,.16)}
-  .spec-note{grid-column:1/-1;margin:0;padding:6px 10px 7px;border-top:1px dashed rgba(203,213,225,.8);background:#fbfcff;font-size:7px;line-height:1.55;color:#8796a9}
+  .spec-note{grid-column:1/-1;margin:0;padding:6px 10px 7px;border-top:1px dashed rgba(203,213,225,.8);background:#fbfcff;font-size:7px;line-height:1.55;color:#5f6d80}
 
   /* command trace ------------------------------------------------------------ */
   #research-console .cmd-panel{margin:0 20px 10px;border-radius:9px;border-color:#1a2638;background:linear-gradient(180deg,#0b1220,#0a101c)}
@@ -2225,7 +2226,7 @@
           <!-- bottom annotation -->
           <g>
             <rect x="30" y="330" width="430" height="76" rx="14" fill="#fbfcff" stroke="#e7ecf5"/>
-            <text x="48" y="355" font-size="10" font-weight="750" letter-spacing=".12em" fill="#8b96a8">EVIDENCE DISCIPLINE</text>
+            <text x="48" y="355" font-size="10" font-weight="750" letter-spacing=".12em" fill="#5f6d80">EVIDENCE DISCIPLINE</text>
             <text x="48" y="377" font-size="12.5" font-weight="650" fill="#0b1220">没有 EA，就没有稿件数字；没有解析槽位，就不导出。</text>
             <text x="48" y="394" font-size="10.5" fill="#5b677a">失效回指 S5c 复验 · G5 fail-closed；SIM 设计演示，非实验结果。</text>
           </g>
@@ -2659,7 +2660,7 @@
                     <path d="M110 179 H120"/><path d="M184 179 H194"/><path d="M258 179 H268"/><path d="M332 179 H342"/>
                     <path d="M406 179 H416"/><path d="M480 179 H490"/><path d="M554 179 H564"/><path d="M628 179 H638"/>
                   </g>
-                  <g font-size="8" fill="#8b96a8" text-anchor="middle">
+                  <g font-size="8" fill="#5f6d80" text-anchor="middle">
                     <text x="79" y="216">编译</text><text x="153" y="216">检索</text><text x="227" y="216">假设</text><text x="301" y="216">冻结</text>
                     <text x="375" y="216">重跑</text><text x="449" y="216">判定</text><text x="523" y="216">写作</text><text x="597" y="216">核验</text><text x="671" y="216">记忆</text>
                   </g>
@@ -2677,7 +2678,7 @@
                   <rect x="305" y="346" width="150" height="34" rx="9" fill="#fff1f2" stroke="#fecdd3"/><text x="380" y="367" fill="#be123c">无护照 · 不判迁移</text>
                   <rect x="492" y="346" width="150" height="34" rx="9" fill="#fff1f2" stroke="#fecdd3"/><text x="567" y="367" fill="#be123c">无留出 · 不归因</text>
                 </g>
-                <text x="380" y="400" font-size="9" fill="#8b96a8" text-anchor="middle">P8 只是候选终点，不是长期记忆写入点；线性流程结束 ≠ 经验可继承。</text>
+                <text x="380" y="400" font-size="9" fill="#5f6d80" text-anchor="middle">P8 只是候选终点，不是长期记忆写入点；线性流程结束 ≠ 经验可继承。</text>
                 <text x="380" y="415" font-size="9" fill="#b91c1c" text-anchor="middle">与主页②对照：现状缺四向准入门，既没有默认拒绝，也没有「变更 → 失效 → 回准入门复验」。</text>
               </g>
             </svg>
@@ -3300,7 +3301,7 @@
       g.appendChild(mg);
 
       // index label
-      g.appendChild(el("text", {x:"20", y:y-22, "font-size":"9", "font-weight":"800", "letter-spacing":".14em", fill:"#8b96a8"}, "SEAM 0" + (i+1)));
+      g.appendChild(el("text", {x:"20", y:y-22, "font-size":"9", "font-weight":"800", "letter-spacing":".14em", fill:"#5f6d80"}, "SEAM 0" + (i+1)));
 
       g.addEventListener("click", function(){ selectSeam(i); });
       g.addEventListener("keydown", function(e){
@@ -5878,7 +5879,7 @@
         '<div class="evo-metric"><b>' + c.rejected + '</b><span>拒绝</span></div>' +
       '</div>' +
       '<p>' + narrative + '</p>' +
-      '<p style="margin-top:5px;color:#8b96a8">留出集 Δ ' + deltaText + ' · 无准入基线 +' + c.base + 'pp（SIM）</p>' +
+      '<p style="margin-top:5px;color:#5f6d80">留出集 Δ ' + deltaText + ' · 无准入基线 +' + c.base + 'pp（SIM）</p>' +
       banner;
   }
 
@@ -5918,7 +5919,7 @@
     const visibleWith = pending ? withAdm.slice(0, 3) : withAdm;
     const grid = [0, 2, 4, 6, 8].map(function(v){
       return '<line x1="48" y1="' + fy(v) + '" x2="' + (W - 18) + '" y2="' + fy(v) + '" stroke="#eef2f7"/>' +
-        '<text x="40" y="' + (fy(v) + 3) + '" text-anchor="end" font-size="8" fill="#8b96a8">' + v + '</text>';
+        '<text x="40" y="' + (fy(v) + 3) + '" text-anchor="end" font-size="8" fill="#5f6d80">' + v + '</text>';
     }).join("");
     const basePath = without.map(function(v, i){ return (i ? "L" : "M") + xs[i] + " " + fy(v); }).join(" ");
     const withPath = visibleWith.map(function(v, i){ return (i ? "L" : "M") + xs[i] + " " + fy(v); }).join(" ");
@@ -5935,12 +5936,12 @@
         '<text x="' + xs[3] + '" y="' + (fy(6.8) - 11) + '" text-anchor="middle" font-size="8.5" font-weight="750" fill="' + pendingMeta.color + '">' + pendingMeta.label + '</text>'
       : "";
     const labels = EVO_CYCLES.map(function(c, i){
-      return '<text x="' + xs[i] + '" y="216" text-anchor="middle" font-size="8.5" font-weight="700" fill="' + (i === state.cycle ? "#0b1220" : "#8b96a8") + '">' + c.label + '</text>';
+      return '<text x="' + xs[i] + '" y="216" text-anchor="middle" font-size="8.5" font-weight="700" fill="' + (i === state.cycle ? "#0b1220" : "#5f6d80") + '">' + c.label + '</text>';
     }).join("");
     const band = '<rect x="' + (xs[state.cycle] - 26) + '" y="26" width="52" height="166" rx="10" fill="rgba(79,70,229,.05)"/>';
     $("evo-chart").innerHTML =
       '<svg viewBox="0 0 520 240" role="img" aria-label="四问准入与无准入基线的留出集能力差值，全部为模拟数据；当前租约状态 ' + mode + '">' +
-        '<text x="48" y="16" font-size="8.5" font-weight="750" fill="#8b96a8">HELD-OUT Δ (pp) · SIM</text>' +
+        '<text x="48" y="16" font-size="8.5" font-weight="750" fill="#5f6d80">HELD-OUT Δ (pp) · SIM</text>' +
         band + grid +
         '<path d="' + basePath + '" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="5 5"/>' +
         baseDots +

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Research Agent · Model Gateway</title>
   <meta name="description" content="Research Agent 本地模型网关：OpenAI、Anthropic 与 OpenAI 兼容端点；密钥只进 runtime 内存或环境变量。" />
+  <link rel="canonical" href="https://yangxc0414.github.io/research-agent/models/" />
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="../assets/base.css" />
   <link rel="stylesheet" href="../assets/theme.css" />
@@ -16,13 +17,23 @@
 .matrix-wrap{overflow-x:auto;margin-top:10px}
 .matrix{width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px}
 .matrix th,.matrix td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line,#e4e9f2);vertical-align:top}
-.matrix th{font:700 10px var(--mono,ui-monospace);letter-spacing:.1em;color:#8a94a6;background:#f4f7fb}
+.matrix th{font:700 10px var(--mono,ui-monospace);letter-spacing:.1em;color:#5f6d80;background:#f4f7fb}
 .matrix td b{display:block;font-weight:700;color:#0b1220}
-.matrix td small{display:block;margin-top:2px;font-size:9.5px;font-weight:500;color:#8a94a6}
+.matrix td small{display:block;margin-top:2px;font-size:9.5px;font-weight:500;color:#5f6d80}
 .matrix tbody tr:last-child td{border-bottom:0}
-.matrix-foot{margin:10px 0 0;font-size:11px;line-height:1.6;color:#8a94a6}
+.matrix-foot{margin:10px 0 0;font-size:11px;line-height:1.6;color:#5f6d80}
 .matrix-foot b{color:#0f766e}
 @media(max-width:760px){.matrix{min-width:480px;font-size:11px}}
+@media(max-width:560px){
+  .matrix{min-width:0}
+  .matrix thead{display:none}
+  .matrix,.matrix tbody{display:block}
+  .matrix tr{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;padding:10px 0;border-bottom:1px solid var(--line,#e4e9f2)}
+  .matrix tr:last-child{border-bottom:0}
+  .matrix td{border:0;padding:0}
+  .matrix td:first-child{grid-column:1/-1;margin-bottom:4px}
+  .matrix td[data-label]::before{content:attr(data-label) " · ";color:#5f6d80}
+}
 </style>
 </head>
 <body class="models-page">
@@ -66,10 +77,10 @@
           <table class="matrix">
             <thead><tr><th>Provider</th><th>思考模式</th><th>思考预算</th><th>extra_body</th><th>usage</th></tr></thead>
             <tbody>
-              <tr><td><b>OpenAI</b><small>Chat / Responses</small></td><td>reasoning effort</td><td>—</td><td>—</td><td>tokens</td></tr>
-              <tr><td><b>Anthropic</b><small>预算 &lt; max_tokens</small></td><td>thinking</td><td>budget_tokens</td><td>—</td><td>input / output</td></tr>
-              <tr><td><b>Azure OpenAI</b><small>需 api-version</small></td><td>reasoning effort</td><td>—</td><td>—</td><td>tokens</td></tr>
-              <tr><td><b>OpenAI-compatible</b><small>DeepSeek / Qwen / vLLM</small></td><td>视服务商</td><td>视服务商</td><td>原样透传</td><td>可能缺失</td></tr>
+              <tr><td><b>OpenAI</b><small>Chat / Responses</small></td><td data-label="思考模式">reasoning effort</td><td data-label="预算">—</td><td data-label="extra_body">—</td><td data-label="usage">tokens</td></tr>
+              <tr><td><b>Anthropic</b><small>预算 &lt; max_tokens</small></td><td data-label="思考模式">thinking</td><td data-label="预算">budget_tokens</td><td data-label="extra_body">—</td><td data-label="usage">input / output</td></tr>
+              <tr><td><b>Azure OpenAI</b><small>需 api-version</small></td><td data-label="思考模式">reasoning effort</td><td data-label="预算">—</td><td data-label="extra_body">—</td><td data-label="usage">tokens</td></tr>
+              <tr><td><b>OpenAI-compatible</b><small>DeepSeek / Qwen / vLLM</small></td><td data-label="思考模式">视服务商</td><td data-label="预算">视服务商</td><td data-label="extra_body">原样透传</td><td data-label="usage">可能缺失</td></tr>
             </tbody>
           </table>
         </div>
