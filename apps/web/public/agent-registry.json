@@ -1,7 +1,7 @@
 {
   "schema_version": "workspace-0.1",
   "source": "modules/*/SPEC.md",
-  "generated_at": "2026-11-10T04:27:10+00:00",
+  "generated_at": "2026-11-10T05:43:44+00:00",
   "count": 26,
   "agents": [
     {
@@ -907,7 +907,7 @@
       "id": "rsi",
       "name": "受治理的递归改进",
       "stage": "META",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "status": "pilot",
       "owner": "research-agent",
       "outputs": [
@@ -968,7 +968,8 @@
         "confirmation/trace 必须 fail closed：status/passed 不一致、scope 不匹配、delta 非有限数值、confirmation 与 ledger hash 不一致时不得通过",
         "自进化策略只控制新候选与记忆调序：master off 时不得新增 propose/自动研究循环候选；不得追溯撤销已有 lease/confirmation",
         "策略只允许切换 literature.memory_order / literature.query_planner / orchestrator.facet_budget；claim/evidence/gate/rubric/held-out/closure/signature/export 不在可切换集合内",
-        "确认不可动作于升级，但 regressed 确认必须可动作于降级：自动撤销该候选的 active 租约；升级仍需人工签署"
+        "确认不可动作于升级，但 regressed 确认必须可动作于降级：自动撤销该候选的 active 租约；升级仍需人工签署",
+        "每个 episode 记录 platform_fingerprint（平台代码指纹）与 candidate.version（自进化候选版本），供自进化版本管理与平台自我迭代的关联/回滚；平台只记账与提供接缝，不实现自进化算法"
       ],
       "spec": "modules/rsi/SPEC.md"
     },

@@ -18,6 +18,25 @@
 /* Unified primary-button color across subpages (some pages hardcode indigo gradients). */
 .btn-primary,.primary,.run-btn,.nav-cta,.lp-btn.primary{background:#2563eb !important;background-image:none !important;border-color:#2563eb !important;color:#fff !important}
 .btn-primary:hover,.primary:hover,.run-btn:hover,.nav-cta:hover,.lp-btn.primary:hover{background:#1d4ed8 !important}
+/* innovation: unify the dark hero/topbar to the shared light palette + blue accent. */
+.hero{background:radial-gradient(900px 520px at 78% 38%,rgba(37,99,235,.10),transparent 65%),radial-gradient(700px 500px at 8% 90%,rgba(13,148,136,.08),transparent 65%),#f8fbff !important;color:#0b1220 !important}
+.hero::before{background:none !important}
+.topbar{color:#0b1220 !important}
+.brand-copy small{color:#8a94a6 !important}
+.pill{border-color:#dbe4f0 !important;color:#5b6472 !important}
+.quiet-link{color:#5b6472 !important}
+.quiet-link:hover{color:#2563eb !important}
+.present-btn{border-color:#dbe4f0 !important;background:#fff !important;color:#23406e !important}
+.hero-copy .eyebrow{color:#2563eb !important}
+.hero h1{color:#0b1220 !important}
+.hero h1 span{background:linear-gradient(100deg,#2563eb,#0f766e) !important;-webkit-background-clip:text !important;background-clip:text !important;color:transparent !important}
+.hero-facts{border-top-color:#e4e9f2 !important;color:#5b6472 !important}
+.hero-facts b{color:#0b1220 !important}
+.hero-caption{color:#8a94a6 !important}
+.lede{color:#5b6472 !important}
+.lede b{color:#0b1220 !important}
+.primary-btn{background:#2563eb !important;background-image:none !important;color:#fff !important;border-color:#2563eb !important}
+.ghost-btn{background:#fff !important;color:#23406e !important;border-color:#dbe4f0 !important}
 .sp-home{color:#2563eb;text-decoration:none;font-weight:700}
 .sp-home:hover{text-decoration:underline}
 .sp-chip{border:1px solid #e6d7b4;background:#fff8e7;color:#8a6d1f;padding:2px 10px;border-radius:999px;font-size:11px}
