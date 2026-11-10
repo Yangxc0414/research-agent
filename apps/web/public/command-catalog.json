@@ -1,9 +1,9 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-10T05:43:44+00:00",
-  "count": 201,
+  "generated_at": "2026-11-10T09:13:15+00:00",
+  "count": 205,
   "curated": 51,
-  "derived": 150,
+  "derived": 154,
   "commands": [
     {
       "id": "study.baseline",
@@ -1163,6 +1163,42 @@
       "label": "fixture",
       "syntax": "python -m research_agent rsi fixture",
       "description": "usage: research_agent rsi fixture [-h] [--ledger LEDGER]\n                                  [--output-dir OUTPUT_DIR] [--tasks TASKS]\n                                  [--approve]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.harness2.probe",
+      "group": "rsi",
+      "label": "probe",
+      "syntax": "python -m research_agent rsi harness2.probe",
+      "description": "usage: research_agent rsi harness2 probe [-h] [--root ROOT] [--python PYTHON]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.harness2.record",
+      "group": "rsi",
+      "label": "record",
+      "syntax": "python -m research_agent rsi harness2.record",
+      "description": "usage: research_agent rsi harness2 record [-h] [--artifact ARTIFACT]\n                                          [--ledger LEDGER] [--scope SCOPE]\n                                          [--policy-path POLICY_PATH]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.harness2.run",
+      "group": "rsi",
+      "label": "run",
+      "syntax": "python -m research_agent rsi harness2.run",
+      "description": "usage: research_agent rsi harness2 run [-h] [--root ROOT] [--python PYTHON]\n                                       [--output OUTPUT] [--artifact ARTIFACT]\n                                       [--k K]\n                                       [--mode {parallel,sequential,both}]\n                                       [--adapter {demo,science}]\n                                       [--timeout TIMEOUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.harness2.status",
+      "group": "rsi",
+      "label": "status",
+      "syntax": "python -m research_agent rsi harness2.status",
+      "description": "usage: research_agent rsi harness2 status [-h] [--artifact ARTIFACT]",
       "safety": "catalog_only",
       "curated": false
     },

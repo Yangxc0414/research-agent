@@ -190,6 +190,7 @@
       <a class="rel-card" href="./demo/"><b>研究运行控制台</b><span>9 阶段对象流 / 指令流 / 失败分支的 SIM 回放。</span><em>./demo/</em></a>
       <a class="rel-card" href="./innovation/"><b>创新点六幕演示</b><span>把创新点变成六个可看见的状态，90 秒 walkthrough。</span><em>./innovation/</em></a>
       <a class="rel-card" href="./qoder/"><b>接入矩阵</b><span>Qoder / Claude Code / Cursor / Cline / Codex CLI … 同一份工具表与门禁。</span><em>./qoder/</em></a>
+      <a class="rel-card" href="./rsi/"><b>自进化接缝</b><span>执行交给 Harness²，平台只留判据、台账与人签；含一次真实运行的账本。</span><em>./rsi/</em></a>
       <a class="rel-card" href="./models/"><b>模型网关</b><span>OpenAI / Anthropic / 兼容端点（需本地 runtime）。</span><em>./models/</em></a>
       <a class="rel-card" href="./live/"><b>本地运行时</b><span>pipeline 执行 + RSI 审计（需本地 runtime）。</span><em>./live/</em></a>
     </div>
@@ -561,7 +562,7 @@
       </div>
     </div>
     <div class="scope-note">
-      <b>接口现状：</b>MCP / HTTP / CLI 三入口共用 <code>framework_api.dispatch</code>；当前 RSI 控制面（policy / lease / step ledger）是保证可运行的最小实现，外部 provider 适配器仍是 roadmap。不把「已实现的控制面」说成「已完成对接」。<br/>
+      <b>接口现状：</b>MCP / HTTP / CLI 三入口共用 <code>framework_api.dispatch</code>；递归改进的执行已接到外部 <a href="./rsi/">Harness²（自进化接缝）</a>，平台只消费 <code>harness2-run-0.1</code> 产物并做准入；流水线编排 / 版本回滚 / 评测调度的其余部分仍是 roadmap。不把「已实现的控制面」说成「已完成对接」。<br/>
       <b>分工口径：</b>自迭代的<b>执行</b>下沉到 RSI 服务；平台只保留判据（准入理由 / 租约 / 撤销传播）与数据基础，不为每个循环重造一遍基础设施。
     </div>
   </section>

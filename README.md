@@ -52,11 +52,23 @@ python scripts/release_check.py --for-public-release
 | 归属 | 负责什么 | 当前状态 |
 | --- | --- | --- |
 | 本平台 | 六模块 SPEC、artifact、span-only 证据、claim / closure、四道人签门 | 已实现（fixture 纵切 + CC-BY 语料 probe） |
-| 本平台 | 自改进判据：EV1–EV4、租约、撤销传播、MetaTracker | 控制面已实现；真实 evaluator 未接 |
-| 可委托 RSI 基础设施 | 流水线编排与重试、阶段 checkpoint、版本 / 回滚、细粒度反馈（知识原子级冲突与污染）、评测调度 | 本仓库只保留最小控制面；外部 provider 适配器是 roadmap |
+| 本平台 | 自改进判据：EV1–EV4、租约、撤销传播、MetaTracker、`harness2-run-0.1` 接缝与 conformance | 控制面已实现；真实 evaluator 未接 |
+| 外部执行（Harness²） | Propose–Probe–Compose 递归、c1..c8 组件面、平行 / 顺序两种模式、R=4k / P=3k 预算 | 已接通并实跑（确定性夹具，`simulation=true`）；真实模型执行器是 roadmap |
+| 可委托 RSI 基础设施 | 流水线编排与重试、阶段 checkpoint、版本 / 回滚、细粒度反馈（知识原子级冲突与污染）、评测调度 | `harness2.harness` scope 已登记；其余仍是 roadmap |
 | 两边共用 | MCP / HTTP / CLI 三入口与 `framework_api.dispatch` | 已实现 |
 
-不宣称：不把「内置最小 RSI 控制面」说成「已完成与 RSI 基础设施对接」；不训练模型权重；人签门始终在平台侧，不能由基础设施或模型代签。验证路线是小数据集 + DeepSeek 基座 + 论文投稿反馈场景，先证明「判定能改变下一步动作」，再谈能力增益。
+接缝怎么跑（需要 Python 3.12/3.13，平台本身仍是 3.8）：
+
+```bash
+python -m research_agent.cli rsi harness2 probe      # 探针：checkout、解释器、桥、补丁
+python -m research_agent.cli rsi harness2 run --k 2 --mode both --adapter science
+python -m research_agent.cli rsi harness2 status     # 契约 / 预算 / 任务 / 分类自检
+python -m research_agent.cli rsi harness2 record     # 只写 pending_human，不 admit
+```
+
+平台不导入 Harness²（它是 3.12-only）：`scripts/harness2_run.py` 在独立进程里跑，回传 `harness2-run-0.1`。Windows 上两个便携性补丁（`fcntl.flock`、`tree.read_tree` 的 POSIX 路径）会写进产物，跑出来的结果不会被误当成上游 POSIX 行为。
+
+不宣称：不把「内置最小 RSI 控制面」说成「已完成与 RSI 基础设施对接」；不训练模型权重；人签门始终在平台侧，不能由基础设施或模型代签。确定性夹具跑通只证明接口与治理映射，不证明能力增益；验证路线是小数据集 + DeepSeek 基座 + 论文投稿反馈场景，先证明「判定能改变下一步动作」，再谈能力增益。
 
 ## 当前事实基线
 

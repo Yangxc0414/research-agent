@@ -102,6 +102,29 @@ function copyStats() {
   }
 }
 
+function copyHarness2Story() {
+  // The RSI page must show a real run, never a hard-coded number. The story is produced by
+  // `rsi harness2 run` next to the artifact; if it is absent (fresh clone, CI) the committed
+  // copy stays in place rather than being replaced by an empty file.
+  const source = path.join(root, "runtime_data", "harness2", "story.json");
+  const target = path.join(site, "data", "harness2.json");
+  if (!fs.existsSync(source)) {
+    return fs.existsSync(target) ? "kept committed copy" : "missing";
+  }
+  ensureDir(path.dirname(target));
+  const raw = fs.readFileSync(source, "utf8");
+  try {
+    const story = JSON.parse(raw);
+    if (!story || story.schema !== "harness2-story-0.1") {
+      throw new Error("unexpected schema: " + (story && story.schema));
+    }
+  } catch (error) {
+    throw new Error("invalid harness2 story: " + source + " — " + error.message);
+  }
+  fs.writeFileSync(target, raw);
+  return "copied";
+}
+
 function validateJsonDir(dir) {
   if (!fs.existsSync(dir)) return [];
   const files = fs.readdirSync(dir).filter((name) => name.endsWith(".json"));
@@ -120,6 +143,7 @@ const demoHash = copyDemo();
 const docs = copyDocs();
 const innovationData = copyInnovationData();
 const stats = copyStats();
+const harness2Story = copyHarness2Story();
 const jsonFiles = validateJsonDir(path.join(site, "data"));
 
 const buildInfo = {
@@ -128,6 +152,7 @@ const buildInfo = {
   docs,
   data_files: jsonFiles,
   innovation_data: innovationData,
+  harness2_story: harness2Story,
   stats
 };
 fs.writeFileSync(path.join(site, "data", "build.json"), JSON.stringify(buildInfo, null, 2) + "\n");
@@ -137,4 +162,5 @@ console.log("  demo:", "site/demo/index.html", "sha256:" + demoHash);
 console.log("  docs:", docs.length ? docs.join(", ") : "(none)");
 console.log("  data:", jsonFiles.length ? jsonFiles.join(", ") : "(none)");
 console.log("  innovation data:", innovationData.length ? innovationData.join(", ") : "(none)");
+console.log("  harness2 story:", harness2Story);
 console.log("  preview: npx serve site");
