@@ -2788,6 +2788,7 @@
           <p class="section-lede">S0–S16 的编排不是把所有 Agent 放进一个聊天室：顶层状态机决定阶段，每一步写产物与事件，门禁不可被绕过。点击任一阶段查看主产物与失败去向。</p>
         </div>
         <div class="section-note"><b>18</b>业务阶段 + 9 门禁<br/>S5e 探索 / S5c 确证分车道</div>
+        <p class="section-lede" style="margin-top:10px">canonical 门禁映射（与主页主循环一致）：G1=S3 想法选择 · G2=S4 设计批准 · S5b=S5c 结果人签 · G5=S16 闭包导出；Q0/Q1/G3/G4 为内部子门。反馈环：失败→修订 / 阻断→修复 / 证据缺口→回检索。</p>
       </div>
 
       <div class="pipeline-card">
@@ -3279,7 +3280,7 @@
     {id:"S3", name:"收敛", out:"短名单 + 查新", gate:"G1", fail:"回 S2/S3", flow:1, note:"有界辩论 + 覆盖度组合"},
     {id:"S4", name:"设计", out:"设计卡 + protocol + TaskSpec", gate:"G2", fail:"改设计", flow:2, note:"消融矩阵 + 人工冻结任务包"},
     {id:"S5e", name:"探索", out:"探索记录", gate:"—", fail:"重试 / 停止", flow:2, note:"不进 Judge、不建 claim"},
-    {id:"S5c", name:"确证", out:"verdict + EA", gate:"G2′", fail:"按失败分类路由", flow:2, note:"Work → 快照 → 干净 Judge"},
+    {id:"S5c", name:"确证", out:"verdict + EA", gate:"S5b", fail:"按失败分类路由", flow:2, note:"Work → 快照 → 干净 Judge；结果 claim 须 S5b 人签"},
     {id:"S6", name:"图表", out:"候选图 + 图计划 + 定稿图", gate:"G3 约束", fail:"修数据 / 重绘", flow:3, note:"S6a 候选 → G3 → S6b 定稿"},
     {id:"S7", name:"论证", out:"论证图", gate:"—", fail:"重规划", flow:3, note:"问题→gap→方法→证据→结论"},
     {id:"S8", name:"大纲", out:"大纲 + 图计划", gate:"G3", fail:"重规划", flow:3, note:"章节义务 + 每图支撑的 claim"},
@@ -7694,6 +7695,6 @@
   render();
 })();
 </script>
-<footer class="sp-foot">Research Agent · 前端 demo · 各子页为同一系统的不同投影，演示逻辑一致（门禁 G1 想法 / G2 设计 / S5b 结果人签 / G5 闭包）；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
+<footer class="sp-foot">Research Agent · 前端 demo · 各子页为同一系统的不同投影，演示逻辑一致（门禁 G1 想法=S3 / G2 设计=S4 / S5b 结果人签=S5c / G5 闭包=S16）；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
 </body>
 </html>
