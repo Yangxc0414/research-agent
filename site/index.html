@@ -47,8 +47,10 @@
 .flow-pane{display:none;margin:0;padding:18px 16px 10px}
 .flow-pane.is-active{display:block}
 .flow-pane svg{display:block;width:100%;height:auto;max-width:920px;margin:0 auto;font-family:inherit}
+.flow-pane img{display:block;width:100%;height:auto;max-width:1100px;margin:0 auto}
 .flow-pane figcaption{margin:12px auto 0;max-width:860px;font-size:12px;line-height:1.7;color:#5b6472;text-align:center}
 .flow-source{margin-top:12px}
+.flow-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 @media (max-width:760px){.flow-tabs{gap:5px;padding:10px}.flow-tab{font-size:11.5px;padding:6px 9px}.flow-pane{padding:12px 8px}}
 
 </style>
@@ -78,7 +80,7 @@
   </a>
   <div class="appbar-context">
     <span class="kicker">EVIDENCE OPERATIONS</span>
-    <b id="app-view-title">接入项目</b>
+    <b id="app-view-title">策略流程图</b>
   </div>
   <div class="appbar-actions">
     <a class="nav-cta" href="./app/" style="border-color:rgba(37,99,235,.42);background:var(--accent-dim);">Agent 工作台 ↗</a>
@@ -104,8 +106,8 @@
     <div class="side-group">
       <span>工作区</span>
       <a class="side-item" href="./app/" style="border-color:rgba(37,99,235,.22);background:var(--accent-dim);"><em>GO</em><b>Agent 工作台</b><small>可部署工作台 · 对话 / 证据 / 自进化</small></a>
-      <button type="button" class="side-item is-active" data-view="intake"><em>00</em><b>接入项目</b><small>仓库 / 文件夹 / URL</small></button>
-      <button type="button" class="side-item" data-view="strategy"><em>MAP</em><b>策略流程图</b><small>同一系统 · 四个投影</small></button>
+      <button type="button" class="side-item" data-view="intake"><em>00</em><b>接入项目</b><small>仓库 / 文件夹 / URL</small></button>
+      <button type="button" class="side-item is-active" data-view="strategy"><em>MAP</em><b>策略流程图</b><small>同一系统 · 四个投影</small></button>
       <button type="button" class="side-item" data-view="demo" data-mode="console"><em>01</em><b>研究运行</b><small>9 阶段 · 对象流 · 指令流</small></button>
       <button type="button" class="side-item" data-view="demo" data-mode="workbench"><em>02</em><b>证据工作台</b><small>7 视图 · 体检 / 变更 / 签署</small></button>
       <button type="button" class="side-item" data-view="demo" data-mode="evolution"><em>03</em><b>自进化</b><small>EV1–EV4 · 租约 · 过程反馈</small></button>
@@ -226,22 +228,27 @@
     </div>
   </section>
 
-  <section class="section view" id="strategy">
+  <section class="section view is-active" id="strategy">
     <div class="section-head">
       <div>
         <p class="index">STRATEGY / FOUR VIEWS</p>
         <h2>同一系统的四个投影。</h2>
       </div>
-      <p class="section-note">过程可信底座 + 判定消费。四张图是同一系统的四个投影，不是实现地图；建议按 ③ → ① → ② → ④ 读。哪些已实现见功能地图，信念修订 / 反事实等前沿环节仍是设计。</p>
+      <p class="section-note">过程可信底座 + 判定消费。默认展示本项目的证据运营设计总览；①–④ 是同一系统的四个策略投影（建议按 ③ → ① → ② → ④ 读），不是实现地图。哪些已实现见功能地图，信念修订 / 反事实等前沿环节仍是设计。</p>
     </div>
     <div class="flow-gallery panel">
       <div class="flow-tabs" role="tablist" aria-label="策略流程图">
-      <button type="button" class="flow-tab is-active" role="tab" aria-selected="true" data-flow="loop">① 过程可信主循环</button>
+      <button type="button" class="flow-tab is-active" role="tab" aria-selected="true" data-flow="design">◎ 设计总览 · 证据运营</button>
+      <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="loop">① 过程可信主循环</button>
       <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="memory">② 记忆协调与证据准入</button>
       <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="delegate">③ 科研持续委托闭环</button>
       <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="routing">④ 执行与路由架构</button>
       </div>
-    <figure class="flow-pane is-active" data-flow-pane="loop">
+    <figure class="flow-pane is-active" data-flow-pane="design">
+      <img src="./assets/fig3-evidence-ops-overview.svg" alt="Research Agent 设计总览：从证据闭合到证据运营（RWJT P0→P7 + 证据账本 + 反馈环）" />
+      <figcaption>本项目早期设计流程图：证据闭合 RWJT（P0 问题冻结 → P1 检索证据 → P4 独立重跑 → P5 判定 → P6 稿件槽位 → P7 导出硬门），统一证据账本 claim↔run↔句/图；失败→修订、阻断→修复、证据缺口→回检索三条反馈环。OVERVIEW · DESIGN / SIM。</figcaption>
+    </figure>
+    <figure class="flow-pane" data-flow-pane="loop">
       <svg viewBox="0 0 900 650" role="img" aria-label="过程可信主循环">
         <title>过程可信主循环流程图</title>
         <desc>七个阶段：文献检索、假设生成、实验设计、执行与数据分析、三层验证、评审反馈、证据绑定陈述；四个反馈：T6b 证伪/反事实、信念修订、溯源/失效传播、同质化监测；四个人工/统计门。</desc>
@@ -532,9 +539,15 @@
     </figure>
     </div>
     <p class="fineprint flow-source">图来源：科研智能体策略论证（1110 可读性修订版）· 第 07 节。红色方块 = 人工门，青色 = 自动门，虚线 = 反馈环。这些是策略投影，当前实现状态以功能地图为准。</p>
+    <div class="flow-links">
+      <a class="nav-cta" href="./innovation/">看六幕创新演示 ↗</a>
+      <a class="nav-cta" href="./app/">进 Agent 工作台 ↗</a>
+      <a class="nav-cta" href="./demo/#console">跑一次研究运行 ↗</a>
+      <a class="nav-cta" href="./qoder/">Qoder 接入 ↗</a>
+    </div>
   </section>
 
-  <section class="section view is-active" id="intake">
+  <section class="section view" id="intake">
     <div class="section-head">
       <div>
         <p class="index">00 / INTAKE</p>

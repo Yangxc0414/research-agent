@@ -845,6 +845,14 @@
     });
   });
 
+  function applyHashView() {
+    const h = (location.hash || "").replace(/^#/, "");
+    const t = document.getElementById(h);
+    if (t && t.classList.contains("view")) showAppView(h);
+  }
+  applyHashView();
+  window.addEventListener("hashchange", applyHashView);
+
   $$(".flow-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
       const key = tab.getAttribute("data-flow");
