@@ -1,9 +1,9 @@
 {
   "schema": "harness2-story-0.1",
-  "generated_at": "2026-11-10T10:52:44Z",
+  "generated_at": "2026-11-10T11:25:09Z",
   "available": true,
   "problems": [],
-  "platform_fingerprint": "d9d851a50bd7ba58",
+  "platform_fingerprint": "7594c67a27762064",
   "run": {
     "adapter": "science",
     "executor": "deterministic-science-fixture",
@@ -13,9 +13,9 @@
       "agg",
       "seq"
     ],
-    "wall_s": 10.399,
-    "started_at": "2026-11-10T10:52:34Z",
-    "finished_at": "2026-11-10T10:52:44Z"
+    "wall_s": 11.289,
+    "started_at": "2026-11-10T11:24:57Z",
+    "finished_at": "2026-11-10T11:25:09Z"
   },
   "budget": {
     "R": 48,
