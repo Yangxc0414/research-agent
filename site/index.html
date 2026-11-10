@@ -73,30 +73,96 @@
 .demo-foot{padding:18px 20px;border-top:1px solid #e5e9f0;color:#8a94a6;font-size:12px;text-align:center}
 @media (max-width:760px){.demo-top{padding:10px 12px}.demo-main{padding:14px 12px 30px}}
 </style>
+
+<style>
+.lp{background:#f8fbff;color:#1f2937}
+.lp-nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;justify-content:space-between;padding:14px 28px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid #e5e9f0}
+.lp-brand{font-weight:800;letter-spacing:.08em;font-size:15px;color:#0f766e;text-decoration:none}
+.lp-brand small{color:#8a94a6;font-weight:600;letter-spacing:.02em}
+.lp-menu{display:flex;gap:4px;flex-wrap:wrap}
+.lp-menu a{color:#3a4353;font-size:13px;font-weight:600;text-decoration:none;padding:6px 10px;border-radius:8px}
+.lp-menu a:hover{background:#eef2ff;color:#2563eb}
+.lp-navcta{background:#2563eb;color:#fff;font-size:13px;font-weight:700;padding:8px 16px;border-radius:9px;text-decoration:none;box-shadow:0 4px 14px rgba(37,99,235,.28)}
+.lp-navcta:hover{background:#1d4ed8}
+.lp-hero{max-width:1080px;margin:0 auto;padding:72px 24px 48px;text-align:center}
+.lp-badge{display:inline-block;border:1px solid #e6d7b4;background:#fff8e7;color:#8a6d1f;font-size:11.5px;font-weight:700;letter-spacing:.06em;padding:4px 12px;border-radius:999px;margin-bottom:20px}
+.lp-hero h1{font-size:44px;line-height:1.2;font-weight:800;letter-spacing:-.01em;margin:0 0 18px}
+.lp-hero h1 span{background:linear-gradient(90deg,#2563eb,#0f766e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lp-lede{max-width:760px;margin:0 auto 28px;font-size:16px;line-height:1.8;color:#5b6472}
+.lp-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.lp-btn{font-size:14px;font-weight:700;padding:12px 22px;border-radius:10px;text-decoration:none}
+.lp-btn.primary{background:#2563eb;color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.3)}
+.lp-btn.primary:hover{background:#1d4ed8}
+.lp-btn.ghost{border:1px solid #dbe4f0;background:#fff;color:#23406e}
+.lp-btn.ghost:hover{border-color:#2563eb;color:#2563eb}
+.lp-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lp-chips span{border:1px solid #e5e9f0;background:#fff;color:#5b6472;font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px}
+.lp-section{max-width:1180px;margin:0 auto;padding:44px 24px}
+.lp-sechead{text-align:center;margin-bottom:28px}
+.lp-sechead .index{color:#2563eb;font-size:12px;font-weight:700;letter-spacing:.12em}
+.lp-sechead h2{font-size:30px;font-weight:800;margin:8px 0 10px}
+.lp-sechead p{color:#5b6472;font-size:14px;line-height:1.7;max-width:720px;margin:0 auto}
+.lp-feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.lp-feat{border:1px solid #e5e9f0;background:#fff;border-radius:14px;padding:20px;transition:transform .15s,border-color .15s}
+.lp-feat:hover{transform:translateY(-3px);border-color:#2563eb}
+.lp-feat i{display:inline-flex;width:34px;height:34px;border-radius:9px;background:#eef2ff;color:#2563eb;align-items:center;justify-content:center;font-style:normal;font-weight:800;margin-bottom:12px}
+.lp-feat b{display:block;font-size:15px;margin-bottom:6px}
+.lp-feat p{font-size:12.5px;line-height:1.7;color:#5b6472;margin:0}
+.lp-bound{border:1px solid #e6d7b4;background:#fff8e7;border-radius:14px;padding:20px 24px;color:#6b5010;font-size:13px;line-height:1.8}
+.lp-bound b{display:block;margin-bottom:6px}
+.lp-foot{border-top:1px solid #e5e9f0;padding:22px;text-align:center;color:#8a94a6;font-size:12px}
+@media (max-width:760px){.lp-hero{padding:44px 16px 32px}.lp-hero h1{font-size:30px}.lp-nav{padding:10px 14px}.lp-menu{display:none}.lp-section{padding:30px 14px}}
+</style>
 </head>
-<body class="demo-landing">
+<body class="lp">
 <a class="skip-link" href="#main">跳到内容</a>
-<header class="demo-top">
-  <a class="demo-brand" href="./">RESEARCH AGENT <span>· DEMO</span></a>
-  <nav class="demo-nav" aria-label="子页面">
-    <a href="./app/">Agent 工作台 ↗</a>
-    <a href="./innovation/">创新演示 ↗</a>
-    <a href="./demo/">研究运行 ↗</a>
-    <a href="./qoder/">Qoder 接入 ↗</a>
-    <a href="./models/">模型</a>
-    <a href="./live/">运行时</a>
+<header class="lp-nav">
+  <a class="lp-brand" href="./">RESEARCH AGENT <small>· 可核验的科研智能体</small></a>
+  <nav class="lp-menu" aria-label="页内导航">
+    <a href="#features">特性</a>
+    <a href="#design">系统设计</a>
+    <a href="#demos">演示与接入</a>
+    <a href="#boundary">边界</a>
     <a href="./docs/README.md">文档</a>
   </nav>
+  <a class="lp-navcta" href="./app/">进入工作台 ↗</a>
 </header>
+<main id="main">
+  <section class="lp-hero">
+    <span class="lp-badge">静态演示镜像 · STATIC DEMO · 无真实执行</span>
+    <h1>把科研自动化，<br>做成一条<span>可核验的证据链</span>。</h1>
+    <p class="lp-lede">Research Agent 是一个证据可审计、能力可插拔、流程可组合的科研智能体运行时：文献检索、独立复现、科研写作与核验接成闭环，并在冻结模型权重下做受治理的程序级自改进。本页是产品介绍；具体的科研智能体在下方按钮进入的子页中运行。</p>
+    <div class="lp-cta">
+      <a class="lp-btn primary" href="./app/">进入科研工作台 →</a>
+      <a class="lp-btn ghost" href="./innovation/">看 90 秒创新演示</a>
+      <a class="lp-btn ghost" href="./demo/">研究运行回放</a>
+    </div>
+    <div class="lp-chips">
+      <span>span-only 证据</span><span>独立重跑复现</span><span>升级人签 · 降级自动</span><span>MCP / HTTP / CLI</span><span>host-model 无外部 key</span>
+    </div>
+  </section>
 
-<div class="site-mode-banner" role="status">
-  <strong>静态前端镜像 · STATIC</strong>
-  <span class="smb-summary">公开原型：无真实 LLM / 实验执行 / claim 签名；人工门只在本地 CLI。</span>
-  <button class="smb-toggle" type="button" id="smb-toggle" aria-expanded="false" aria-controls="smb-detail">详情</button>
-  <span class="smb-detail" id="smb-detail" hidden>本页是公开原型：runtime 在构建时已禁用，没有真实 LLM、实验执行、claim 签名或 runtime job；页面数值来自 CACHED 快照或 SIM 演示，不是实测结果。人工门（G1 / G2 / claim / closure / export）只在本地 CLI。站内的 “LIVE PUBLIC” 仅指浏览器直连 OpenAlex 公开元数据。</span>
-</div>
-<main id="main" class="demo-main">
-<section class="section" id="strategy">
+  <section class="lp-section" id="features">
+    <div class="lp-sechead">
+      <p class="index">FEATURES / 四个判定</p>
+      <h2>不是再做一个论文生成器。</h2>
+      <p>差异在四个判定的交集：资格、完成、失效、供给。稳定的是证据与门禁，可变的是工具、流程与接入方式。</p>
+    </div>
+    <div class="lp-feats">
+      <div class="lp-feat"><i>1</i><b>资格判定 · 证据闭合</b><p>句子必须落到已持有 span 或人签实验证据；claim 只由 Evidence 创建，摘要不能当全文证据。</p></div>
+      <div class="lp-feat"><i>2</i><b>完成判定 · 可复现</b><p>RunCapsule + 独立重跑 + EA；Work 与 Judge 分离，失败也留下可审计的运行胶囊与成本。</p></div>
+      <div class="lp-feat"><i>3</i><b>失效判定 · 变更传播</b><p>spec/data/code/evidence/claim 以 SHA-256 串联；输入变了沿链标 stale，导出 fail-closed。</p></div>
+      <div class="lp-feat"><i>4</i><b>供给判定 · 受治理自改进</b><p>模型可换（含无 key 的 host-model），但证据资格不可移植；经验准入/租约/撤销，升级人签、降级自动。</p></div>
+    </div>
+  </section>
+
+  <section class="lp-section" id="design">
+    <div class="lp-sechead">
+      <p class="index">DESIGN / 系统投影</p>
+      <h2>同一系统的四个投影。</h2>
+      <p>下面四张图与《科研智能体策略论证》原文 SVG 完全一致，是设计投影而非实现地图；建议按 ③ → ① → ② → ④ 读。</p>
+    </div>
+    <section class="section" id="strategy">
     <div class="section-head">
       <div>
         <p class="index">STRATEGY / FOUR VIEWS</p>
@@ -409,27 +475,32 @@
       <a class="nav-cta" href="./qoder/">Qoder 接入 ↗</a>
     </div>
   </section>
+  </section>
 
-  <section class="section" id="pages">
-    <div class="section-head">
-      <div>
-        <p class="index">PAGES / 关系</p>
-        <h2>总览在这里，执行在子页。</h2>
-      </div>
-      <p class="section-note">首页只回答“系统长什么样”（四张流程图）；每个子页回答“它怎么跑”。真实执行、模型调用与人工签署只在本地 CLI / runtime，不在本静态镜像。</p>
+  <section class="lp-section" id="demos">
+    <div class="lp-sechead">
+      <p class="index">DEMOS / 进入智能体</p>
+      <h2>介绍在这里，运行在子页。</h2>
+      <p>每个按钮进入一个具体的科研智能体页面；真实执行、模型调用与人工签署只在本地 CLI / runtime。</p>
     </div>
     <div class="rel-grid">
-      <a class="rel-card" href="./app/"><b>Agent 工作台</b><span>可部署的对话式科研工作台：证据、自进化、签署等视图。</span><em>./app/</em></a>
+      <a class="rel-card" href="./app/"><b>Agent 工作台</b><span>可部署的对话式科研工作台：证据、自进化、签署视图。</span><em>./app/</em></a>
       <a class="rel-card" href="./demo/"><b>研究运行控制台</b><span>9 阶段对象流 / 指令流 / 失败分支的 SIM 回放。</span><em>./demo/</em></a>
       <a class="rel-card" href="./innovation/"><b>创新点六幕演示</b><span>把创新点变成六个可看见的状态，90 秒 walkthrough。</span><em>./innovation/</em></a>
-      <a class="rel-card" href="./qoder/"><b>Qoder 即插即用</b><span>MCP 接入、host-model 与人工门边界说明。</span><em>./qoder/</em></a>
-      <a class="rel-card" href="./models/"><b>模型网关</b><span>OpenAI / Anthropic / 兼容端点配置（需本地 runtime）。</span><em>./models/</em></a>
+      <a class="rel-card" href="./qoder/"><b>Qoder 即插即用</b><span>MCP 接入、host-model 与人工门边界。</span><em>./qoder/</em></a>
+      <a class="rel-card" href="./models/"><b>模型网关</b><span>OpenAI / Anthropic / 兼容端点（需本地 runtime）。</span><em>./models/</em></a>
       <a class="rel-card" href="./live/"><b>本地运行时</b><span>pipeline 执行 + RSI 审计（需本地 runtime）。</span><em>./live/</em></a>
     </div>
   </section>
-</main>
-<footer class="demo-foot">Research Agent · 前端 demo · 静态镜像，无真实 LLM / 执行 / 签名；人工门只在本地 CLI</footer>
 
+  <section class="lp-section" id="boundary">
+    <div class="lp-bound">
+      <b>边界与诚实声明</b>
+      本公开站为静态镜像：无真实 LLM、实验执行、claim 签名或 runtime job；数值来自 CACHED 快照或 SIM 演示。人工门（G1/G2/claim/closure/export）只在本地 CLI。fixture 与模拟分数不得当作真实证据；不提供代写、伪造数据/引用、规避检测或自动投稿。AI 生成内容是草稿，科学决策与署名责任由作者/PI 保留。
+    </div>
+  </section>
+</main>
+<footer class="lp-foot">Research Agent · 证据闭合的科研智能体运行时 · 静态产品演示页</footer>
 <script>
 (function(){
   function q(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
@@ -440,8 +511,6 @@
       q(".flow-pane").forEach(function(p){p.classList.toggle("is-active",p.getAttribute("data-flow-pane")===key);});
     });
   });
-  var bt=document.getElementById("smb-toggle"),bd=document.getElementById("smb-detail");
-  if(bt&&bd){bt.addEventListener("click",function(){var open=bd.hidden;bd.hidden=!open;bt.setAttribute("aria-expanded",open?"true":"false");bt.textContent=open?"收起":"详情";});}
 })();
 </script>
 </body>
