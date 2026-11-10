@@ -44,7 +44,9 @@
 .flow-tab{border:1px solid #e5e9f0;background:#fff;color:#3a4353;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
 .flow-tab:hover{border-color:#9aa3af}
 .flow-tab.is-active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
-.flow-pane{display:none;margin:0;padding:18px 16px 10px}
+.flow-pane{display:block;margin:0;padding:8px 16px 10px}
+.flow-title{font-size:16px;font-weight:700;color:#1f2937;margin:22px 16px 0}
+.flow-gallery .flow-title:first-of-type{margin-top:14px}
 .flow-pane.is-active{display:block}
 .flow-pane svg{display:block;width:100%;height:auto;max-width:920px;margin:0 auto;font-family:inherit}
 .flow-pane figcaption{margin:12px auto 0;max-width:860px;font-size:12px;line-height:1.7;color:#5b6472;text-align:center}
@@ -163,21 +165,9 @@
       <p>下面四张图与《科研智能体策略论证》原文 SVG 完全一致，是设计投影而非实现地图；建议按 ③ → ① → ② → ④ 读。</p>
     </div>
     <section class="section" id="strategy">
-    <div class="section-head">
-      <div>
-        <p class="index">STRATEGY / FOUR VIEWS</p>
-        <h2>同一系统的四个投影。</h2>
-      </div>
-      <p class="section-note">过程可信底座 + 判定消费。四张图与《科研智能体策略论证》原文 SVG 完全一致，是同一系统的四个投影，不是实现地图；建议按 ③ → ① → ② → ④ 读。哪些已实现见功能地图，信念修订 / 反事实等前沿环节仍是设计。</p>
-    </div>
     <div class="flow-gallery panel">
-      <div class="flow-tabs" role="tablist" aria-label="策略流程图">
-      <button type="button" class="flow-tab is-active" role="tab" aria-selected="true" data-flow="loop">① 过程可信主循环</button>
-      <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="memory">② 记忆协调与证据准入</button>
-      <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="delegate">③ 科研持续委托闭环</button>
-      <button type="button" class="flow-tab" role="tab" aria-selected="false" data-flow="routing">④ 执行与路由架构</button>
-      </div>
-    <figure class="flow-pane is-active" data-flow-pane="loop">
+    <h3 class="flow-title">① 过程可信主循环</h3>
+    <figure class="flow-pane" data-flow-pane="loop">
       <svg viewBox="0 0 900 650" role="img" aria-label="过程可信主循环">
         <title>过程可信主循环流程图</title>
         <desc>七个阶段：文献检索、假设生成、实验设计、执行与数据分析、三层验证、评审反馈、证据绑定陈述；四个反馈：T6b 证伪/反事实、信念修订、溯源/失效传播、同质化监测；四个人工/统计门。</desc>
@@ -255,6 +245,7 @@
       </svg>
       <figcaption>实线向下 = 研究过程前向；红色方块 = 人工门，青色方块 = 自动门；虚线向上 = 反馈环（证伪/反事实、信念修订、溯源/失效）；「假设生成」阶段右侧自环 = 多样性/同质化监测。反馈均回指更早阶段，与前向流区分。</figcaption>
     </figure>
+    <h3 class="flow-title">② 记忆协调与证据准入</h3>
     <figure class="flow-pane" data-flow-pane="memory">
       <svg viewBox="0 0 900 400" role="img" aria-label="记忆协调与学习证据准入">
         <title>类型化记忆协调与学习证据准入流程图</title>
@@ -312,6 +303,7 @@
       </svg>
       <figcaption>中：新经验经学习证据准入门——通过则写入记忆图谱、未过则拒绝（默认拒绝）；上：记忆图谱供研究各阶段消费；右：通过即绑定执行契约/溯源数据；虚线：上游变更→失效→回指准入门复验。箭头均指向框边，反馈回指准入门而非边框。</figcaption>
     </figure>
+    <h3 class="flow-title">③ 科研持续委托闭环</h3>
     <figure class="flow-pane" data-flow-pane="delegate">
       <svg viewBox="0 0 900 430" role="img" aria-label="科研持续委托闭环">
         <title>科研持续委托闭环流程图</title>
@@ -375,6 +367,7 @@
       </svg>
       <figcaption>承接持续委托闭环：授权范围前置 → 触发(相关性检查) → 上下文(链式召回) → 方案(两级过滤) → 获批执行(人门/异步) → 核验外部结果(回执) → 更新记忆并继续负责 → 回指触发；虚线为持续负责回路，目标撤销/失效即停（右上红框）。</figcaption>
     </figure>
+    <h3 class="flow-title">④ 执行与路由架构</h3>
     <figure class="flow-pane" data-flow-pane="routing">
       <svg viewBox="0 0 900 420" role="img" aria-label="执行与路由架构">
         <title>执行与路由架构图</title>
@@ -501,17 +494,5 @@
   </section>
 </main>
 <footer class="lp-foot">Research Agent · 证据闭合的科研智能体运行时 · 静态产品演示页</footer>
-<script>
-(function(){
-  function q(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
-  q(".flow-tab").forEach(function(tab){
-    tab.addEventListener("click",function(){
-      var key=tab.getAttribute("data-flow");
-      q(".flow-tab").forEach(function(t){var on=t.getAttribute("data-flow")===key;t.classList.toggle("is-active",on);t.setAttribute("aria-selected",on?"true":"false");});
-      q(".flow-pane").forEach(function(p){p.classList.toggle("is-active",p.getAttribute("data-flow-pane")===key);});
-    });
-  });
-})();
-</script>
 </body>
 </html>
