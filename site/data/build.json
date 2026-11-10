@@ -1,6 +1,6 @@
 {
-  "built_at": "2026-11-07T16:45:40.480Z",
-  "demo_sha256_16": "0658f279c87bc5da",
+  "built_at": "2026-11-10T05:31:46.052Z",
+  "demo_sha256_16": "69f9ffc6302c9b86",
   "docs": [
     "README.md",
     "16-科研Skill生态调研.md",
@@ -22,9 +22,9 @@
     "grant.json"
   ],
   "stats": {
-    "tests_run": 1307,
+    "tests_run": 1320,
     "ok": true,
-    "source_fingerprint": "605f36cc0df98b1a",
-    "finished_at": "2026-11-07T16:45:05+00:00"
+    "source_fingerprint": "dea19f98c6c5e850",
+    "finished_at": "2026-11-07T17:53:36+00:00"
   }
 }
