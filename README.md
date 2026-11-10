@@ -45,11 +45,24 @@ python scripts/release_check.py
 python scripts/release_check.py --for-public-release
 ```
 
+## 平台与 RSI 基础设施的分工（2026-11-10 组会口径）
+
+本仓库是**科研智能体平台**：负责模块契约、证据与产物、数据基础，以及自改进的**判据**（准入理由 / 租约 / 撤销传播 / 留出增益）。RSI 基础设施是可委托的相邻课题，边界如下。
+
+| 归属 | 负责什么 | 当前状态 |
+| --- | --- | --- |
+| 本平台 | 六模块 SPEC、artifact、span-only 证据、claim / closure、四道人签门 | 已实现（fixture 纵切 + CC-BY 语料 probe） |
+| 本平台 | 自改进判据：EV1–EV4、租约、撤销传播、MetaTracker | 控制面已实现；真实 evaluator 未接 |
+| 可委托 RSI 基础设施 | 流水线编排与重试、阶段 checkpoint、版本 / 回滚、细粒度反馈（知识原子级冲突与污染）、评测调度 | 本仓库只保留最小控制面；外部 provider 适配器是 roadmap |
+| 两边共用 | MCP / HTTP / CLI 三入口与 `framework_api.dispatch` | 已实现 |
+
+不宣称：不把「内置最小 RSI 控制面」说成「已完成与 RSI 基础设施对接」；不训练模型权重；人签门始终在平台侧，不能由基础设施或模型代签。验证路线是小数据集 + DeepSeek 基座 + 论文投稿反馈场景，先证明「判定能改变下一步动作」，再谈能力增益。
+
 ## 当前事实基线
 
-- 39 个 MCP 工具：计划/执行/状态/产物读取、外部 Skill、手稿修订、AstraDraw 绘图、写作包与手稿预审、顶会语料、创新评审、初稿生成、手稿评审、宿主模型交接（读队列 / 提交回答）；
+- 46 个 MCP 工具（以 `tools/list` 为准，随版本变化）：计划/执行/状态/产物读取、外部 Skill、手稿修订、AstraDraw 绘图、写作包与手稿预审、顶会语料、创新评审、初稿生成、手稿评审、宿主模型交接（读队列 / 提交回答）；
 - **策略自动驾驶（CLI only）**：`autopilot policy init` 写一次授权（scope、数据集、最低种子、断言=最差种子下限、有效期、次数、终点），之后 `autopilot research --project --topic --policy` 一条命令从主题跑到封包（S1→S5→G1→G2→claim→closure→bundle→lineage），或用 `autopilot run` 接一个已有 run；每一步 reason 带 `[delegated:autopilot]` 与策略 SHA-256，越界即停，不覆盖已有 claim/bundle；runtime 的 `/api/autopilot-status` 与工作台 AUTOPILOT 条带只读展示，MCP/HTTP 不提供任何门禁工具；
-- MCP 统一由 `scripts/research_mcp_server.py` 启动，固定 cwd 与 import path 到本仓库；Qoder 注册与项目 `.mcp.json` 一致，38 tools ready；`.mcp.json` 含本机绝对路径，已加入 `.gitignore`，对外使用 [`.mcp.json.example`](.mcp.json.example)；
+- MCP 统一由 `scripts/research_mcp_server.py` 启动，固定 cwd 与 import path 到本仓库；Qoder 注册与项目 `.mcp.json` 一致，`tools/list` 当前返回 46 个（数量随版本变化，以 `research_agent/mcp_tools.py` 为准）；`.mcp.json` 含本机绝对路径，已加入 `.gitignore`，对外使用 [`.mcp.json.example`](.mcp.json.example)；
 - HTTP JSON + Python SDK 与 MCP 共用同一套工具契约（数量以 `tools/list` 为准）；
 - 顶会语料：按 venue/year 抓取 2024–2026 的 arXiv 公开版本，过滤 workshop/symposium/preprint/非 agent 标题；真实跑通 22 篇检索、22 篇全文可解析；
 - 多篇综合：16 篇来源 → 6 个跨来源主题、0 篇未使用；每个主题至少 3 篇来源，记录一致点与张力；
@@ -227,7 +240,7 @@ python scripts/release_check.py --for-public-release
 │   ├── agent/                                       ← LEGACY 单文件工作台；保留旧链接，不再作为主入口
 │   ├── live/                                        ← 本地 runtime 控制台：真实运行/SSE/产物/RSI 只读
 │   ├── models/                                      ← 模型接入页：Provider / Profile / 思考 / Probe / 模块绑定
-│   ├── innovation/                                  ← 静态创新点演示：深色 hero + 五幕舞台 + SVG/证据/稿件状态；无 API
+│   ├── innovation/                                  ← 静态创新点演示：六幕舞台 + SVG/证据/稿件状态 + 度量有效性；无 API
 │   └── docs/                                        ← 关键设计文档副本
 ├── scripts/                                         ← build-site.mjs / refresh-digest.mjs
 ├── .github/workflows/                               ← pages.yml / refresh-digest.yml

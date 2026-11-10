@@ -137,6 +137,10 @@
   .map-legend span{display:inline-flex;align-items:center;gap:6px}
   .map-legend i{width:18px;height:0;border-top:2px solid var(--indigo);display:inline-block}
   .map-legend i.dash{border-top-style:dashed;border-color:var(--violet)}
+  .map-legend i.human{width:9px;height:9px;border:1.2px solid #b91c1c;background:#fef2f2;border-radius:2px}
+  .map-legend i.auto{width:9px;height:9px;border:1.2px solid #0f766e;background:#ecfdf5;border-radius:2px}
+  .hero-gate-label{font-size:9.5px;font-weight:750;letter-spacing:.02em}
+  .map-foot{margin:0 10px 12px;font-size:10.5px;line-height:1.6;color:var(--faint)}
   .hero-map{display:block;width:100%;height:auto;margin-top:2px}
   .hero-map text{font-family:inherit}
   .node-label{font-size:10.5px;font-weight:750;letter-spacing:.08em;fill:var(--faint);text-transform:uppercase}
@@ -207,7 +211,21 @@
   .stage-name{font-size:12.5px;font-weight:700;fill:var(--ink)}
   .stage-node.active .stage-code,.stage-node.active .stage-name{fill:#fff}
   .gate-badge text{font-size:8.5px;font-weight:800;fill:var(--muted);letter-spacing:.02em}
-  .stage-connector{fill:none;stroke:#cbd5e1;stroke-width:1.4;stroke-dasharray:4 5}
+  .gate-badge.human rect{fill:#fef2f2;stroke:#b91c1c}
+  .gate-badge.human text{fill:#b91c1c}
+  .gate-badge.auto rect{fill:#ecfdf5;stroke:#0f766e}
+  .gate-badge.auto text{fill:#0f766e}
+  /* 与主页①一致的读图约定：实线 = 前向；虚线 = 反馈（回指更早阶段且改变下一步动作） */
+  .stage-connector{fill:none;stroke:#94a3b8;stroke-width:1.5}
+  .stage-feedback{fill:none;stroke-width:1.7;stroke-dasharray:6 4;stroke-linecap:round;stroke-linejoin:round}
+  .stage-feedback-label{font-size:8.5px;font-weight:700;letter-spacing:.01em}
+  .pipeline-legend{display:flex;flex-wrap:wrap;align-items:center;gap:7px 16px;padding:0 8px 12px;font-size:10px;font-weight:600;color:var(--muted)}
+  .pipeline-legend span{display:inline-flex;align-items:center;gap:6px}
+  .pipeline-legend i{display:inline-block;width:18px;height:0;border-top:2px solid #94a3b8}
+  .pipeline-legend i.fb{border-top:2px dashed #7c3aed}
+  .pipeline-legend i.human{width:9px;height:9px;border:1.2px solid #b91c1c;background:#fef2f2;border-radius:2px}
+  .pipeline-legend i.auto{width:9px;height:9px;border:1.2px solid #0f766e;background:#ecfdf5;border-radius:2px}
+  .pipeline-note{margin:0 8px 12px;padding:9px 12px;border:1px solid #e6d7b4;background:#fff8e7;color:#7a5f22;border-radius:10px;font-size:10.5px;line-height:1.65}
   .stage-detail{
     display:grid;grid-template-columns:86px minmax(0,1.1fr) minmax(0,1fr) auto;gap:22px;align-items:center;
     margin:8px 8px 18px;padding:18px 20px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fff,#fbfcff);
@@ -2094,12 +2112,15 @@
         <div class="map-top">
           <div class="map-title"><span class="live-dot"></span>实时证据流 <small>· 从文献到导出，只有带证据的节点会亮起</small></div>
           <div class="map-legend">
-            <span><i></i>证据链</span>
-            <span><i class="dash"></i>失效传播</span>
+            <span><i></i>实线 · 证据链前向</span>
+            <span><i class="dash"></i>虚线 · 回指更早阶段</span>
+            <span><i class="human"></i>红 · 人工门</span>
+            <span><i class="auto"></i>青 · 自动门</span>
           </div>
         </div>
         <div class="diagram-scroll scroll-map">
         <svg class="hero-map" viewBox="0 145 1200 272" role="img" aria-label="从文献、设计、确证运行、证据闭合写作到导出的证据流示意图">
+          <desc>实线为证据链前向；紫色虚线把下游变更汇入 F5 传播枢纽后回指 S5c 确证复验，不在导出节点终止；红色方块为人工门（G2 / S5b / G5），青色方块为自动门（Q0）。</desc>
           <defs>
             <linearGradient id="heroFade" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stop-color="#4f46e5"/><stop offset=".55" stop-color="#0ea5e9"/><stop offset="1" stop-color="#0d9488"/>
@@ -2107,23 +2128,28 @@
             <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
             </filter>
+            <marker id="hmFb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#7c3aed"/></marker>
           </defs>
 
           <rect x="0" y="145" width="1200" height="272" fill="transparent"/>
 
-          <!-- connectors -->
+          <!-- 前向实线：证据链（与主页①「实线 = 前向」同一约定） -->
           <path class="flow-path" d="M200 220 C228 220 242 220 260 220" stroke="#4f46e5" data-color="#4f46e5" data-dots="2" data-speed="0.055"/>
           <path class="flow-path" d="M430 220 C458 220 472 220 490 220" stroke="#0284c7" data-color="#0284c7" data-dots="2" data-speed="0.05"/>
           <path class="flow-path" d="M680 220 C708 220 722 220 740 220" stroke="#0d9488" data-color="#0d9488" data-dots="3" data-speed="0.045"/>
           <path class="flow-path" d="M940 220 C958 220 970 220 985 220" stroke="#d97706" data-color="#d97706" data-dots="2" data-speed="0.06"/>
-          <path class="flow-path dashed" d="M840 310 C840 288 840 278 840 265" stroke="#7c3aed" data-color="#7c3aed" data-dots="1" data-speed="0.035"/>
-          <path class="flow-path dashed" d="M940 330 C1010 330 1080 300 1085 265" stroke="#7c3aed" data-color="#7c3aed" data-dots="1" data-speed="0.03" data-dir="reverse"/>
+          <!-- 反馈虚线：下游变更先进入传播枢纽，再一律回指更早阶段（S5c 确证复验），
+               不在导出节点终止；G5 在导出前 fail-closed 阻断。 -->
+          <path class="flow-path dashed" d="M840 265 C840 286 840 296 840 308" stroke="#7c3aed" data-color="#7c3aed" data-dots="1" data-speed="0.035" marker-end="url(#hmFb)"/>
+          <path class="flow-path dashed" d="M1080 265 C1080 300 1010 330 942 330" stroke="#7c3aed" data-color="#7c3aed" data-dots="1" data-speed="0.03" marker-end="url(#hmFb)"/>
+          <path class="flow-path dashed" d="M740 350 C660 350 585 310 585 267" stroke="#7c3aed" data-color="#7c3aed" data-dots="1" data-speed="0.03" marker-end="url(#hmFb)"/>
 
-          <text class="edge-label" x="214" y="168">claim + span</text>
-          <text class="edge-label" x="442" y="168">协议冻结</text>
-          <text class="edge-label" x="672" y="168">scored verdict + EA</text>
-          <text class="edge-label" x="944" y="168">Q1 + G5</text>
-          <text class="edge-label" x="858" y="298">受影响 claim · 三类处置</text>
+          <text class="edge-label" x="214" y="168">claim + span · Q0</text>
+          <text class="edge-label" x="442" y="168">协议冻结 · G2 人签</text>
+          <text class="edge-label" x="672" y="168">EA + S5b 人签</text>
+          <text class="edge-label" x="944" y="168">Q1 自动 · G5 人签</text>
+          <text class="edge-label" x="748" y="302">上游变更 / stale → 三类处置</text>
+          <text class="edge-label" x="470" y="330">回指确证复验</text>
 
           <!-- S1 -->
           <g class="node-card">
@@ -2175,19 +2201,25 @@
             <circle cx="1143" cy="196" r="4" fill="#e11d48"/>
           </g>
 
-          <!-- F5 -->
+          <!-- F5：失效传播枢纽（不是终点），把下游变更回指到更早的确证阶段 -->
           <g class="node-card">
             <rect x="740" y="310" width="200" height="80" rx="16" fill="#fbfaff" stroke="#ded7fb" stroke-dasharray="5 5"/>
-            <text class="node-label" x="758" y="333">F5 · 传播</text>
-            <text class="node-title" x="758" y="357">变更与失效</text>
-            <text class="node-sub" x="758" y="375">rerun / rewrite / review</text>
+            <text class="node-label" x="758" y="333">F5 · 回指枢纽</text>
+            <text class="node-title" x="758" y="357">溯源 / 失效传播</text>
+            <text class="node-sub" x="758" y="375">三类处置 → 回 S5c 复验</text>
             <circle cx="918" cy="330" r="4" fill="#7c3aed"/>
           </g>
 
-          <!-- gate marker -->
+          <!-- 门禁方块：与主页①同色语义（红 = 人工门，青 = 自动门） -->
           <g>
-            <circle cx="962" cy="220" r="9" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
-            <path d="M958 220l3 3 4-5" fill="none" stroke="#d97706" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="225" y="216" width="11" height="8" rx="2" fill="#a7f3d0" stroke="#0f766e" stroke-width="1.2"/>
+            <text class="hero-gate-label" x="240" y="208" fill="#0f766e">Q0</text>
+            <rect x="455" y="216" width="11" height="8" rx="2" fill="#fecaca" stroke="#b91c1c" stroke-width="1.2"/>
+            <text class="hero-gate-label" x="470" y="208" fill="#b91c1c">G2</text>
+            <rect x="705" y="216" width="11" height="8" rx="2" fill="#fecaca" stroke="#b91c1c" stroke-width="1.2"/>
+            <text class="hero-gate-label" x="720" y="208" fill="#b91c1c">S5b</text>
+            <rect x="956" y="216" width="11" height="8" rx="2" fill="#fecaca" stroke="#b91c1c" stroke-width="1.2"/>
+            <text class="hero-gate-label" x="968" y="208" fill="#b91c1c">G5</text>
           </g>
 
           <!-- bottom annotation -->
@@ -2195,11 +2227,12 @@
             <rect x="30" y="330" width="430" height="76" rx="14" fill="#fbfcff" stroke="#e7ecf5"/>
             <text x="48" y="355" font-size="10" font-weight="750" letter-spacing=".12em" fill="#8b96a8">EVIDENCE DISCIPLINE</text>
             <text x="48" y="377" font-size="12.5" font-weight="650" fill="#0b1220">没有 EA，就没有稿件数字；没有解析槽位，就不导出。</text>
-            <text x="48" y="394" font-size="10.5" fill="#5b677a">This page is a design demo, not an experimental result.</text>
+            <text x="48" y="394" font-size="10.5" fill="#5b677a">失效回指 S5c 复验 · G5 fail-closed；SIM 设计演示，非实验结果。</text>
           </g>
         </svg>
         </div>
         <p class="scroll-hint">左右滑动查看完整证据流</p>
+        <p class="map-foot">与主页《过程可信主循环》同一语义：实线前向、虚线反馈一律回指更早阶段且改变下一步动作；红方块 = 人工门（G2 / S5b / G5），青方块 = 自动门（Q0）。本图是五节点压缩视图，G1 想法选择（S3）与其余阶段见下方 18 阶段全链；失效传播终点是 S5c 确证复验，G5 在导出前 fail-closed 阻断，不把「流向导出」画成反馈。</p>
       </div>
     </div>
   </section>
@@ -2308,7 +2341,7 @@
                 <div class="spec-cell"><span>FAILURE ROUTE</span><p id="spec-failure">—</p></div>
                 <div class="spec-cell"><span>PROCESS PROTOCOL / SIM</span><p id="spec-process">—</p></div>
                 <div class="spec-cell wide"><span>LIMIT / REFS</span><p id="spec-limit">—</p><small id="spec-refs">—</small></div>
-                <p class="spec-note">9 阶段是叙事压缩；rail 上的门禁是演示标签。S 段/门禁与角色按 09 §5.12，服务/端口按 17 §2，过程反馈按 11 §9.1；所有 RUN 值仍为 SIM。</p>
+                <p class="spec-note">9 阶段是叙事压缩；门禁标签已对齐主页 canonical：G1 想法选择(P2) · G2 设计批准(P3) · S5b 结果人签(P5) · G5 闭包签署(P7)；Q0/Q1/G3 为自动门，X0/C2/M1 为过程标记。S 段/门禁与角色按 09 §5.12，服务/端口按 17 §2，过程反馈按 11 §9.1；所有 RUN 值仍为 SIM。</p>
               </div>
             </details>
 
@@ -2477,7 +2510,7 @@
         <div>
           <span class="kicker">Evolution loop · 自进化闭环</span>
           <h2>一轮研究不是终点：<span class="nw">四问决定什么能进入下一轮。</span></h2>
-          <p class="section-lede">P0–P8 只是第 t 轮。每个候选改进都要回答：为何被接受、能否跨循环保留、能否迁移到新任务、是否真的提升后续能力。四问有记录才发租约；租约到期或被撤销，依赖它的运行与稿句一起失效。阶段内部还保留过程级反馈：这一次哪种跑法有效，下一次同阶段是否加载，同样要过四问。</p>
+          <p class="section-lede">P0–P8 只是第 t 轮。每个候选改进都要回答：为何被接受、能否跨循环保留、能否迁移到新任务、是否真的提升后续能力。四问有记录才发租约；租约到期或被撤销，依赖它的运行与稿句一起失效。准入门与主页②一致：通过才绑定执行契约 / 溯源数据并写入记忆，未过走<b>默认拒绝</b>不写长期记忆；上游变更或租约撤销会<b>回指准入门复验</b>，下一次不会静默加载。阶段内部还保留过程级反馈：这一次哪种跑法有效，下一次同阶段是否加载，同样要过四问。</p>
         </div>
         <div class="section-note"><b>9 阶段 · 4 问 · 4 道门</b>过程反馈也要租约<br/>全部为 SIM 设计演示 · 未实测</div>
       </div>
@@ -2500,6 +2533,9 @@
                 </marker>
                 <marker id="evoArrowRose" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                   <path d="M0 0 L10 5 L0 10 z" fill="#e11d48"/>
+                </marker>
+                <marker id="evoRevert" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 z" fill="#b45309"/>
                 </marker>
                 <linearGradient id="evoGrad" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0" stop-color="#4f46e5"/>
@@ -2534,8 +2570,9 @@
 
                 <text class="evo-track-label" x="380" y="36" text-anchor="middle">失败 / 残差 / 人工建议 → 候选</text>
                 <text class="evo-track-label" x="668" y="235" text-anchor="middle" transform="rotate(90 668 235)">pilot 证据 → 四问</text>
-                <text class="evo-track-label" x="380" y="444" text-anchor="middle">接受 → 发租约 → 下一轮继承</text>
-                <text class="evo-track-label" x="92" y="235" text-anchor="middle" transform="rotate(-90 92 235)">复评 / 回滚 → 新候选</text>
+                <text class="evo-track-label" x="210" y="462" text-anchor="middle">通过即绑定契约 / 溯源 → 发租约 → 下一轮继承</text>
+                <text class="evo-track-label" x="560" y="462" text-anchor="middle" style="fill:#b91c1c">未过四问 → 拒绝 / 不写入（默认出口）</text>
+                <text class="evo-track-label" x="92" y="235" text-anchor="middle" transform="rotate(-90 92 235)">复评 / 回滚 → 回准入门复验或新候选</text>
 
                 <g class="evo-station">
                   <rect x="145" y="48" width="200" height="80" rx="16" fill="#fff" stroke="#c7d2fe" stroke-width="1.4"/>
@@ -2594,6 +2631,11 @@
 
                 <text class="evo-center-sub" x="232" y="302">接受理由 → 租约 → 护照 → 留出增益</text>
                 <text class="evo-center-sub" x="232" y="316" fill="#e11d48">任一环撤销，准入进入 under_review</text>
+
+                <!-- 与主页②「学习证据准入门」同一逻辑：默认拒绝出口 + 变更→失效→回准入门复验 -->
+                <line x1="515" y1="422" x2="515" y2="438" stroke="#e11d48" stroke-width="1.7" marker-end="url(#evoArrowRose)"/>
+                <path d="M245 422 L245 445 L400 445 L400 400 L415 400" fill="none" stroke="#b45309" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round" marker-end="url(#evoRevert)"/>
+                <text class="evo-track-label" x="252" y="438" style="fill:#b45309">上游变更 / 租约撤销 → 失效 → 回四问复验</text>
               </g>
 
               <g id="evo-linear-layer" style="display:none">
@@ -2635,17 +2677,18 @@
                   <rect x="305" y="346" width="150" height="34" rx="9" fill="#fff1f2" stroke="#fecdd3"/><text x="380" y="367" fill="#be123c">无护照 · 不判迁移</text>
                   <rect x="492" y="346" width="150" height="34" rx="9" fill="#fff1f2" stroke="#fecdd3"/><text x="567" y="367" fill="#be123c">无留出 · 不归因</text>
                 </g>
-                <text x="380" y="406" font-size="9" fill="#8b96a8" text-anchor="middle">P8 只是候选终点，不是长期记忆写入点；线性流程结束 ≠ 经验可继承。</text>
+                <text x="380" y="400" font-size="9" fill="#8b96a8" text-anchor="middle">P8 只是候选终点，不是长期记忆写入点；线性流程结束 ≠ 经验可继承。</text>
+                <text x="380" y="415" font-size="9" fill="#b91c1c" text-anchor="middle">与主页②对照：现状缺四向准入门，既没有默认拒绝，也没有「变更 → 失效 → 回准入门复验」。</text>
               </g>
             </svg>
           </div>
           <div class="evo-swipe-hint">← 左右滑动查看流程图 →</div>
 
           <div class="evo-legend">
-            <span><i></i>主循环 / 继承路径</span>
-            <span><i class="dash"></i>复评 / 拒绝理由回流</span>
-            <span><i class="rose"></i>失败、撤销与 stale 传播</span>
-            <span>所有状态为 SIM 演示</span>
+            <span><i></i>实线 · 前向 / 继承</span>
+            <span><i class="dash"></i>虚线 · 变更 → 失效 → 回准入门复验</span>
+            <span><i class="rose"></i>红 · 默认拒绝 / 撤销 / stale</span>
+            <span>与主页②准入口径一致 · 全部状态为 SIM 演示</span>
           </div>
         </div>
 
@@ -2788,7 +2831,7 @@
           <p class="section-lede">S0–S16 的编排不是把所有 Agent 放进一个聊天室：顶层状态机决定阶段，每一步写产物与事件，门禁不可被绕过。点击任一阶段查看主产物与失败去向。</p>
         </div>
         <div class="section-note"><b>18</b>业务阶段 + 9 门禁<br/>S5e 探索 / S5c 确证分车道</div>
-        <p class="section-lede" style="margin-top:10px">canonical 门禁映射（与主页主循环一致）：G1=S3 想法选择 · G2=S4 设计批准 · S5b=S5c 结果人签 · G5=S16 闭包导出；Q0/Q1/G3/G4 为内部子门。反馈环：失败→修订 / 阻断→修复 / 证据缺口→回检索；策略层反馈环（与主页一致）：证伪/反事实 · 信念修订 · 溯源/失效 · 同质化监测。</p>
+        <p class="section-lede" style="margin-top:10px">读图约定与主页①一致：<b>实线 = 前向</b>，<b>虚线 = 反馈（一律回指更早阶段）</b>，红方块 = 人工门，青方块 = 自动 / 内部子门。canonical 人门四个：G1=S3 想法选择 · G2=S4 设计批准 · S5b=S5c 结果人签 · G5=S16 闭包导出；Q0/Q1/G3/G4 为内部子门，默认拒绝（未过不产 claim、不导出）。三条反馈的落点都改变下一步动作，而不是只写反思文本：覆盖度不足 → 改下一轮检索预算；证伪 / 信念修订 → 换主假设重跑；溯源 / 失效 → 回确证复验并阻断 G5。</p>
       </div>
 
       <div class="pipeline-card">
@@ -2800,15 +2843,22 @@
           </button>
         </div>
         <div class="diagram-scroll scroll-pipeline">
-          <svg id="pipeline-svg" viewBox="0 0 1180 300" role="img" aria-label="S0 到 S16 的 18 阶段流程图"></svg>
+          <svg id="pipeline-svg" viewBox="0 0 1180 300" role="img" aria-label="S0 到 S16 的 18 阶段流程图：实线为前向，彩色虚线为回指更早阶段的反馈环，红色为人工门、青色为自动门"></svg>
         </div>
         <p class="scroll-hint">左右滑动查看 18 个阶段</p>
+        <div class="pipeline-legend" aria-label="流程图图例">
+          <span><i></i>实线 · 前向</span>
+          <span><i class="fb"></i>虚线 · 反馈回指（改变下一步动作）</span>
+          <span><i class="human"></i>红 · 人工门（人签）</span>
+          <span><i class="auto"></i>青 · 自动门 / 内部子门（默认拒绝）</span>
+        </div>
+        <p class="pipeline-note">与主页《过程可信主循环》同一套语义：反馈必须改变下一步行动，自动门未过走默认拒绝、不静默放行，四个 canonical 人门不可由模型代签。G4 终审的人工签署动作并入 G5 的「人工终审已签署」硬门项。全部阶段与状态为 SIM 设计演示。</p>
         <div class="stage-detail" id="stage-detail">
           <div class="big-code" id="stage-code">S0</div>
           <div><h3 id="stage-name">接入与问题卡</h3><p id="stage-out">主产物：问题卡</p></div>
           <div class="meta">
             <div><span>门禁</span><b id="stage-gate">G0</b></div>
-            <div><span>失败去向</span><b id="stage-fail">补材料</b></div>
+            <div><span>反馈 / 失败去向</span><b id="stage-fail">补材料</b></div>
             <div><span>说明</span><b id="stage-note">人主导，Planner 辅助</b></div>
           </div>
           <div class="flow-tag" id="stage-flow">F1 文献与证据</div>
@@ -2823,7 +2873,7 @@
         <div>
           <span class="kicker">Claim lifecycle · 证据闭合</span>
           <h2>数字不是写出来的，<br/>是从 verdict 与 <span class="nw">EA 里长出来的。</span></h2>
-          <p class="section-lede">三类 claim 分阶段创建：S1 文献 claim、S5c 结果 claim、S9 稿件 claim。点击按钮模拟一次数字篡改，观察失效如何沿 claim 图传播并阻断导出。</p>
+          <p class="section-lede">三类 claim 分阶段创建：S1 文献 claim、S5c 结果 claim、S9 稿件 claim。点击按钮模拟一次数字篡改，观察失效如何沿 claim 图传播、在 G5 阻断导出，再沿虚线回指 S5c 确证复验 —— 与主页①一致，反馈必须改变下一步动作。</p>
         </div>
         <div class="section-note"><b>0</b>容忍伪造数字<br/>G5 fail-closed</div>
       </div>
@@ -2831,13 +2881,16 @@
       <div class="claim-grid">
         <div class="panel claim-card">
           <div class="diagram-scroll scroll-claim">
-          <svg id="claim-svg" viewBox="0 0 760 414" role="img" aria-label="三类 claim 的生命周期与失效传播图">
+          <svg id="claim-svg" viewBox="0 0 760 414" role="img" aria-label="三类 claim 的生命周期、stale 失效传播，以及阻断后回指 S5c 确证复验的反馈环">
             <defs>
               <marker id="arrowGray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M0 0 10 5 0 10Z" fill="#cbd5e1"/>
               </marker>
               <marker id="arrowRose" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M0 0 10 5 0 10Z" fill="#e11d48"/>
+              </marker>
+              <marker id="claimFb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 10 5 0 10Z" fill="#b45309"/>
               </marker>
             </defs>
 
@@ -2917,11 +2970,16 @@
               <text class="cn-sub" x="576" y="308">覆盖率 · 越级 · 孤儿</text>
             </g>
 
+            <!-- 反馈回指：与主页①「溯源 / 失效传播」一致 —— 阻断不是终点，
+                 必须回指更早的确证阶段复验，且改变下一步动作 -->
+            <path d="M635 326 L635 338 L430 338" fill="none" stroke="#b45309" stroke-width="1.7" stroke-dasharray="6 4" stroke-linecap="round" marker-end="url(#claimFb)"/>
+            <text x="196" y="328" font-size="10" font-weight="700" fill="#b45309">↩ G5 阻断 / stale → 回 S5c 确证复验（反馈改变下一步动作）</text>
+
             <!-- bottom annotation -->
             <g>
-              <rect x="18" y="344" width="724" height="54" rx="10" fill="#fbfcff" stroke="#e7ecf5"/>
-              <text x="32" y="364" font-size="10.5" fill="#5b677a">创建边界：S1 → literature_claim · S5c → result_claim · S9 → manuscript_claim；S10 只绑定槽位。</text>
-              <text x="32" y="384" font-size="10.5" fill="#5b677a">失效传播：数字 ≠ EA → result_claim stale → manuscript_claim stale → G5 阻断导出。</text>
+              <rect x="18" y="350" width="724" height="52" rx="10" fill="#fbfcff" stroke="#e7ecf5"/>
+              <text x="32" y="370" font-size="10.5" fill="#5b677a">创建边界：S1 → literature_claim · S5c → result_claim · S9 → manuscript_claim；S10 只绑定槽位。</text>
+              <text x="32" y="390" font-size="10.5" fill="#5b677a">失效传播：数字 ≠ EA → result_claim / manuscript_claim stale → G5 阻断导出 → 回 S5c 确证复验，不只写反思文本。</text>
             </g>
           </svg>
           </div>
@@ -2930,7 +2988,8 @@
             <span><i style="background:#4f46e5"></i>literature_claim</span>
             <span><i style="background:#0d9488"></i>result_claim</span>
             <span><i style="background:#d97706"></i>manuscript_claim</span>
-            <span class="legend-note">虚线 = stale 传播路径</span>
+            <span><i style="background:#b45309"></i>反馈回指确证复验</span>
+            <span class="legend-note">实线 = 前向；虚线 = stale 传播 / 反馈回指</span>
           </div>
         </div>
 
@@ -2963,7 +3022,7 @@
             导出已阻断：N-04 的 5.1% 无匹配 EA；CL-0107 已 stale。请回到 S5c 重跑，或把数字改回 3.2%。
           </div>
           <ul class="prop-log" id="prop-log" aria-live="polite"></ul>
-          <p class="tamper-hint">演示只改变本地 DOM 状态，不修改任何真实文档或数据。</p>
+          <p class="tamper-hint">演示只改变本地 DOM 状态，不修改任何真实文档或数据；阻断后的处置是回指 S5c 重跑，与主页①的失效传播反馈一致。</p>
         </aside>
       </div>
     </div>
@@ -3273,25 +3332,27 @@
   }
 
   /* ---------------- pipeline ---------------- */
+  // gk = gate kind，与主页①读图约定一致：human 红方块（人签/人门），auto 青方块（自动/内部子门）。
+  // canonical 人门只有四个：G1=S3 想法选择 · G2=S4 设计批准 · S5b=S5c 结果人签 · G5=S16 闭包导出。
   const stages = [
-    {id:"S0", name:"接入", out:"问题卡", gate:"G0", fail:"补材料", flow:0, note:"人主导，Planner 辅助"},
-    {id:"S1", name:"文献", out:"文献快照 + claim 卡", gate:"Q0", fail:"回检索/抽取", flow:0, note:"D0–D4 阅读深度 + Q0 抽样"},
-    {id:"S2", name:"发散", out:"候选全集", gate:"—", fail:"补发散", flow:1, note:"20–50 候选，保留原始种子"},
-    {id:"S3", name:"收敛", out:"短名单 + 查新", gate:"G1", fail:"回 S2/S3", flow:1, note:"有界辩论 + 覆盖度组合"},
-    {id:"S4", name:"设计", out:"设计卡 + protocol + TaskSpec", gate:"G2", fail:"改设计", flow:2, note:"消融矩阵 + 人工冻结任务包"},
-    {id:"S5e", name:"探索", out:"探索记录", gate:"—", fail:"重试 / 停止", flow:2, note:"不进 Judge、不建 claim"},
-    {id:"S5c", name:"确证", out:"verdict + EA", gate:"S5b", fail:"按失败分类路由", flow:2, note:"Work → 快照 → 干净 Judge；结果 claim 须 S5b 人签"},
-    {id:"S6", name:"图表", out:"候选图 + 图计划 + 定稿图", gate:"G3 约束", fail:"修数据 / 重绘", flow:3, note:"S6a 候选 → G3 → S6b 定稿"},
-    {id:"S7", name:"论证", out:"论证图", gate:"—", fail:"重规划", flow:3, note:"问题→gap→方法→证据→结论"},
-    {id:"S8", name:"大纲", out:"大纲 + 图计划", gate:"G3", fail:"重规划", flow:3, note:"章节义务 + 每图支撑的 claim"},
-    {id:"S9", name:"证据卡", out:"manuscript_claim + 槽位", gate:"—", fail:"补证据", flow:3, note:"Claim Composer 每句一条 claim"},
-    {id:"S10", name:"起草", out:"草稿 + 槽位", gate:"—", fail:"回 S9/S10", flow:3, note:"只绑定，不新建 claim"},
-    {id:"S11", name:"批判", out:"问题清单", gate:"—", fail:"回 S10", flow:3, note:"证据 / 方法 / 结构 / 语言"},
-    {id:"S12", name:"修订", out:"修订稿 + diff", gate:"—", fail:"回 S11", flow:3, note:"最多 2 轮，保留回归检查"},
-    {id:"S13", name:"核验", out:"Q1 核验报告", gate:"Q1", fail:"回 S12", flow:3, note:"覆盖率 / 越级 / stale / 槽位"},
-    {id:"S14", name:"评审", out:"评审报告", gate:"—", fail:"按回退矩阵", flow:3, note:"P1；只作自检，不冒充真实评审"},
-    {id:"S15", name:"终审", out:"终稿", gate:"G4", fail:"退回", flow:3, note:"科学价值 / 责任 / 署名"},
-    {id:"S16", name:"导出", out:"EB 导出包", gate:"G5", fail:"阻止导出", flow:3, note:"8 条硬门 fail-closed"}
+    {id:"S0", name:"接入", out:"问题卡", gate:"G0", gk:"auto", fail:"补材料", flow:0, note:"人主导，Planner 辅助"},
+    {id:"S1", name:"文献", out:"文献快照 + claim 卡", gate:"Q0", gk:"auto", fail:"回检索/抽取", flow:0, note:"D0–D4 阅读深度 + Q0 抽样"},
+    {id:"S2", name:"发散", out:"候选全集", gate:"—", gk:"", fail:"补发散", flow:1, note:"20–50 候选，保留原始种子"},
+    {id:"S3", name:"收敛", out:"短名单 + 查新", gate:"G1", gk:"human", fail:"回 S2/S3", flow:1, note:"有界辩论 + 覆盖度组合"},
+    {id:"S4", name:"设计", out:"设计卡 + protocol + TaskSpec", gate:"G2", gk:"human", fail:"改设计", flow:2, note:"消融矩阵 + 人工冻结任务包"},
+    {id:"S5e", name:"探索", out:"探索记录", gate:"—", gk:"", fail:"重试 / 停止", flow:2, note:"不进 Judge、不建 claim"},
+    {id:"S5c", name:"确证", out:"verdict + EA", gate:"S5b", gk:"human", fail:"按失败分类路由", flow:2, note:"Work → 快照 → 干净 Judge；结果 claim 须 S5b 人签"},
+    {id:"S6", name:"图表", out:"候选图 + 图计划 + 定稿图", gate:"G3 约束", gk:"auto", fail:"修数据 / 重绘", flow:3, note:"S6a 候选 → G3 → S6b 定稿"},
+    {id:"S7", name:"论证", out:"论证图", gate:"—", gk:"", fail:"重规划", flow:3, note:"问题→gap→方法→证据→结论"},
+    {id:"S8", name:"大纲", out:"大纲 + 图计划", gate:"G3", gk:"auto", fail:"重规划", flow:3, note:"章节义务 + 每图支撑的 claim"},
+    {id:"S9", name:"证据卡", out:"manuscript_claim + 槽位", gate:"—", gk:"", fail:"补证据", flow:3, note:"Claim Composer 每句一条 claim"},
+    {id:"S10", name:"起草", out:"草稿 + 槽位", gate:"—", gk:"", fail:"回 S9/S10", flow:3, note:"只绑定，不新建 claim"},
+    {id:"S11", name:"批判", out:"问题清单", gate:"—", gk:"", fail:"回 S10", flow:3, note:"证据 / 方法 / 结构 / 语言"},
+    {id:"S12", name:"修订", out:"修订稿 + diff", gate:"—", gk:"", fail:"回 S11", flow:3, note:"最多 2 轮，保留回归检查"},
+    {id:"S13", name:"核验", out:"Q1 核验报告", gate:"Q1", gk:"auto", fail:"回 S12", flow:3, note:"覆盖率 / 越级 / stale / 槽位"},
+    {id:"S14", name:"评审", out:"评审报告", gate:"—", gk:"", fail:"按回退矩阵", flow:3, note:"P1；只作自检，不冒充真实评审"},
+    {id:"S15", name:"终审", out:"终稿", gate:"G4", gk:"auto", fail:"退回", flow:3, note:"科学价值 / 责任 / 署名；人签并入 G5 的人工终审项"},
+    {id:"S16", name:"导出", out:"EB 导出包", gate:"G5", gk:"human", fail:"阻止导出", flow:3, note:"8 条硬门 fail-closed"}
   ];
   const flowMeta = [
     {name:"F1 文献与证据", color:"#4f46e5", soft:"#eef2ff"},
@@ -3327,9 +3388,14 @@
     const marker = el("marker", {id:"stageArrow", viewBox:"0 0 10 10", refX:"8", refY:"5", markerWidth:"5", markerHeight:"5", orient:"auto-start-reverse"});
     marker.appendChild(el("path", {d:"M0 0 10 5 0 10Z", fill:"#94a3b8"}));
     defs.appendChild(marker);
+    [["fbTeal","#0f766e"], ["fbViolet","#7c3aed"], ["fbAmber","#b45309"]].forEach(function(m){
+      const mk = el("marker", {id:m[0], viewBox:"0 0 10 10", refX:"8", refY:"5", markerWidth:"5", markerHeight:"5", orient:"auto"});
+      mk.appendChild(el("path", {d:"M0 0 10 5 0 10Z", fill:m[1]}));
+      defs.appendChild(mk);
+    });
     pipelineSvg.appendChild(defs);
 
-    // connectors first
+    // 前向实线：S0→…→S16，蛇形两行（与主页①「实线向下 = 前向」同一约定）
     for(let i=0;i<8;i++){
       const a = stagePos(i), b = stagePos(i+1);
       pipelineSvg.appendChild(el("path", {class:"stage-connector", d:"M"+(a.x+104)+" "+(a.y+28)+" L"+(b.x-2)+" "+(b.y+28), "marker-end":"url(#stageArrow)"}));
@@ -3340,6 +3406,30 @@
       const a = stagePos(i), b = stagePos(i+1);
       pipelineSvg.appendChild(el("path", {class:"stage-connector", d:"M"+(a.x)+" "+(a.y+28)+" L"+(b.x+106)+" "+(b.y+28), "marker-end":"url(#stageArrow)"}));
     }
+
+    // 反馈虚线：与主页①一致，一律「向上回指更早阶段」，且落点必须改变下一步动作，
+    // 而不是只写一段反思文本。三条分别对应：溯源/失效、证伪/信念修订、证据缺口/覆盖度。
+    // 端点由 stagePos 推导，阶段布局若调整，反馈边会自动跟随而不会错位。
+    const fbNode = function(i){ const p = stagePos(i); return p.x + 52; };
+    const rowTopBottom = stagePos(0).y + 56;   // 上排节点底边 = 箭头落点
+    const rowBottomTop = stagePos(9).y;        // 下排节点顶边 = 反馈起点
+    const feedbacks = [
+      {from:17, to:6, y:118, c:"#b45309", m:"fbAmber",
+       label:"溯源 / 失效传播 → 回 S5c 确证复验；G5 fail-closed 阻断导出", lx:300, ly:108},
+      {from:15, to:3, y:142, c:"#7c3aed", m:"fbViolet",
+       label:"证伪 / 反事实 · 信念修订 → 假设再激活 S3（含同质化监测）", lx:340, ly:132},
+      {from:14, to:1, y:166, c:"#0f766e", m:"fbTeal",
+       label:"覆盖度不足 → 回检索并改下一轮预算", lx:340, ly:156}
+    ];
+    const fbLayer = el("g", {"aria-label":"反馈环：虚线回指更早阶段"});
+    feedbacks.forEach(function(f){
+      const a = fbNode(f.from), b = fbNode(f.to);
+      const d = "M"+a+" "+rowBottomTop+" L"+a+" "+f.y+" L"+b+" "+f.y+" L"+b+" "+rowTopBottom;
+      fbLayer.appendChild(el("path", {d:d, fill:"none", stroke:"#fff", "stroke-width":"5", "stroke-linecap":"round", "stroke-linejoin":"round"}));
+      fbLayer.appendChild(el("path", {class:"stage-feedback", d:d, stroke:f.c, "marker-end":"url(#"+f.m+")"}));
+      fbLayer.appendChild(el("text", {class:"stage-feedback-label", x:f.lx, y:f.ly, fill:f.c}, f.label));
+    });
+    pipelineSvg.appendChild(fbLayer);
 
     stages.forEach(function(s, i){
       const p = stagePos(i);
@@ -3354,7 +3444,7 @@
       if(s.gate !== "—"){
         const gw = Math.max(34, s.gate.length * 7 + 12);
         const gx = p.x + 104 - gw - 5;
-        const gg = el("g", {class:"gate-badge"});
+        const gg = el("g", {class:"gate-badge " + (s.gk || "auto")});
         gg.appendChild(el("rect", {x:gx, y:p.y-8, width:gw, height:"17", rx:"8.5", fill:"#fff", stroke:"#dbe3ee"}));
         gg.appendChild(el("text", {x:gx+gw/2, y:p.y+3.5, "text-anchor":"middle"}, s.gate));
         g.appendChild(gg);
@@ -3872,20 +3962,24 @@
     }
   };
 
+  // gate 标签已与主页 canonical 对齐：G1 想法选择 = S3 · G2 设计批准 = S4 ·
+  // S5b 结果人签 = S5c · G5 闭包签署 = S16；Q0/Q1/G3 为自动 / 内部子门；
+  // X0 / C2 / M1 只是过程契约编号（编译 / 复现 / 学习证据准入），不表示人签门。
   const PHASES = [
     {code:"P0", name:"任务编译", gate:"X0", sub:"把研究意图编译成可检验、可停止的 TaskSpec。", rail:"研究意图 → TaskSpec"},
-    {code:"P1", name:"检索与阅读", gate:"G1", sub:"检索、去重、定位 span；只让可核验证据进入账本。", rail:"检索 → 可核验 span"},
-    {code:"P2", name:"假设裁决", gate:"G2", sub:"生成可证伪假设，记录预测、否证条件与先验。", rail:"3 个可证伪假设"},
-    {code:"P3", name:"设计冻结", gate:"G4", sub:"冻结协议、指标与停止条件，防止事后改判据。", rail:"协议 / 停止条件"},
+    {code:"P1", name:"检索与阅读", gate:"Q0", sub:"检索、去重、定位 span；只让可核验证据进入账本。", rail:"检索 → 可核验 span"},
+    {code:"P2", name:"假设裁决", gate:"G1", sub:"生成可证伪假设，记录预测、否证条件与先验。", rail:"3 个可证伪假设"},
+    {code:"P3", name:"设计冻结", gate:"G2", sub:"冻结协议、指标与停止条件，防止事后改判据。", rail:"协议 / 停止条件"},
     {code:"P4", name:"复现执行", gate:"C2", sub:"独立重跑、失败记录、修订与反事实探针。", rail:"失败 → 修订 → 重跑"},
-    {code:"P5", name:"判定与 Claim", gate:"C3", sub:"scored verdict + EA 才允许创建结果 claim。", rail:"verdict + EA → claim"},
+    {code:"P5", name:"判定与 Claim", gate:"S5b", sub:"scored verdict + EA 才允许创建结果 claim。", rail:"verdict + EA → claim"},
     {code:"P6", name:"写作与图表", gate:"G3", sub:"事实句绑定槽位；Writer 只读 claim 与 EA。", rail:"句 → claim → 槽"},
     {code:"P7", name:"核验与导出", gate:"G5", sub:"Q1 独立复核 + G5 fail-closed + 人工终审。", rail:"Q1 + G5 硬门"},
     {code:"P8", name:"记忆准入", gate:"M1", sub:"学习证据达标才晋升技能，并判定跨域适用性。", rail:"5 项学习证据"}
   ];
 
-  // Grounded in 09-系统架构 / 17-上层微服务 / 11-自进化；S 段与门禁为真实契约，
-  // rail 上的 gate 是 9 阶段叙事压缩标签，不一一对应。
+  // Grounded in 09-系统架构 / 17-上层微服务 / 11-自进化；S 段与门禁为真实契约。
+  // 9 阶段 rail 是叙事压缩，但门禁标签不自造口径：四个 canonical 人门必须落在与
+  // 主页 / 18 阶段全链一致的阶段上，其余为自动门或过程标记。
   const STAGE_CONTRACTS = [
     {
       service:"Workflow · Orchestrator", svc:"Workflow", owner:"Planner", inv:"INV-3", sref:"S0 / S4 · G2′",
@@ -4201,7 +4295,7 @@
       return '<li class="rail-item"><button type="button" class="rail-btn" data-jump="' + i + '" aria-label="跳转到 ' + p.code + ' ' + p.name + '">' +
         '<span class="rail-dot">' + i + '</span>' +
         '<span class="rail-copy"><b>' + p.name + '</b><span>' + p.rail + '</span></span>' +
-        '<span class="rail-gate" title="演示门禁标签；真实 S 段门禁见 STAGE CONTRACT">' + p.gate + '</span>' +
+        '<span class="rail-gate" title="canonical：G1 想法 / G2 设计 / S5b 结果人签 / G5 闭包；Q0 Q1 G3 自动门；X0 C2 M1 过程标记">' + p.gate + '</span>' +
         '<span class="rail-progress" aria-hidden="true"><i></i></span></button></li>';
     }).join("");
     if(runId) runId.textContent = "SIM · " + domain().task;
@@ -4269,7 +4363,7 @@
           return '<div class="belief-row"><b>' + b[0] + '</b><span class="' + b[3] + '">' + b[1] + ' → ' + b[2] + '</span><span class="revive">' + b[4] + '</span></div>';
         }).join("") +
         '<p style="margin-top:5px">冲突不会被平均成一句话；旧解释降权，但保留可追溯来源。</p>') +
-      mc("G1 / LITERATURE CLAIM", "只有带可定位 span 的 claim 才能进入 S9",
+      mc("Q0 / LITERATURE CLAIM", "只有带可定位 span 的 claim 才能进入 S9",
         trace([["检索 " + f[0]], ["去重 " + f[1]], ["可核验 " + f[2]], ["文献 claim " + f[3], "teal"]]) +
         '<p style="margin-top:6px">缺失元数据的条目留在待核验；未被真正读取的内容，不当作已读证据。</p>', "span2");
   }
@@ -4319,7 +4413,7 @@
       mc("IMMUTABLE SNAPSHOT", "冻结后不可原地改",
         tickList(["指标口径与排除规则", "样本量与随机种子", "分析脚本与依赖版本", "镜像与运行环境"]) +
         chipRow(["旧版本保留", "变更需新版本"], "soft")) +
-      mc("G4 / CHANGE CONTROL", "Run 1 失败后，只允许在预注册范围内修订",
+      mc("G2 / CHANGE CONTROL", "Run 1 失败后，只允许在预注册范围内修订",
         trace([["冻结 v1"], ["Run 1"], ["修订说明"], ["v2 · 保留 v1"], ["重跑", "teal"]]) +
         '<p style="margin-top:6px">越界改动不是“调参”，而是新版本：旧协议、旧运行与旧结论都保留，失效关系显式记录。</p>', "span2");
   }
@@ -4835,11 +4929,11 @@
     const d = domain(), h = hyp(), o = out(), f = d.funnel;
     const arr = [
       ["编译研究意图 → TaskSpec <b>" + d.task + "</b>；6 个成功判据写入", "X0 立项门通过：数据边界、算力预算与停止条件已声明"],
-      ["检索 <b>" + f[0] + "</b> 条 → 去重 " + f[1] + " → 可核验 span <b>" + f[2] + "</b> → literature_claim " + f[3], "G1：" + (f[0] - f[2]) + " 条无来源摘要退回待核验，不当作已读证据"],
-      ["生成 <b>3</b> 个可证伪假设；记录预测、否证条件与先验", "G2 通过：主假设 <b>" + h.code + "</b> 进入设计，替代解释保留"],
-      ["冻结协议 RP-0311：指标、样本量、停止规则、变更锁", "G4：快照哈希 9f2c…；此后变更生成新版本并保留旧版"],
+      ["检索 <b>" + f[0] + "</b> 条 → 去重 " + f[1] + " → 可核验 span <b>" + f[2] + "</b> → literature_claim " + f[3], "Q0：" + (f[0] - f[2]) + " 条无来源摘要退回待核验，不当作已读证据"],
+      ["生成 <b>3</b> 个可证伪假设；记录预测、否证条件与先验", "G1 通过：主假设 <b>" + h.code + "</b> 进入设计，替代解释保留"],
+      ["冻结协议 RP-0311：指标、样本量、停止规则、变更锁", "G2：快照哈希 9f2c…；此后变更生成新版本并保留旧版"],
       ["Run 1 完成：" + fmt(h, h.run1) + " vs 门槛 " + fmt(h, h.threshold) + " → <b>未过门槛</b>", "预注册范围内修订 → Run 2 " + fmt(h, h.run2) + "；反事实探针完成"],
-      ["独立 Judge：verdict = <b>scored</b>；EA 绑定 Run 2 与协议快照", "C3：" + o.decision],
+      ["独立 Judge：verdict = <b>scored</b>；EA 绑定 Run 2 与协议快照", "S5b 结果人签：" + o.decision],
       ["Claim Composer：事实句 → manuscript_claim；Writer 只读 claim / EA", "G3：槽位、越界引用、图表来源检查通过"],
       ["Q1 独立复核 + G5 八项硬门 → <b>PASS</b>（人工终审已签）", "EB-0061 生成：稿件 + claims + EA + 运行快照 + 复现清单"],
       ["学习证据 <b>5/5</b>；" + d.skill + " 晋升为可复用技能", "适用域：直接复用 1 · 先 pilot 1 · 拒绝复用 1"]
@@ -6349,7 +6443,7 @@
       boundary:{valid:"主指标可量化、停止条件可执行", invalid:"探索性研究尚无主指标；安全审批未完成", unchanged:"研究问题、假设与门槛由人决定"}
     },
     {
-      code:"P1", name:"检索与阅读", gate:"G1", status:"active",
+      code:"P1", name:"检索与阅读", gate:"Q0", status:"active",
       metric:"可核验 span 转化率", delta:"+11pp",
       big:{before:"31%", value:"42%", label:"可核验 span 转化率", change:"+11pp · Q0 0.71→0.78", tone:"up"},
       last:{
@@ -6382,7 +6476,7 @@
       boundary:{valid:"中文核刊 · 材料/文本；有可定位全文", invalid:"生物数据库/词表未适配；只有摘要", unchanged:"不把摘要当已读证据；不生成假设"}
     },
     {
-      code:"P2", name:"假设裁决", gate:"G2", status:"pilot",
+      code:"P2", name:"假设裁决", gate:"G1", status:"pilot",
       metric:"可证伪假设", delta:"+1 条",
       big:{before:"2/3", value:"3/3", label:"可证伪假设", change:"+1 条 · 自评分降为排序", tone:"up"},
       last:{
@@ -6415,7 +6509,7 @@
       boundary:{valid:"有明确否证条件、可用现有预算检验", invalid:"新颖性需要外部评审；同模型自评", unchanged:"假设内容与选择权仍归人"}
     },
     {
-      code:"P3", name:"设计冻结", gate:"G4", status:"pilot",
+      code:"P3", name:"设计冻结", gate:"G2", status:"pilot",
       metric:"冻结后改判", delta:"0 次",
       big:{before:"2 次", value:"0", label:"冻结后改判（近域）", change:"−2 次 · 耗时 +6 min", tone:"up"},
       last:{
@@ -6481,7 +6575,7 @@
       boundary:{valid:"失败可复现、分析协议已冻结", invalid:"依赖漂移未复评；跨域未验证", unchanged:"不自动改判据；不绕过独立 Judge"}
     },
     {
-      code:"P5", name:"判定与 Claim", gate:"C3", status:"rejected",
+      code:"P5", name:"判定与 Claim", gate:"S5b", status:"rejected",
       metric:"显著性门槛", delta:"拒绝",
       big:{before:"0.05", value:"0.05", label:"门槛保持不变", change:"0 · 候选被拒", tone:""},
       last:{
@@ -6827,11 +6921,11 @@
 
   const WB_STAGES = [
     {code:"P0", name:"任务编译", gate:"X0"},
-    {code:"P1", name:"检索与阅读", gate:"G1"},
-    {code:"P2", name:"假设裁决", gate:"G2"},
-    {code:"P3", name:"设计冻结", gate:"G4"},
+    {code:"P1", name:"检索与阅读", gate:"Q0"},
+    {code:"P2", name:"假设裁决", gate:"G1"},
+    {code:"P3", name:"设计冻结", gate:"G2"},
     {code:"P4", name:"复现执行", gate:"C2"},
-    {code:"P5", name:"判定与 Claim", gate:"C3"},
+    {code:"P5", name:"判定与 Claim", gate:"S5b"},
     {code:"P6", name:"写作与图表", gate:"G3"},
     {code:"P7", name:"核验与导出", gate:"G5"},
     {code:"P8", name:"记忆准入", gate:"M1"}
@@ -7695,6 +7789,6 @@
   render();
 })();
 </script>
-<footer class="sp-foot">Research Agent · 前端 demo · 各子页为同一系统的不同投影，演示逻辑一致（门禁 G1 想法=S3 / G2 设计=S4 / S5b 结果人签=S5c / G5 闭包=S16）；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
+<footer class="sp-foot">Research Agent · 各子页是同一系统的投影：实线 = 前向 · 虚线 = 反馈（回指更早阶段且改变下一步动作） · 红 = 人工门 · 青 = 自动门（默认拒绝）<br/>canonical 门禁：G1 想法=S3 / G2 设计=S4 / S5b 结果人签=S5c / G5 闭包=S16；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
 </body>
 </html>

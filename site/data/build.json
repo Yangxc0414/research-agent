@@ -1,6 +1,6 @@
 {
-  "built_at": "2026-11-10T05:31:46.052Z",
-  "demo_sha256_16": "69f9ffc6302c9b86",
+  "built_at": "2026-11-10T07:23:58.067Z",
+  "demo_sha256_16": "e99fc157e7e7761b",
   "docs": [
     "README.md",
     "16-科研Skill生态调研.md",
@@ -14,12 +14,12 @@
   ],
   "innovation_data": [
     "demo.json",
-    "specs.json",
     "figure.svg",
     "figure.scene.json",
     "figure.manifest.json",
     "paper.json",
-    "grant.json"
+    "grant.json",
+    "specs.json"
   ],
   "stats": {
     "tests_run": 1320,

@@ -87,20 +87,30 @@ function renderRail() {
 
 function noteFor(index) {
   const act = ACTS[index];
+  // 右侧数字必须与左侧画布同源：槽位 pending 数从 paper.slots 现算，避免硬编码 5 与 4 打架。
+  let fact = act.noteFact;
+  let label = act.noteFactLabel;
+  const slots = state.data?.modules?.paper?.slots;
+  if (act.key === "paper" && Array.isArray(slots)) {
+    fact = String(slots.filter((slot) => slot.status === "pending_evidence").length);
+    label = "PENDING SLOTS";
+  }
   return `<span class="note-kicker">WHY IT MATTERS</span><b class="note-title">${esc(act.noteTitle)}</b><p class="note-body">${esc(act.noteBody)}</p>
     <div class="note-tags">${act.tags.map((tag) => `<span class="note-tag">${esc(tag)}</span>`).join("")}</div>
-    <div class="note-fact"><b>${esc(act.noteFact)}</b><span>${esc(act.noteFactLabel)}</span></div>`;
+    <div class="note-fact"><b>${esc(fact)}</b><span>${esc(label)}</span></div>`;
 }
 
 function specAct() {
   const ids = available();
   return `<div class="act-head"><p class="eyebrow">ACT 01 / SPEC</p><h2>${esc(ACTS[0].title)}</h2><p>六模块同构：输入、输出、门禁、不变量、实现边界都写在 Markdown 里；代码读取版本，CLI 只改指定字段。</p></div>
+    <div class="act-metrics"><span><b>${ids.length}</b> 模块 SPEC</span><span><b>version + changelog</b> 变更留痕</span><span><b>1</b> 次只改一个模块</span><span><b>tests first</b> 契约先行</span></div>
     <div class="spec-grid">${ids.map((id) => `<article class="spec-card" data-kind="${moduleMeta(id).kind}"><b>${esc(moduleMeta(id).label)}</b><small>${esc(specOf(id)?.stage || "")} · v${esc(specOf(id)?.version || state.data.spec_versions?.[id] || "—")}</small><em>${esc(statusOf(id))}</em></article>`).join("")}</div>
     <div class="spec-console"><span class="prompt">$</span> python -m research_agent spec update figure \\
   --version 0.1.1 --status pilot \\
   --changelog "最小改进：增加 SVG 审计"
 <span class="prompt">→</span> body preserved · changelog appended · no cross-module edit</div>
-    <div class="spec-points"><span>SPEC = single source</span><span>最小的 diff</span><span>version / changelog</span><span>tests first</span></div>`;
+    <div class="spec-points"><span>SPEC = single source</span><span>最小的 diff</span><span>version / changelog</span><span>tests first</span></div>
+    <p class="source-note">数据来源：<code>data/specs.json</code>（由 <code>workspace export</code> 从 modules/*/SPEC.md 派生）· 版本与状态为当前检出值</p>`;
 }
 
 function evidenceAct() {
@@ -115,35 +125,81 @@ function evidenceAct() {
     </div>
     <div class="flow-line"><span class="flow-step">QueryPlan</span><span class="flow-arrow">→</span><span class="flow-step">SourceHit</span><span class="flow-arrow">→</span><span class="flow-step">full text</span><span class="flow-arrow">→</span><span class="flow-step">Span</span><span class="flow-arrow">→</span><span class="flow-step">CoverageReceipt</span></div>
     <div class="span-stack">${spans.map((span) => `<div class="span-item"><code>${esc(span.span_id)} · ${esc(span.section)}</code>${esc(span.text)}</div>`).join("") || `<div class="span-item">没有 span。先补全文。</div>`}</div>
-    <div class="gap-line">${(coverage.gaps || []).map((gap) => `<span class="gap-chip">${esc(gap.code)}</span>`).join("") || `<span class="gap-chip">no gap reported</span>`}</div>`;
+    <div class="gap-line">${(coverage.gaps || []).map((gap) => `<span class="gap-chip">${esc(gap.code)}</span>`).join("") || `<span class="gap-chip">no gap reported</span>`}</div>
+    <p class="source-note">数据来源：<code>data/demo.json · modules.literature.coverage</code>（fixture run；不是真实检索结果）</p>`;
 }
 
 function figureAct() {
   const figure = state.data.modules.figure || {};
   const audit = figure.audit || {};
-  const checks = Object.entries(audit.checks || {}).filter(([key, value]) => typeof value === "boolean");
-  return `<div class="act-head"><p class="eyebrow">ACT 03 / SVG</p><h2>${esc(ACTS[2].title)}</h2><p>scene 由我们的 FigureAgent 生成，AstraDraw 渲染成 SVG；交付前必须通过可访问性、安全与文本检查。</p></div>
-    <div class="figure-showcase"><img src="data/figure.svg" alt="研究运行时模块关系示意图；示意图，不是实验结果" /></div>
-    <div class="audit-list">${checks.map(([key, value]) => `<div class="audit-row"><span class="audit-tick">${value ? "✓" : "×"}</span><span>${esc(CHECK_LABELS[key] || key)}</span></div>`).join("")}</div>
-    <div class="hash-line"><span>SCENE ${esc((figure.manifest?.scene_sha256 || "").slice(0, 18))}…</span><span>SVG ${esc((figure.manifest?.svg_sha256 || "").slice(0, 18))}…</span><span>SCHEMATIC</span></div>`;
+  const checks = Object.entries(audit.checks || {}).filter(([, value]) => typeof value === "boolean");
+  const pass = checks.filter(([, value]) => value).length;
+  const scene = (figure.manifest?.scene_sha256 || "").slice(0, 18);
+  const svg = (figure.manifest?.svg_sha256 || "").slice(0, 18);
+  const refs = (figure.manifest?.evidence_refs || []).length;
+  const groups = [
+    { name: "结构", keys: ["root", "size", "ids_unique"] },
+    { name: "可访问", keys: ["role_img", "labelled", "has_title", "has_desc"] },
+    { name: "安全 / 文本", keys: ["text_count", "aria_targets"] }
+  ];
+  const rowsOf = (group) => group.keys.map((key) => {
+    const value = audit.checks?.[key];
+    const mark = value === true ? "✓" : value === false ? "×" : String(value ?? "—");
+    return `${CHECK_LABELS[key] || key} ${mark}`;
+  }).join(" · ");
+  return `<div class="act-head"><p class="eyebrow">ACT 03 / SVG PROVENANCE</p><h2>${esc(ACTS[2].title)}</h2><p>scene 由 FigureAgent 生成，AstraDraw 渲染成 SVG；交付前必须通过可访问性、安全与文本检查。scene / svg / audit / manifest 四件一起交付。</p></div>
+    <div class="act-metrics"><span><b>${pass}/${checks.length}</b> audit pass</span><span><b>${refs}</b> evidence refs</span><span><b>0</b> external refs</span><span><b>SCHEMATIC</b> 非结果图</span></div>
+    <div class="provenance-strip">
+      <div class="pv-step"><span>01 · SCENE</span><b>FigureScene</b><em>结构化节点 / 连线</em></div>
+      <i class="provenance-arrow">→</i>
+      <div class="pv-step"><span>02 · RENDER</span><b>figure.svg</b><em>AstraDraw</em></div>
+      <i class="provenance-arrow">→</i>
+      <div class="pv-step"><span>03 · AUDIT</span><b>${pass}/${checks.length} pass</b><em>XML · aria · 文本</em></div>
+      <i class="provenance-arrow">→</i>
+      <div class="pv-step"><span>04 · MANIFEST</span><b>hash bound</b><em>scene ${esc(scene.slice(0, 12))}…</em></div>
+    </div>
+    <figure class="figure-stage" title="点击放大">
+      <img src="data/figure.svg" alt="研究运行时模块关系示意图；示意图，不是实验结果" />
+      <figcaption><span>SCHEMATIC · 不是实验结果 · SVG ${esc(svg.slice(0, 12))}…</span><b>点击放大 ↗</b></figcaption>
+    </figure>
+    <div class="audit-matrix">${groups.map((group) => `<div class="audit-group"><b>${esc(group.name)} <i>${group.keys.length}</i></b><span>${esc(rowsOf(group))}</span></div>`).join("")}</div>
+    <p class="source-note">数据来源：<code>modules.figure.audit</code> / <code>figure.manifest.json</code>；图为 schematic，不是实验结果</p>`;
 }
 
 function paperAct() {
   const paper = state.data.modules.paper || {};
   const grant = state.data.modules.grant;
   const g5 = (state.data.gates || []).find((gate) => gate.gate === "G5") || {};
-  return `<div class="act-head"><p class="eyebrow">ACT 04 / SLOTS + GATES</p><h2>${esc(ACTS[3].title)}</h2><p>论文与基金共享同一套 Evidence 约束：方法/结构可以先写，结果槽必须等 EA；示意图不能被冒充成结果图。</p></div>
-    <div class="slot-grid">${(paper.slots || []).map((slot) => `<div class="slot-card"><b>${esc(slot.slot_id)}</b><span>${esc(slot.section)} · ${esc(slot.required_evidence)}</span><span class="slot-pill">${esc(slot.status)}</span></div>`).join("")}</div>
+  const slots = paper.slots || [];
+  const pending = slots.filter((slot) => slot.status === "pending_evidence").length;
+  const boundSlots = slots.filter((slot) => slot.status !== "pending_evidence");
+  // paper.json 的 warnings 明确写着「schematic 不能绑成结果图」。所以 bound_figure 不能渲染成
+  // 绿色的「已完成」；它绑定的是示意图，换成数据图之前 G5 仍然关着。
+  const schematic = state.data.modules.figure?.manifest?.schematic !== false;
+  const boundLabel = boundSlots.length
+    ? `${boundSlots.length} 绑定 ${schematic ? "schematic" : "数据图"}`
+    : "0 绑定";
+  return `<div class="act-head"><p class="eyebrow">ACT 04 / SLOTS + GATES</p><h2>${esc(ACTS[3].title)}</h2><p>方法 / 结构可以先写，结果槽必须等 EA；示意图不能冒充结果图。</p></div>
+    <div class="gate-banner"><span>G5 EXPORT · ${esc(g5.status || "blocked")}</span><b>${esc(g5.reason || "no EA/Closure")}</b><small>三件套少一件就 fail-closed；result.figure 绑的是 schematic，换数据图前 G5 仍关着。</small></div>
+    <div class="slot-hero"><b>${pending}</b><span>PENDING SLOTS</span><em>没有 EA 就不填数字 · ${pending} 待证据 / ${boundLabel}</em></div>
+    <div class="slot-stack">${slots.map((slot) => {
+      const isBound = slot.status === "bound_figure";
+      const cls = isBound ? (schematic ? "is-schematic" : "is-bound") : "";
+      const stateText = isBound && schematic ? "bound · schematic" : slot.status;
+      return `<div class="slot-card ${cls}"><span class="slot-id">${esc(slot.slot_id)}</span><span class="slot-sec">${esc(slot.section)}</span><span class="slot-req">${esc(slot.required_evidence)}</span><span class="slot-state">${esc(stateText)}</span></div>`;
+    }).join("")}</div>
     <div class="track-grid">
-      <div class="track-card"><span class="mono">PAPER TRACK</span><h3>${esc(paper.profile?.venue_type || "论文契约")}</h3><p>${esc(paper.profile?.citation_style || "GB/T 7714")} · ${(paper.sections || []).length} sections · 0 claims</p></div>
-      <div class="track-card"><span class="mono">GRANT TRACK</span><h3>${grant ? esc(grant.scheme.toUpperCase()) : "未生成"}</h3><p>${grant ? `${(grant.modules || []).length} modules · ${(grant.compliance || []).length} compliance checks` : "用 --grant nsfc 生成基金骨架"}</p></div>
+      <div class="track-card"><span class="mono">PAPER TRACK</span><b>${esc(paper.profile?.venue_type || "论文契约")}</b><small>${esc(paper.profile?.citation_style || "GB/T 7714")} · ${(paper.sections || []).length} sections · 0 claims</small></div>
+      <div class="track-card"><span class="mono">GRANT TRACK</span><b>${grant ? esc(grant.scheme.toUpperCase()) : "未生成"}</b><small>${grant ? `${(grant.modules || []).length} modules · ${(grant.compliance || []).length} compliance checks` : "用 --grant nsfc 生成基金骨架"}</small></div>
     </div>
-    <div class="gate-banner"><span>G5 EXPORT · ${esc(g5.status || "blocked")}</span><b>${esc(g5.reason || "no EA/Closure")}</b></div>`;
+    <p class="source-note">数据来源：<code>modules.paper.slots</code> / <code>modules.grant</code>；槽状态为 scaffold，不含任何结果数字</p>`;
 }
 
 function boundaryAct() {
   const specCount = state.specs.length || 6;
+  const tests = state.stats && state.stats.ok && Number.isFinite(state.stats.tests_run) ? state.stats.tests_run : "—";
   return `<div class="act-head"><p class="eyebrow">ACT 05 / BOUNDARY</p><h2>${esc(ACTS[4].title)}</h2><p>这一页不把 fixture 说成实验，也不把“架构更清楚”说成“科研效果更好”。能证明的和不能证明的分开写。</p></div>
+    <div class="act-metrics"><span><b>0</b> API calls</span><span><b>0</b> 外部效果数字</span><span><b>${specCount}</b> SPEC</span><span><b>${esc(tests)}</b> 自动测试</span></div>
     <div class="boundary-grid">
       <div class="boundary-card"><b>不是通用 AI 科学家</b><p>机器负责检索、草稿、图、核验；科学决策、实验安全、署名与责任在人。</p></div>
       <div class="boundary-card"><b>不是效果论文</b><p>当前没有真实检索、run/EA、用户研究；不引用任何外部效果数字。</p></div>
@@ -177,7 +233,8 @@ function validityAct() {
       <div class="advantage-row"><b>VENUE</b><span>中文期刊：摘要/关键词/章节/GB/T 7714/基金/创新/数据</span><em>MCP tool</em></div>
       <div class="advantage-row"><b>GRANT</b><span>NSFC/NSSFC 模块、创新点、活页匿名、AI 声明</span><em>MCP tool</em></div>
       <div class="advantage-row"><b>BIBLIO</b><span>DataCite 快照：2 篇引用 verified；原始响应 SHA-256 与仓库快照一致</span><em>verified</em></div>
-    </div>`;
+    </div>
+    <p class="source-note">数据来源：64 种子预注册扩样（97–160），见仓库 59- / 60- 文档；本页数字为研究快照，结论更新时需同步</p>`;
 }
 
 const RENDERERS = [specAct, evidenceAct, figureAct, paperAct, boundaryAct, validityAct];
@@ -221,6 +278,19 @@ function renderAct(index, animate = true) {
 
 function setSource() {
   $("stage-source").textContent = state.data?.fixture_mode ? "FIXTURE / NO API" : "STATIC DEMO";
+}
+
+// 全景状态条：直接读 demo.json 的 gates，避免页面写死「停在哪一步」。
+function fillPanorama() {
+  const el = $("pano-status");
+  if (!el) return;
+  if (!state.data) {
+    el.textContent = "fixture 未载入：先启动静态服务器或运行 pipeline。";
+    return;
+  }
+  const gates = state.data.gates || [];
+  const g = (id) => (gates.find((gate) => gate.gate === id) || {}).status || "—";
+  el.innerHTML = `<b>${esc(state.data.run_id)}</b><span>status ${esc(state.data.status)}</span><span>G1 ${esc(g("G1"))}</span><span>G2 ${esc(g("G2"))}</span><span>S5 ${esc(g("S5"))}</span><span>G5 ${esc(g("G5"))}</span>`;
 }
 
 function setProgress(value) {
@@ -315,6 +385,22 @@ document.addEventListener("click", (event) => {
   const act = event.target.closest("[data-act]");
   if (act) selectAct(Number(act.dataset.act));
 });
+
+// 图放大：示意图在 700px 画布里会被压小，点开看细节。仍是同一张 fixture SVG，不引入新数据。
+document.addEventListener("click", (event) => {
+  const stage = event.target.closest(".figure-stage");
+  if (!stage) return;
+  const img = stage.querySelector("img");
+  if (!img) return;
+  const box = document.createElement("div");
+  box.className = "figure-lightbox";
+  box.innerHTML = `<button type="button" aria-label="关闭放大">×</button><img src="${esc(img.getAttribute("src"))}" alt="${esc(img.getAttribute("alt"))}">`;
+  const close = () => { box.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = (keyEvent) => { if (keyEvent.key === "Escape") close(); };
+  box.addEventListener("click", close);
+  document.addEventListener("keydown", onKey);
+  document.body.appendChild(box);
+});
 $("start-btn").addEventListener("click", openDemo);
 $("play-btn").addEventListener("click", toggleAuto);
 $("prev-btn").addEventListener("click", () => go(-1));
@@ -391,10 +477,12 @@ async function load() {
     state.specs = specs.ok ? await specs.json() : [];
     state.stats = stats && stats.ok ? await stats.json() : null;
     fillFacts();
+    fillPanorama();
     renderAct(0, false);
     layoutBoard();
   } catch (error) {
     renderAct(0, false);
+    fillPanorama();
     $("stage-source").textContent = "FIXTURE MISSING";
     $("stage-title").textContent = "静态数据未载入";
     $("act-note").innerHTML = `<span class="note-kicker">STATIC DEMO</span><b class="note-title">从仓库根目录启动静态服务器</b><p class="note-body">为了在 GitHub Pages 或本地正确读取 data/demo.json，不要直接双击文件；运行 <code>python -m http.server</code> 或部署到 Pages。</p>`;

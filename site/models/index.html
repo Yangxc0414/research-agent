@@ -11,6 +11,19 @@
   <link rel="stylesheet" href="../assets/custom.css" />
   <link rel="stylesheet" href="./models.css" />
 <link rel="stylesheet" href="../assets/subpage.css" />
+<style>
+.mg-matrix .mg-panel-head{align-items:flex-start}
+.matrix-wrap{overflow-x:auto;margin-top:10px}
+.matrix{width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px}
+.matrix th,.matrix td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line,#e4e9f2);vertical-align:top}
+.matrix th{font:700 10px var(--mono,ui-monospace);letter-spacing:.1em;color:#8a94a6;background:#f4f7fb}
+.matrix td b{display:block;font-weight:700;color:#0b1220}
+.matrix td small{display:block;margin-top:2px;font-size:9.5px;font-weight:500;color:#8a94a6}
+.matrix tbody tr:last-child td{border-bottom:0}
+.matrix-foot{margin:10px 0 0;font-size:11px;line-height:1.6;color:#8a94a6}
+.matrix-foot b{color:#0f766e}
+@media(max-width:760px){.matrix{min-width:480px;font-size:11px}}
+</style>
 </head>
 <body class="models-page">
 <div class="sp-top"><a class="sp-home" href="../">← 返回主页</a><span class="sp-chip">配置说明 · 需本地 runtime</span><nav class="sp-sib"><a href="../demo/">运行</a><a href="../innovation/">创新</a><a href="../app/">工作台</a><a href="../qoder/">接入</a></nav></div>
@@ -44,6 +57,25 @@
     <div class="mg-banner" id="banner" hidden></div>
 
     <div class="mg-grid">
+      <section class="mg-panel mg-matrix">
+        <div class="mg-panel-head">
+          <div><span class="mg-kicker">00 / CAPABILITY MATRIX</span><h2>哪种端点支持哪些字段</h2></div>
+          <p class="mg-note">绑定只改配置，不改变模块行为。字段不被端点支持时会被忽略或截断，所以先看表再填。</p>
+        </div>
+        <div class="matrix-wrap">
+          <table class="matrix">
+            <thead><tr><th>Provider</th><th>思考模式</th><th>思考预算</th><th>extra_body</th><th>usage</th></tr></thead>
+            <tbody>
+              <tr><td><b>OpenAI</b><small>Chat / Responses</small></td><td>reasoning effort</td><td>—</td><td>—</td><td>tokens</td></tr>
+              <tr><td><b>Anthropic</b><small>预算 &lt; max_tokens</small></td><td>thinking</td><td>budget_tokens</td><td>—</td><td>input / output</td></tr>
+              <tr><td><b>Azure OpenAI</b><small>需 api-version</small></td><td>reasoning effort</td><td>—</td><td>—</td><td>tokens</td></tr>
+              <tr><td><b>OpenAI-compatible</b><small>DeepSeek / Qwen / vLLM</small></td><td>视服务商</td><td>视服务商</td><td>原样透传</td><td>可能缺失</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="matrix-foot">当前只有 <b>rsi</b> 是 WIRED（真实消费者）；其他模块标 CONFIG ONLY。接入 API 不等于 pipeline 已使用模型，也不绕过 claim / EA / gate。</p>
+      </section>
+
       <section class="mg-panel mg-providers">
         <div class="mg-panel-head">
           <div><span class="mg-kicker">01 / PROVIDERS</span><h2>接入端点</h2></div>
@@ -185,6 +217,6 @@
   </main>
 
   <script src="./models.js"></script>
-<footer class="sp-foot">Research Agent · 前端 demo · 各子页为同一系统的不同投影，演示逻辑一致（门禁 G1 想法=S3 / G2 设计=S4 / S5b 结果人签=S5c / G5 闭包=S16）；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
+<footer class="sp-foot">Research Agent · 各子页是同一系统的投影：实线 = 前向 · 虚线 = 反馈（回指更早阶段且改变下一步动作） · 红 = 人工门 · 青 = 自动门（默认拒绝）<br/>canonical 门禁：G1 想法=S3 / G2 设计=S4 / S5b 结果人签=S5c / G5 闭包=S16；真实执行 / 模型 / 签署只在本地 CLI / runtime</footer>
 </body>
 </html>

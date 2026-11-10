@@ -1,9 +1,9 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-07T15:42:48+00:00",
-  "count": 195,
+  "generated_at": "2026-11-10T05:43:44+00:00",
+  "count": 201,
   "curated": 51,
-  "derived": 144,
+  "derived": 150,
   "commands": [
     {
       "id": "study.baseline",
@@ -717,6 +717,42 @@
       "curated": false
     },
     {
+      "id": "experiment.local-approve",
+      "group": "experiment",
+      "label": "local approve",
+      "syntax": "python -m research_agent experiment local-approve",
+      "description": "usage: research_agent experiment local-approve [-h] --project PROJECT\n                                               --experiment-id EXPERIMENT_ID\n                                               --human-reason HUMAN_REASON",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-ingest",
+      "group": "experiment",
+      "label": "local ingest",
+      "syntax": "python -m research_agent experiment local-ingest",
+      "description": "usage: research_agent experiment local-ingest [-h] --project PROJECT\n                                              --experiment-id EXPERIMENT_ID",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-init",
+      "group": "experiment",
+      "label": "local init",
+      "syntax": "python -m research_agent experiment local-init",
+      "description": "usage: research_agent experiment local-init [-h] --project PROJECT\n                                            --experiment-id EXPERIMENT_ID\n                                            --command COMMAND [--cwd CWD]\n                                            [--env-prefix ENV_PREFIX]\n                                            [--expect EXPECT]\n                                            [--timeout TIMEOUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "experiment.local-run",
+      "group": "experiment",
+      "label": "local run",
+      "syntax": "python -m research_agent experiment local-run",
+      "description": "usage: research_agent experiment local-run [-h] --project PROJECT\n                                           --experiment-id EXPERIMENT_ID\n                                           [--allow-execute]\n                                           [--timeout TIMEOUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
       "id": "experiment.preflight",
       "group": "experiment",
       "label": "preflight",
@@ -924,6 +960,15 @@
       "curated": false
     },
     {
+      "id": "literature.prescreen",
+      "group": "literature",
+      "label": "prescreen",
+      "syntax": "python -m research_agent literature prescreen",
+      "description": "usage: research_agent literature prescreen [-h] --input INPUT --query QUERY\n                                           [--abstracts ABSTRACTS]\n                                           [--min-hits MIN_HITS]\n                                           [--exclude-terms EXCLUDE_TERMS]\n                                           [--output OUTPUT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
       "id": "mandate.status",
       "group": "mandate",
       "label": "status",
@@ -1082,6 +1127,15 @@
       "label": "show",
       "syntax": "python -m research_agent rsi active.show",
       "description": "usage: research_agent rsi active show [-h] [--active-path ACTIVE_PATH]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "rsi.actuals",
+      "group": "rsi",
+      "label": "actuals",
+      "syntax": "python -m research_agent rsi actuals",
+      "description": "usage: research_agent rsi actuals [-h] [--ledger LEDGER] --episode EPISODE\n                                  [--metric KEY=VALUE] [--note NOTE]",
       "safety": "catalog_only",
       "curated": false
     },

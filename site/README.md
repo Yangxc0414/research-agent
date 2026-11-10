@@ -7,7 +7,9 @@
 
 这是项目的 GitHub Pages 站点，采用**单屏应用壳**：顶部状态栏 + 左侧工作区导航 + 右侧活动视图；工作台主入口是 **`site/app/`**（源码 `apps/web/`，静态三模式：调研/实验/全自动；全自动在 claim 人工门暂停；自进化候选/租约/回滚；不接 API），可从顶栏或侧栏“Agent 工作台”进入；旧版 `site/agent/` 仅保留历史链接。桌面端页面本身不滚动，首次加载先显示 boot，再按次序浮现 appbar、侧栏、标题与面板；默认打开“接入项目”。接入页包含 **REPORT PREVIEW** 空态、只读扫描三段式进度、readiness 计数环、结构统计、可复现缺口与可点击候选方向；支持本地文件夹（只读文件名/大小）、GitHub 公开元数据或示例仓库，再进入研究运行。顶部“演示模式”隐藏全部外壳、让运行台直接铺满，按 `Esc` 退出。工作区包括研究运行（对象流 + 指令流；子步骤推进，阶段卡可翻页/自动跟随）、证据工作台、自进化、功能地图、证据链、变更回放、多智能体、技能运行时、真实检索、部署与文档。Demo 由 `demo/index.html?embed=console|workbench|evolution` 提供，左侧工作区按钮控制 iframe 模式；演示页头部按模式显示 RUN CONSOLE / EVIDENCE WORKBENCH / SELF-EVOLUTION 与对应强调色，skill runtime 默认折叠。目标地址为 **https://yangxc0414.github.io/research-agent/**。
 
-新增 **创新点演示**：`site/innovation/`，地址 **https://yangxc0414.github.io/research-agent/innovation/**。它是纯静态、无 API 的五幕舞台：SPEC 契约 → span/coverage → AstraDraw SVG audit → 论文/基金 pending 槽 → 可宣称边界；数据来自 `research_agent/web/data` 的 fixture，构建时由 `build-site.mjs` 同步到 `site/innovation/data`。深色 hero、单屏舞台、自动播放/手动切幕、全屏演示模式；不包含真实检索或实验结果。
+`site/qoder/` 是**接入矩阵**（不是 Qoder 专属页，路径沿用旧地址）：Qoder / Claude Code / Cursor / Cline / Codex CLI / Zed / Continue / 自建脚本共用同一份 `tools/list`；页面只给配置与边界，不发起真实连接。
+
+新增 **创新点演示**：`site/innovation/`，地址 **https://yangxc0414.github.io/research-agent/innovation/**。它是纯静态、无 API 的六幕舞台：SPEC 契约 → span/coverage → AstraDraw SVG audit → 论文/基金 pending 槽 → 可宣称边界 → 度量有效性（64 种子预注册扩样）；数据来自 `research_agent/web/data` 的 fixture，构建时由 `build-site.mjs` 同步到 `site/innovation/data`。单屏舞台、自动播放/手动切幕、全屏演示模式（每幕 15 秒，共 90 秒）；读图约定与主页一致：实线 = 前向、虚线 = 反馈回指且改变下一步动作、红 = 人工门、青 = 自动门。不包含真实检索或实验结果。
 
 版式参考 `yangxc0414.github.io/agent-memory-push` 的宋体大标题、等宽标签、淡蓝网格与细线排版；`assets/base.css` / `theme.css` 是参考页的公开样式底座，`assets/custom.css` 是 research-agent 自有组件与响应式覆盖。研究台使用双环 HUD、阶段轨完成勾/进度条、增量对象流与 PENDING 占位、指令分组筛选、卡组圆点/锁定页/方向翻页、逐阶段记忆计数与 +Δ；新增 **聚焦视图**（收起日志、一屏显示对象流/阶段卡/当前指令，站点演示模式自动开启）、**阶段封印**（P·gate·SEALED）、对象节点光环与当前指令同步脉冲，以及可展开 **STAGE CONTRACT**（S 段/门禁、服务/端口、artifact 链、硬不变量、失败路由、PF-P0–P8 过程协议、角色与 SIM 限制）。移动端阶段轨横向滚动并做边缘渐隐，翻页器保持单行。所有 `SIM` 标注保留；`prefers-reduced-motion` 与无 JS 场景均可用。
 

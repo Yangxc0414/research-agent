@@ -40,10 +40,19 @@
 .app-main .view.is-active{animation:viewIn .28s ease}
 @media (prefers-reduced-motion:reduce){.app-main .view.is-active{animation:none}}
 .flow-gallery{padding:0;overflow:hidden}
-.flow-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;border-bottom:1px solid #e5e9f0;background:#f6f8fc}
-.flow-tab{border:1px solid #e5e9f0;background:#fff;color:#3a4353;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;transition:all .15s}
-.flow-tab:hover{border-color:#9aa3af}
-.flow-tab.is-active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+.flow-convention{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;max-width:920px;margin:0 auto 18px;padding:12px 16px;border:1px solid #e5e9f0;background:#fff;border-radius:12px;font-size:12px;color:#3a4353;font-weight:600}
+.flow-convention span{display:inline-flex;align-items:center;gap:7px}
+.flow-convention i{display:inline-block;width:20px;border-top:2px solid #16181d}
+.flow-convention i.fb{border-top:2px dashed #0f766e}
+.flow-convention i.human{width:10px;height:10px;border:1.5px solid #b91c1c;background:#fecaca;border-radius:2px}
+.flow-convention i.auto{width:10px;height:10px;border:1.5px solid #0f766e;background:#a7f3d0;border-radius:2px}
+.gate-map{max-width:920px;margin:18px auto 0;padding:16px 20px;border:1px solid #e5e9f0;background:#f8fbff;border-radius:14px}
+.gate-map h4{margin:0 0 8px;font-size:14px;font-weight:700;color:#1f2937}
+.gate-map p{margin:0 0 8px;font-size:12.5px;line-height:1.8;color:#5b6472}
+.gate-map p:last-child{margin-bottom:0}
+.gate-map code{font-family:ui-monospace,monospace;font-size:11.5px;background:#eef2ff;color:#1d4ed8;padding:1px 5px;border-radius:4px}
+.gate-map b{color:#1f2937}
+.gate-map a{color:#1d4ed8;text-decoration:underline;text-underline-offset:2px}
 .flow-pane{display:block;margin:0;padding:8px 16px 10px}
 .flow-title{font-size:16px;font-weight:700;color:#1f2937;margin:22px 16px 0}
 .flow-gallery .flow-title:first-of-type{margin-top:14px}
@@ -52,7 +61,7 @@
 .flow-pane figcaption{margin:12px auto 0;max-width:860px;font-size:12px;line-height:1.7;color:#5b6472;text-align:center}
 .flow-source{margin-top:12px}
 .flow-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-@media (max-width:760px){.flow-tabs{gap:5px;padding:10px}.flow-tab{font-size:11.5px;padding:6px 9px}.flow-pane{padding:12px 8px}}
+@media (max-width:760px){.flow-pane{padding:12px 8px}.flow-convention{gap:6px 12px;font-size:11px}.gate-map{padding:12px 14px}}
 
 </style>
 <noscript><style>.frame-loading,.app-loader,.boot-cover{display:none!important}</style></noscript>
@@ -110,8 +119,25 @@
 .lp-feat i{display:inline-flex;width:34px;height:34px;border-radius:9px;background:#eef2ff;color:#2563eb;align-items:center;justify-content:center;font-style:normal;font-weight:800;margin-bottom:12px}
 .lp-feat b{display:block;font-size:15px;margin-bottom:6px}
 .lp-feat p{font-size:12.5px;line-height:1.7;color:#5b6472;margin:0}
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:920px;margin:0 auto}
+.scope-col{border:1px solid #e5e9f0;background:#fff;border-radius:14px;padding:20px 22px}
+.scope-col h3{margin:0 0 10px;font-size:15px;color:#1f2937}
+.scope-col ul{margin:0;padding-left:18px;color:#5b6472;font-size:13px;line-height:1.95}
+.scope-col li{margin:2px 0}
+.scope-col--partner{background:linear-gradient(180deg,#fff,#f0fdfa);border-color:#a7f3d0}
+.scope-col--partner h3{color:#0f766e}
+.scope-note{max-width:920px;margin:14px auto 0;padding:14px 18px;border:1px dashed #dbe4f0;border-radius:12px;background:#f8fbff;font-size:12.5px;line-height:1.8;color:#5b6472}
+.scope-note b{color:#1f2937}
+.scope-note code{font-family:ui-monospace,monospace;font-size:11.5px;background:#eef2ff;color:#1d4ed8;padding:1px 5px;border-radius:4px}
+@media (max-width:760px){.scope-grid{grid-template-columns:1fr}.scope-col{padding:16px 18px}}
 .lp-bound{border:1px solid #e6d7b4;background:#fff8e7;border-radius:14px;padding:20px 24px;color:#6b5010;font-size:13px;line-height:1.8}
 .lp-bound b{display:block;margin-bottom:6px}
+.lp-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:16px 38px;max-width:780px;margin:28px auto 0;padding-top:22px;border-top:1px solid #e5e9f0}
+.lp-stats div{text-align:center}
+.lp-stats b{display:block;font-size:28px;font-weight:800;letter-spacing:-.03em;color:#0f172a}
+.lp-stats span{display:block;margin-top:4px;font-size:11px;font-weight:600;color:#8a94a6}
+.lp-stats-note{margin:10px auto 0;max-width:660px;font-size:11px;line-height:1.6;color:#8a94a6;text-align:center}
+@media (max-width:760px){.lp-stats{gap:12px 22px}.lp-stats b{font-size:22px}}
 .lp-foot{border-top:1px solid #e5e9f0;padding:22px;text-align:center;color:#8a94a6;font-size:12px}
 @media (max-width:760px){.lp-hero{padding:44px 16px 32px}.lp-hero h1{font-size:30px}.lp-nav{padding:10px 14px}.lp-menu{display:none}.lp-section{padding:30px 14px}}
 </style>
@@ -124,8 +150,9 @@
     <a href="#features">特性</a>
     <a href="#design">系统设计</a>
     <a href="#demos">演示与接入</a>
+    <a href="#scope">平台分工</a>
     <a href="#boundary">边界</a>
-    <a href="./docs/README.md">文档</a>
+    <a href="./docs/">文档</a>
   </nav>
   <a class="lp-navcta" href="./app/">进入工作台 ↗</a>
 </header>
@@ -142,6 +169,14 @@
     <div class="lp-chips">
       <span>span-only 证据</span><span>独立重跑复现</span><span>升级人签 · 降级自动</span><span>MCP / HTTP / CLI</span><span>host-model 无外部 key</span>
     </div>
+    <div class="lp-stats" aria-label="当前实现规模">
+      <div><b>6</b><span>模块 SPEC</span></div>
+      <div><b>46</b><span>MCP 工具</span></div>
+      <div><b>1300+</b><span>自动测试</span></div>
+      <div><b>9</b><span>门禁</span></div>
+      <div><b>4</b><span>反馈环</span></div>
+    </div>
+    <p class="lp-stats-note">数字截至 2026-11，随版本变化；测试数取自已记录的判定，不写成宣传口径。</p>
   </section>
 
   <section class="lp-section" id="demos">
@@ -154,7 +189,7 @@
       <a class="rel-card" href="./app/"><b>Agent 工作台</b><span>可部署的对话式科研工作台：证据、自进化、签署视图。</span><em>./app/</em></a>
       <a class="rel-card" href="./demo/"><b>研究运行控制台</b><span>9 阶段对象流 / 指令流 / 失败分支的 SIM 回放。</span><em>./demo/</em></a>
       <a class="rel-card" href="./innovation/"><b>创新点六幕演示</b><span>把创新点变成六个可看见的状态，90 秒 walkthrough。</span><em>./innovation/</em></a>
-      <a class="rel-card" href="./qoder/"><b>Qoder 即插即用</b><span>MCP 接入、host-model 与人工门边界。</span><em>./qoder/</em></a>
+      <a class="rel-card" href="./qoder/"><b>接入矩阵</b><span>Qoder / Claude Code / Cursor / Cline / Codex CLI … 同一份工具表与门禁。</span><em>./qoder/</em></a>
       <a class="rel-card" href="./models/"><b>模型网关</b><span>OpenAI / Anthropic / 兼容端点（需本地 runtime）。</span><em>./models/</em></a>
       <a class="rel-card" href="./live/"><b>本地运行时</b><span>pipeline 执行 + RSI 审计（需本地 runtime）。</span><em>./live/</em></a>
     </div>
@@ -177,7 +212,13 @@
     <div class="lp-sechead">
       <p class="index">DESIGN / 系统投影</p>
       <h2>同一系统的四个投影。</h2>
-      <p>下面四张图与《科研智能体策略论证》原文 SVG 完全一致，是设计投影而非实现地图；建议按 ③ → ① → ② → ④ 读。</p>
+      <p>下面四张图与《科研智能体策略论证》原文 SVG 完全一致，是设计投影而非实现地图。读法：③ 先定授权与停止边界 → ① 看主循环的前向与反馈 → ② 看记忆准入门 → ④ 看执行与路由。</p>
+    </div>
+    <div class="flow-convention" aria-label="四张流程图的统一读图约定">
+      <span><i></i>实线 · 研究过程前向</span>
+      <span><i class="fb"></i>虚线 · 反馈环（回指更早阶段，且改变下一步动作）</span>
+      <span><i class="human"></i>红方块 · 人工门</span>
+      <span><i class="auto"></i>青方块 · 自动门（默认拒绝）</span>
     </div>
     <section class="section" id="strategy">
     <div class="flow-gallery panel">
@@ -475,17 +516,55 @@
       <figcaption>承接 DeepSeek Super-agent：触发事件经两级过滤（快层程序→慢层语义）入路由层；路由层冷启动分派隔离执行单元池；已订阅任务线程后续事件直通执行单元池；独立外部监督控制回路监控进展/偏离；人仅在门禁/验收交互；过滤层判定不行动时统一静默丢弃（默认拒绝）；存算分离使执行环境留在用户原地。</figcaption>
     </figure>
     </div>
-    <p class="fineprint">门禁口径（canonical）：G1 想法选择 · G2 设计批准 · S5b 结果人签 · G5 闭包签署；升级人签 · 降级自动。demo 阶段映射：G1=S3 · G2=S4 · S5b=S5c · G5=S16。各子页投影的标签均映射到此统一口径。</p>
-    <p class="fineprint flow-source">图来源：科研智能体策略论证（1110 可读性修订版）· 第 07 节。红色方块 = 人工门，青色 = 自动门，虚线 = 反馈环。这些是策略投影，当前实现状态以功能地图为准。</p>
+    <div class="gate-map">
+      <h4>门禁口径（canonical）· 四张图与所有子页共用</h4>
+      <p>四个人工门：<code>G1 想法选择 = S3</code> · <code>G2 设计批准 = S4</code> · <code>S5b 结果人签 = S5c</code> · <code>G5 闭包签署 = S16</code>。升级人签、降级自动；自动门（Q0 / Q1 / G3 / G4）未过走默认拒绝，不静默放行；四个门都不能由模型代签。</p>
+      <p>图① 的「人门·假设选择 / 设计批准·契约 / 签署」分别对应 G1 / G2 / <b>S5b 结果签署</b>，青色「统计 / 复现门」是自动门。<b>G5 闭包签署在导出边界</b>（图③ 核验外部结果之后的授权收口），不在图① 的七阶段投影内 —— 不要把两者混读；图③ 的「必要时人签」落到实现就是 G2 / S5b。</p>
+      <p>四条反馈（T6b 证伪 / 反事实、信念修订 / 假设再激活、同质化监测、溯源 / 失效传播）都<b>回指更早阶段并改变下一步动作</b>，而不是只写反思文本。子页 <a href="./demo/">18 阶段全链</a>、<a href="./qoder/">接入闭环</a>、<a href="./innovation/">六幕演示</a> 与自进化循环按同一套语义绘制，门禁标签不另造口径。</p>
+    </div>
+    <p class="fineprint">门禁与读法以上方 canonical 卡片为准；demo 阶段映射 G1=S3 · G2=S4 · S5b=S5c · G5=S16，各子页投影的标签均映射到此统一口径。</p>
+    <p class="fineprint flow-source">图来源：科研智能体策略论证（1110 可读性修订版）· 第 07 节。四张图是策略投影，不是实现地图；当前实现状态以功能地图为准，本站为静态镜像、无真实执行。</p>
     <div class="flow-links">
       <a class="nav-cta" href="./innovation/">看六幕创新演示 ↗</a>
       <a class="nav-cta" href="./app/">进 Agent 工作台 ↗</a>
       <a class="nav-cta" href="./demo/#console">跑一次研究运行 ↗</a>
-      <a class="nav-cta" href="./qoder/">Qoder 接入 ↗</a>
+      <a class="nav-cta" href="./qoder/">客户端接入 ↗</a>
     </div>
   </section>
   </section>
 
+
+  <section class="lp-section" id="scope">
+    <div class="lp-sechead">
+      <p class="index">SCOPE / 平台边界</p>
+      <h2>这是平台，不是 RSI 基础设施。</h2>
+      <p>本平台负责「科研过程 + 证据 + 自改进判据」；流水线编排、版本回滚与评测调度可以下沉到独立的 RSI 基础设施。边界写清楚，两边才好对接。</p>
+    </div>
+    <div class="scope-grid">
+      <div class="scope-col">
+        <h3>本平台负责</h3>
+        <ul>
+          <li>模块契约与产物：QueryPlan / Span / EA / Claim / Closure</li>
+          <li>数据基础：文献、实验、图表、稿件、基金的 artifact 与哈希</li>
+          <li>自改进判据：准入理由、租约、撤销传播、留出增益</li>
+          <li>人签门：G1 / G2 / S5b / G5，升级人签、降级自动</li>
+        </ul>
+      </div>
+      <div class="scope-col scope-col--partner">
+        <h3>可委托 RSI 基础设施</h3>
+        <ul>
+          <li>流水线编排与重试、阶段级 checkpoint</li>
+          <li>版本 / 回滚 / 租约生命周期</li>
+          <li>细粒度反馈：知识原子级的冲突与污染检测</li>
+          <li>评测调度：小数据集、Token 预算、DeepSeek 基座</li>
+        </ul>
+      </div>
+    </div>
+    <div class="scope-note">
+      <b>接口现状：</b>MCP / HTTP / CLI 三入口共用 <code>framework_api.dispatch</code>；当前 RSI 控制面（policy / lease / step ledger）是保证可运行的最小实现，外部 provider 适配器仍是 roadmap。不把「已实现的控制面」说成「已完成对接」。<br/>
+      <b>分工口径：</b>自迭代的<b>执行</b>下沉到 RSI 服务；平台只保留判据（准入理由 / 租约 / 撤销传播）与数据基础，不为每个循环重造一遍基础设施。
+    </div>
+  </section>
 
   <section class="lp-section" id="boundary">
     <div class="lp-bound">
