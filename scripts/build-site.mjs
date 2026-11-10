@@ -47,26 +47,34 @@ function copyDocs() {
 function copyInnovationData() {
   const sourceDir = path.join(root, "research_agent", "web", "data");
   const targetDir = path.join(site, "innovation", "data");
-  if (!fs.existsSync(sourceDir)) {
-    console.warn("skip innovation data: research_agent/web/data not found");
-    return [];
-  }
   ensureDir(targetDir);
-  const names = [
-    "demo.json",
-    "specs.json",
-    "figure.svg",
-    "figure.scene.json",
-    "figure.manifest.json",
-    "paper.json",
-    "grant.json"
-  ];
   const copied = [];
-  for (const name of names) {
-    const source = path.join(sourceDir, name);
-    if (!fs.existsSync(source)) continue;
-    fs.copyFileSync(source, path.join(targetDir, name));
-    copied.push(name);
+  if (fs.existsSync(sourceDir)) {
+    const names = [
+      "demo.json",
+      "figure.svg",
+      "figure.scene.json",
+      "figure.manifest.json",
+      "paper.json",
+      "grant.json"
+    ];
+    for (const name of names) {
+      const source = path.join(sourceDir, name);
+      if (!fs.existsSync(source)) continue;
+      fs.copyFileSync(source, path.join(targetDir, name));
+      copied.push(name);
+    }
+  } else {
+    console.warn("skip innovation runtime data: research_agent/web/data not found");
+  }
+  // Single source of truth: the innovation demo and the app workbench both read the
+  // workspace registry exported from modules/*/SPEC.md, so their module versions and
+  // statuses can never drift apart.
+  const registryPath = path.join(root, "apps", "web", "public", "agent-registry.json");
+  if (fs.existsSync(registryPath)) {
+    const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
+    fs.writeFileSync(path.join(targetDir, "specs.json"), JSON.stringify(registry.agents || [], null, 2) + "\n");
+    copied.push("specs.json");
   }
   return copied;
 }
