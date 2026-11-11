@@ -37,6 +37,9 @@
 .lede b{color:#0b1220 !important}
 .primary-btn{background:#2563eb !important;background-image:none !important;color:#fff !important;border-color:#2563eb !important}
 .ghost-btn{background:#fff !important;color:#23406e !important;border-color:#dbe4f0 !important}
+/* innovation figure: give the module/provenance diagrams room and unified accent framing. */
+.stage-body svg{max-width:100%;height:auto}
+.figure-frame,.svg-frame,.proof-figure{border:1px solid #e5e9f0;border-radius:12px;background:#fff;padding:12px}
 .sp-home{color:#2563eb;text-decoration:none;font-weight:700}
 .sp-home:hover{text-decoration:underline}
 .sp-chip{border:1px solid #e6d7b4;background:#fff8e7;color:#8a6d1f;padding:2px 10px;border-radius:999px;font-size:11px}
