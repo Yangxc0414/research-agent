@@ -1,6 +1,6 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-10T23:00:37+00:00",
+  "generated_at": "2026-11-11T01:22:00+00:00",
   "count": 217,
   "curated": 51,
   "derived": 166,
@@ -1000,7 +1000,7 @@
       "group": "memory",
       "label": "compare",
       "syntax": "python -m research_agent memory ab.compare",
-      "description": "usage: research_agent memory ab compare [-h] --project PROJECT\n                                        [--output-dir OUTPUT_DIR]",
+      "description": "usage: research_agent memory ab compare [-h] --project PROJECT\n                                        [--output-dir OUTPUT_DIR]\n                                        [--sessions {single,multi}]",
       "safety": "catalog_only",
       "curated": false
     },
@@ -1018,7 +1018,7 @@
       "group": "memory",
       "label": "record",
       "syntax": "python -m research_agent memory ab.record",
-      "description": "usage: research_agent memory ab record [-h] --project PROJECT --run-id RUN_ID\n                                       --arm {with,without} --ideas-file\n                                       IDEAS_FILE --literature-file\n                                       LITERATURE_FILE",
+      "description": "usage: research_agent memory ab record [-h] --project PROJECT --run-id RUN_ID\n                                       --arm {with,without} --ideas-file\n                                       IDEAS_FILE --literature-file\n                                       LITERATURE_FILE\n                                       [--session-host-label SESSION_HOST_LABEL]\n                                       [--session-id SESSION_ID]",
       "safety": "catalog_only",
       "curated": false
     },
@@ -1027,7 +1027,7 @@
       "group": "memory",
       "label": "guidelines",
       "syntax": "python -m research_agent memory guidelines",
-      "description": "usage: research_agent memory guidelines [-h] --project PROJECT\n                                        [--propose-file PROPOSE_FILE]\n                                        [--step STEP]",
+      "description": "usage: research_agent memory guidelines [-h] --project PROJECT\n                                        [--propose-file PROPOSE_FILE]\n                                        [--step STEP] [--admission ADMISSION]",
       "safety": "catalog_only",
       "curated": false
     },

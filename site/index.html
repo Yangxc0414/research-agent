@@ -180,6 +180,7 @@
   <nav class="lp-menu" aria-label="页内导航">
     <a href="#features">特性</a>
     <a href="#vision">愿景</a>
+    <a href="#metrics">指标</a>
     <a href="#design">系统设计</a>
     <a href="#demos">演示与接入</a>
     <a href="#scope">平台分工</a>
@@ -673,6 +674,20 @@
         </div>
         <p>升级人签、降级自动；候选版本与平台指纹绑定，可关联、可回滚。</p>
       </div>
+    </div>
+  </section>
+
+  <section class="lp-section" id="metrics">
+    <div class="lp-sechead">
+      <p class="index">METRICS / 数字怎么读</p>
+      <h2>每个数字的实际价值。</h2>
+      <p>不堆指标。下面每个读数都对应一个可检查的工程事实，以及它对"科研可信"的实际作用。</p>
+    </div>
+    <div class="vision-grid">
+      <div class="vision-card"><b>SPEC 模块契约</b><p><b>含义</b>：每个子智能体先有 Markdown 契约（输入/输出/门禁/不变量）。<b>价值</b>：改一个模块不必理解全部代码；同学可据此做细粒度自进化而不破坏边界。</p></div>
+      <div class="vision-card"><b>自动测试数</b><p><b>含义</b>：离线回归测试总量，随提交增长。<b>价值</b>：任何改动破坏证据链/门禁会立刻红，保证"可核验"不是口号。</p></div>
+      <div class="vision-card"><b>人工门禁 G1/G2/S5b/G5</b><p><b>含义</b>：想法选择/设计批准/结果人签/闭包签署四个把关节点。<b>价值</b>：机器起草、人作判断；未签名的结论进不了导出，杜绝"AI 自己说了算"。</p></div>
+      <div class="vision-card"><b>0 外部 API · 0 效果数字</b><p><b>含义</b>：静态 demo 不联网、不引用外部效果数。<b>价值</b>：展示的是机制与证据结构，而非不可复现的营销数字；真实效果须由本地 run+EA+人签产生。</p></div>
     </div>
   </section>
 
