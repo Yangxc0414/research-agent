@@ -168,6 +168,10 @@
 .lp-stats b{display:block;font-size:28px;font-weight:800;letter-spacing:-.03em;color:#0f172a}
 .lp-stats span{display:block;margin-top:4px;font-size:11px;font-weight:600;color:#5f6d80}
 .lp-stats-note{margin:10px auto 0;max-width:660px;font-size:11px;line-height:1.6;color:#5f6d80;text-align:center}
+.lp-glossary{margin:14px auto 0;max-width:860px;text-align:left;font-size:12px;line-height:1.7;color:#414d61;background:#f4f7fb;border:1px solid #dbe4f0;border-radius:10px;padding:10px 16px}
+.lp-glossary summary{cursor:pointer;font-weight:600;color:#24344d}
+.lp-glossary ul{margin:10px 0 4px;padding-left:18px}
+.lp-glossary li{margin:6px 0}
 @media (max-width:760px){.lp-stats{gap:12px 22px}.lp-stats b{font-size:22px}}
 .lp-foot{border-top:1px solid #e5e9f0;padding:22px;text-align:center;color:#5f6d80;font-size:12px}
 @media (max-width:760px){.lp-hero{padding:44px 16px 32px}.lp-hero h1{font-size:30px}.lp-nav{padding:10px 14px}.lp-menu{display:none}.lp-section{padding:30px 14px}}
@@ -203,13 +207,23 @@
       <span>span-only 证据</span><span>独立重跑复现</span><span>升级人签 · 降级自动</span><span>MCP / HTTP / CLI</span><span>host-model 无外部 key</span>
     </div>
     <div class="lp-stats" aria-label="当前实现规模">
-      <div><b>28</b><span>模块 SPEC</span></div>
+      <div><b>32</b><span>模块 SPEC</span></div>
       <div><b>46</b><span>MCP 工具</span></div>
       <div><b>1300+</b><span>自动测试用例</span></div>
       <div><b>4</b><span>人工门 · G1/G2/S5b/G5</span></div>
-      <div><b>1/4</b><span>反馈环已自动闭环</span></div>
+      <div><b>4/4</b><span>反馈环改变下一步动作 · 默认关</span></div>
     </div>
     <p class="lp-stats-note">数字截至 2026-11，随版本变化；测试数取自已记录的判定，不写成宣传口径。</p>
+    <details class="lp-glossary">
+      <summary>这些数字对第一次看的人意味着什么？</summary>
+      <ul>
+        <li><b>32 模块 SPEC</b> —— 每个能力先写「合同」再写代码：改行为必须先改合同，代码不能偷偷越权。价值：别人（或别的 Agent）扩展平台时，边界是读得懂、测得到的。</li>
+        <li><b>46 MCP 工具</b> —— Claude Code / Qoder / Codex / Zcode 用同一份工具表接入；里面<b>没有任何签名/批准按钮</b>。价值：外部 Agent 能干活，但签字永远在人手里。</li>
+        <li><b>1300+ 自动测试</b> —— 每条边界（摘要不能当证据、未签不能导出、fixture 必须自报…）都有测试钉住。价值：改坏了立刻红，而不是演示时才发现。</li>
+        <li><b>4 人工门</b> —— 选想法 G1、批设计 G2、签结果 S5b、签导出 G5 必须人签（或人预先写策略授权 autopilot 代签并留痕）。价值：自动化跑门与门之间，高杠杆决定留给人。</li>
+        <li><b>4/4 反馈环</b> —— 上一轮的判定（证伪 / 评审 / 同质化 / 失效）会真实改变下一轮动作：否证条件带进新假设、被评审否掉的候选降权、单一视角强制换轴、失效沿哈希链锁导出。默认关闭、逐环开启；约束来源哈希过期即拒绝。价值：反思不是日志，是下一步的输入。</li>
+      </ul>
+    </details>
   </section>
 
   <section class="lp-section" id="demos">
@@ -574,17 +588,17 @@
     </div>
     <div class="strategy-map">
       <h4>接下来做什么 · 一个总线 + 四个端口（71 号设计文档 · 2026-11-10 立项）</h4>
-      <p class="sm-lede">四图对照的结论：四条反馈环只有「溯源 / 失效传播」一条真实自动闭环，其余是审计项或 roadmap。解耦设计把"判定改变下一步行动"做成<b>可插拔、可单独开关与测量的对象</b>——这正是四条策略的实验台。</p>
+      <p class="sm-lede">四图对照的起点：四条反馈环曾只有「溯源 / 失效传播」一条真实自动闭环。本轮把其余三条的<b>回指侧</b>也接通——判定变成下一轮假设生成的输入（默认关闭、逐环开启、来源哈希过期即拒绝），并给图③补上「触发 → 相关性检查 → 下一次 run 消费」的委托骨架。解耦设计把"判定改变下一步行动"做成<b>可插拔、可单独开关与测量的对象</b>——这正是四条策略的实验台。</p>
       <div class="sm-strategies">
         <div class="sm-strategy"><b>第一步 · 判定总线（Verdict Ledger）<em>✅ 已落地 · verdict-ledger 0.1.0</em></b><span>append-only 判定账本：三态判定 / closure blockers / lineage stale / rsi regressed / 护栏拦截统一入账；消费者（next_actions、反馈环、autopilot）只读总线。生产者不变、门禁语义不变、缺失 fail-closed。实测已抓到真实缺陷：autopilot 代签后 capsule 快照仍报 CLOSURE_UNSIGNED——漂移从静默变为一等行（<code>verdicts collect</code>）。</span></div>
-        <div class="sm-strategy"><b>第二步 · FeedbackPort（反馈环一等化）<em>默认拒绝</em></b><span>observe → propose → gate → apply → record；T6b 证伪 / 信念修订 / 溯源失效 / 同质化各为一个可开关实现。可失败的验收：关闭全部环 = 与今日行为逐字节一致。</span></div>
-        <div class="sm-strategy"><b>第三步 · M1 五类反馈对照<em>Q2 · 诊断实验</em></b><span>真实 / 打乱 / 过时 / 含噪 / 矛盾五类反馈跑在 FeedbackPort 上——反馈敏感性与信息价值一致 → 切口不成立，如实记录。</span></div>
-        <div class="sm-strategy"><b>第四步 · MemoryWritePort + M2<em>方向 A · 第一切口</em></b><span>记忆写入收敛一个端口，全存 / 全不存 / 重放后存 / 独立验证后存四策略可插拔对照；类型化记忆图谱等 M2 结果出来再定型，不提前固化。</span></div>
-        <div class="sm-strategy"><b>第五步 · ExecPort + waitpoints<em>图③ 骨架</em></b><span>三执行面（平台 3.8 / Harness² 3.12 桥 / 外部 host）统一抽象；事件进 waitpoint → 程序快层相关性检查 → 判定总线 → 下一次 run 消费。不引入常驻进程，autopilot 单次委托语义不动。</span></div>
+        <div class="sm-strategy"><b>第二步 · FeedbackPort（反馈环一等化）<em>✅ 4/4 环接入下一步动作 · feedback 0.6.0</em></b><span>observe → propose → gate → apply → record；四环各为可开关实现。消费侧类型化：约束带 <code>constraint_kind + payload</code>，生成端按类型分派（文本仅供人读，旧账本消费边缘一次性推断）——改一句措辞不会让闭环静默失效。T6b 携带已执行否证条件、信念修订对「revise or drop」候选降权、同质化强制第二视角；idea.json 写 <code>feedback_constraints_applied</code> provenance。消费时重算来源 sha256，stale 默认拒绝。关闭全部环 = 逐字节一致。</span></div>
+        <div class="sm-strategy"><b>第三步 · M1 五类反馈对照<em>✅ 判别力 supported · 多 run 测量待执行</em></b><span>真实 / 打乱 / 过时 / 含噪 / 矛盾五类反馈跑在 FeedbackPort 上：real 1.0 / 退化均值 0.333 / 矛盾 5/5 升级人工；决策表接入 next_actions 端到端 behavior_changed=True。多 run 统计脚本就绪、按指示延后取数。</span></div>
+        <div class="sm-strategy"><b>第四步 · MemoryWritePort + M2<em>◐ 准入半程 · memory-port 0.1.0</em></b><span>四准入策略（全存 / 全不存 / 重放后存 / 独立验证后存）可插拔，严格度对照 4/4→2/4→1/4→0/4 两两互异（verdict=supported）；跨任务收益需多会话测量，按 73- 号设计延后。类型化记忆图谱等 M2 结果出来再定型，不提前固化。</span></div>
+        <div class="sm-strategy"><b>第五步 · ExecPort + waitpoints<em>◐ 骨架+接缝落地 · waitpoints 0.2.0 / exec-port 0.1.0</em></b><span>事件进 waitpoint → 程序快层相关性检查（无 scope / 无匹配 = 默认拒绝带收据）→ 追加式事件账本 → 下一次 run 消费并标 acted（图③ 01/06 回指）；next_actions 增 delegation_event。ExecPort 把三执行面（inprocess 3.8 / bridge 3.12 / host_agent）登记为可注册接缝（<code>exec faces</code> 只读），新面可注册；「路由只经端口分派」仍 roadmap。不引入常驻进程，autopilot 单次委托语义不动。</span></div>
         <div class="sm-strategy"><b>贯穿 · 接入面收尾<em>Zcode / Qoder / Codex</em></b><span>SKILL.md 第 0 步 = 先比 build fingerprint 再读结果（宿主里"测过"默认测的是历史快照）；接入矩阵随发行同步，产品仓自证 46 工具 ready + 零签名入口。</span></div>
       </div>
       <div class="sm-rows">
-        <div class="sm-row"><span class="sm-key">已实测基线</span><p>search-study 三态判定（区间跨零即「不可判定」）· 复现计数 + 功效阶梯（会推翻自己的旧结论）· 护栏开火率 8.1% · Host-as-Model 零 key 闭环 · autopilot 单次委托 · 46 工具零签名入口 · <b>M1 反馈敏感性实测（2026-11-11）：真实判定 1.0 自复现、退化类均值 0.333、矛盾判定 5/5 升级人工；端到端 behavior_changed=True</b>（stale 重签建议被 verify_bundle 取代，见 73- 号设计文档）。</p></div>
+        <div class="sm-row"><span class="sm-key">已实测基线</span><p>search-study 三态判定（区间跨零即「不可判定」）· 复现计数 + 功效阶梯（会推翻自己的旧结论）· 护栏开火率 8.1% · Host-as-Model 零 key 闭环 · autopilot 单次委托 · 46 工具零签名入口 · <b>M1 反馈敏感性实测（2026-11-11）：真实判定 1.0 自复现、退化类均值 0.333、矛盾判定 5/5 升级人工；端到端 behavior_changed=True</b>（stale 重签建议被 verify_bundle 取代，见 73- 号设计文档）· <b>反馈回指消费 E2E（2026-11-11）：pipeline 读新鲜约束进 idea 生成、stale 约束默认拒绝、委托事件下一次 run 消费并标 acted</b>（tests/test_pipeline FeedbackLoopWiringTest 钉住）。</p></div>
         <div class="sm-row"><span class="sm-key">四个问题</span><p><b>Q1</b> 指标收益与独立证据是否脱钩（优先预实验）· <b>Q2</b> 反馈何时真改变行动 · <b>Q3</b> 一次成功何时值得沉淀为经验 · <b>Q4</b> 自主循环是否越走越窄。</p></div>
         <div class="sm-row"><span class="sm-key">出处</span><p><a href="https://github.com/Yangxc0414/research-agent/blob/main/71-四图对照与解耦设计-判定总线与反馈环一等化.md">71-四图对照与解耦设计</a>（四图逐环节对照 + 可失败的验收）· <a href="https://github.com/Yangxc0414/research-agent/blob/main/73-M1M2收尾设计-单会话与多会话可选的反馈测量.md">73-M1/M2 收尾设计</a>（单会话/多会话可选）· 逐项实测读数见仓库 docs/fact-baseline.md。</p></div>
       </div>

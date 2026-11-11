@@ -1,9 +1,9 @@
 {
   "schema_version": "workspace-0.1",
-  "generated_at": "2026-11-11T01:22:00+00:00",
-  "count": 217,
+  "generated_at": "2026-11-11T08:06:56+00:00",
+  "count": 219,
   "curated": 51,
-  "derived": 166,
+  "derived": 168,
   "commands": [
     {
       "id": "study.baseline",
@@ -695,6 +695,15 @@
       "label": "paper",
       "syntax": "python -m research_agent empirical paper",
       "description": "usage: research_agent empirical paper [-h] --project PROJECT --run-id RUN_ID\n                                      --experiment-id EXPERIMENT_ID --output\n                                      OUTPUT [--language {zh,en}]\n                                      [--venue {zh_core_journal,software_journal,computer_journal,en_conference}]\n                                      [--max-sources MAX_SOURCES]\n                                      [--max-spans-per-source MAX_SPANS_PER_SOURCE]\n                                      [--review-rounds REVIEW_ROUNDS]\n                                      [--repair-attempts REPAIR_ATTEMPTS]\n                                      [--method-scene METHOD_SCENE | --method-template METHOD_TEMPLATE]\n                                      [--semantic-support] [--strict-support]\n                                      [--support-votes SUPPORT_VOTES]\n                                      [--judge-profile JUDGE_PROFILE]\n                                      [--ab-check] [--ab-section AB_SECTION]\n                                      [--offline-draft] [--external-lint]\n                                      [--external-skill-root EXTERNAL_SKILL_ROOT]\n                                      [--external-consistency]\n                                      [--external-consistency-registry EXTERNAL_CONSISTENCY_REGISTRY]\n                                      [--external-consistency-auto]\n                                      [--threshold THRESHOLD]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "exec.faces",
+      "group": "exec",
+      "label": "faces",
+      "syntax": "python -m research_agent exec faces",
+      "description": "usage: research_agent exec faces [-h]",
       "safety": "catalog_only",
       "curated": false
     },
@@ -1793,6 +1802,15 @@
       "label": "status",
       "syntax": "python -m research_agent waitpoint status",
       "description": "usage: research_agent waitpoint status [-h] --id ID [--root ROOT]",
+      "safety": "catalog_only",
+      "curated": false
+    },
+    {
+      "id": "waitpoint.triage",
+      "group": "waitpoint",
+      "label": "triage",
+      "syntax": "python -m research_agent waitpoint triage",
+      "description": "usage: research_agent waitpoint triage [-h] --project PROJECT --owner OWNER\n                                       [--scope SCOPE] [--root ROOT]",
       "safety": "catalog_only",
       "curated": false
     },
