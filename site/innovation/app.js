@@ -198,6 +198,21 @@ function paperAct() {
       <div class="track-card"><span class="mono">PAPER TRACK</span><b>${esc(paper.profile?.venue_type || "论文契约")}</b><small>${esc(paper.profile?.citation_style || "GB/T 7714")} · ${(paper.sections || []).length} sections · 0 claims</small></div>
       <div class="track-card"><span class="mono">GRANT TRACK</span><b>${grant ? esc(grant.scheme.toUpperCase()) : "未生成"}</b><small>${grant ? `${(grant.modules || []).length} modules · ${(grant.compliance || []).length} compliance checks` : "用 --grant nsfc 生成基金骨架"}</small></div>
     </div>
+    <div class="vision-preview">
+      <span class="vp-tag">预期效果 · 演示愿景（非实测）</span>
+      <div class="vp-body">
+        <svg viewBox="0 0 220 120" role="img" aria-label="建成后结果节对照示意（非实测）">
+          <line x1="20" y1="98" x2="205" y2="98" stroke="#e4e9f2"/>
+          <rect x="45" y="74" width="40" height="24" rx="4" fill="#94a3b8"/>
+          <rect x="125" y="30" width="40" height="68" rx="4" fill="#2563eb"/>
+          <text x="65" y="112" text-anchor="middle" font-size="9" fill="#5b6472">基线</text>
+          <text x="145" y="112" text-anchor="middle" font-size="9" fill="#5b6472">本方法</text>
+          <text x="145" y="24" text-anchor="middle" font-size="9" fill="#2563eb" font-weight="700">+Δ 示意</text>
+        </svg>
+        <div class="vp-chain"><span>result claim</span><i>→</i><span>EA + 独立重跑</span><i>→</i><span>人签</span><i>→</i><em>PASS</em></div>
+      </div>
+      <small>建成后的结果节形态示意：数字须来自 EA 与人签。当前槽位仍 pending、G5 保持 blocked——愿景与现状分开标注。</small>
+    </div>
     <p class="source-note">数据来源：<code>modules.paper.slots</code> / <code>modules.grant</code>；槽状态为 scaffold，不含任何结果数字</p>`;
 }
 
