@@ -1,7 +1,7 @@
 {
   "schema_version": "workspace-0.1",
   "source": "modules/*/SPEC.md",
-  "generated_at": "2026-11-11T00:44:09+00:00",
+  "generated_at": "2026-11-11T01:22:00+00:00",
   "count": 29,
   "agents": [
     {
@@ -930,7 +930,7 @@
       "id": "rsi",
       "name": "受治理的递归改进",
       "stage": "META",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "status": "pilot",
       "owner": "research-agent",
       "outputs": [
@@ -996,7 +996,8 @@
         "自进化策略只控制新候选与记忆调序：master off 时不得新增 propose/自动研究循环候选；不得追溯撤销已有 lease/confirmation",
         "策略只允许切换 literature.memory_order / literature.query_planner / orchestrator.facet_budget；claim/evidence/gate/rubric/held-out/closure/signature/export 不在可切换集合内",
         "确认不可动作于升级，但 regressed 确认必须可动作于降级：自动撤销该候选的 active 租约；升级仍需人工签署",
-        "每个 episode 记录 platform_fingerprint（平台代码指纹）与 candidate.version（自进化候选版本），供自进化版本管理与平台自我迭代的关联/回滚；平台只记账与提供接缝，不实现自进化算法"
+        "每个 episode 记录 platform_fingerprint（平台代码指纹）与 candidate.version（自进化候选版本），供自进化版本管理与平台自我迭代的关联/回滚；平台只记账与提供接缝，不实现自进化算法",
+        "EvalEvidence 自动绑定 code_fingerprint（产生该证据的平台代码指纹），verdict 不得跨构建静默复用；ProposerPort/EvaluatorPort 为候选/评测供给接缝（内部简单自改进、外部 Agent、同学细粒度自进化均可实现），平台只校验证据形状与哈希、不伪造指标"
       ],
       "spec": "modules/rsi/SPEC.md"
     },
