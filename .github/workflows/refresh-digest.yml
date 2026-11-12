@@ -25,6 +25,9 @@ jobs:
           node-version: 20
 
       - name: Fetch public metadata
+        env:
+          # OpenAlex polite pool: a contact email lifts anonymous datacenter-IP throttling
+          OPENALEX_MAILTO: Yangxc0414@users.noreply.github.com
         run: node scripts/refresh-digest.mjs
 
       - name: Commit digest if changed
