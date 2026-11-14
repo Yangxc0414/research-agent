@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-13T08:04:10.491Z",
+  "generated_at": "2026-11-14T07:38:24.317Z",
   "source": "OpenAlex /works",
   "mode": "CACHED",
   "license": "OpenAlex metadata; respect source licenses and attribution",
@@ -9,7 +9,7 @@
       "label": "钙钛矿太阳能电池稳定性",
       "query": "perovskite solar cell stability",
       "from_year": 2020,
-      "total_hits": 16783,
+      "total_hits": 16789,
       "returned": 6,
       "works": [
         {
@@ -32,7 +32,7 @@
           "doi": "https://doi.org/10.1038/s41560-019-0529-5",
           "title": "Consensus statement for stability assessment and reporting for perovskite photovoltaics based on ISOS procedures",
           "year": 2020,
-          "cited_by": 2007,
+          "cited_by": 2008,
           "venue": "Nature Energy",
           "authors": [
             "Mark Khenkin",
@@ -62,7 +62,7 @@
           "doi": "https://doi.org/10.1126/science.abp8873",
           "title": "Inactive (PbI 2 ) 2 RbCl stabilizes perovskite films for efficient solar cells",
           "year": 2022,
-          "cited_by": 1458,
+          "cited_by": 1459,
           "venue": "Science",
           "authors": [
             "Yang Zhao",
@@ -92,7 +92,7 @@
           "doi": "https://doi.org/10.1126/science.abh1885",
           "title": "Conformal quantum dot–SnO 2 layers as electron transporters for efficient perovskite solar cells",
           "year": 2022,
-          "cited_by": 1358,
+          "cited_by": 1359,
           "venue": "Science",
           "authors": [
             "Minjin Kim",
@@ -109,7 +109,7 @@
       "label": "固态电池界面",
       "query": "solid-state battery interface",
       "from_year": 2020,
-      "total_hits": 6876,
+      "total_hits": 6878,
       "returned": 4,
       "works": [
         {
@@ -117,7 +117,7 @@
           "doi": "https://doi.org/10.1002/aenm.202203307",
           "title": "Lithium Batteries and the Solid Electrolyte Interphase (SEI)—Progress and Outlook",
           "year": 2023,
-          "cited_by": 880,
+          "cited_by": 884,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Henry Adenusi",
