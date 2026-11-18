@@ -53,6 +53,31 @@
 
 ---
 
+
+## 2.3 不用 Docker 能跑到什么程度（实测结论）
+
+**官方 CLI 跑任何内置任务都需要 Docker**，原因不是配置问题：
+
+- flashrsi/_startup.py 的 _requires_docker：22 个容器类 benchmark + 9 个 supplied-context benchmark（searchqa/math/aime/bbeh/supergpqa/nq/triviaqa/musique/twowiki）= 31 个内置任务全部命中；
+- 试过自定义 benchmark 名（benchmark.name=local_qa）：CLI 直接拒绝——Unsupported benchmark，只接受那 31 个名字。
+
+**无 Docker 仍然可以做的三件事**（都不等于“跑通一个任务”）：
+
+1. `--prepare-only`：生成脱敏配置目录（已实测成功）；
+2. `--help` / 参数校验 / 配置 schema：已实测；
+3. **框架级 evolution 回路**：tests/test_algorithm.py 的 20 项测试在 in-memory benchmark + 确定性 worker 上全部通过（无 Docker、无模型调用）：
+
+       .venv/Scripts/python.exe -m pytest tests/test_algorithm.py -q
+       -> 20 passed
+
+   这能证明 Propose→Evaluate→Snapshot 选择回路本身可运行，但**不是 benchmark 任务结果**，组会上必须这样说明。
+
+**结论**：
+
+- 组会要展示“跑通一个任务”，只能装 Docker（WSL Engine 或 Docker Desktop）；
+- 若来不及，就诚实展示：prepare-only + test_algorithm 20 项 + Docker 阻塞点，并给出装 Docker 的计划；
+- 不建议为赶组会去改 FlashRSI 源码加自定义 benchmark——那不是它的标准任务，也没有可比性。
+
 ## 3. 跑通路线（按推荐顺序）
 
 ### 方案 A（推荐）：WSL2 里装 Docker Engine
