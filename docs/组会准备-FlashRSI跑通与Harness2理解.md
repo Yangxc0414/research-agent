@@ -35,6 +35,19 @@
   产物：runtime_data/flashrsi-prepare/skillopt-miniagent-searchqa-<timestamp>/config.yaml（redacted）；
 - 示例数据存在：FlashRSI-main/examples/data/quickstart.jsonl（约 3.3 KB）。
 
+### 2.1b 已有一次 L1 最小端到端记录（不是本轮）
+
+design/121 记录了 2026-11-16 的一次 FlashRSI 本地上扩展跑通，按等级划分：
+
+| 级别 | 定义 | 状态 |
+| --- | --- | --- |
+| L1 最小端到端 | 官方代码真跑一圈演化：算法→harness→评分→选择→产物 | ✅ 有实物、可对账（12/12 turn、候选快照、accepted=false 平局拒收） |
+| L1.5 效应演示 | 基线下有“被采纳的改进/涨分” | ❌ 未达成（题池饱和） |
+| L2 上游官方路径 | Docker + 外部模型 API + 31 基准原生 | ❌ 未验证 |
+| L3 受治理接入 | 进 ExecPort/claim/closure/lineage | ❌ 未接入 |
+
+**所以组会最诚实的说法是：L1 已达成过一次（有记录），L2 仍卡 Docker；不要笼统说“跑通了”。** 若本地 L1 产物还在，现场展示它比口头说更有力；若产物不在，就以 design/121 的表格 + 本轮 prepare-only/test_algorithm 证据说明。
+
 ### 2.2 当前阻塞点（跑不通的真正原因）
 
     python -m flashrsi run --config examples/quickstart.yaml --check-only
@@ -74,9 +87,10 @@
 
 **结论**：
 
-- 组会要展示“跑通一个任务”，只能装 Docker（WSL Engine 或 Docker Desktop）；
-- 若来不及，就诚实展示：prepare-only + test_algorithm 20 项 + Docker 阻塞点，并给出装 Docker 的计划；
-- 不建议为赶组会去改 FlashRSI 源码加自定义 benchmark——那不是它的标准任务，也没有可比性。
+- 官方 31 个 benchmark 路径（L2）= 只能装 Docker；
+- 但“跑通一次演化”不必依赖官方 benchmark：design/121 的本地扩展 localqa 已达成 **L1**（12/12 turn、候选快照、平局拒收），本轮又用 test_algorithm 20 项证明回路可跑；
+- 组会优先讲 L1 证据 + L2 阻塞与计划；若要补 L2，装 Docker（WSL Engine 或 Docker Desktop）后用 §4 命令；
+- 不建议为赶组会临时改 FlashRSI 源码造一个 benchmark——它不能替代官方路径，也没有可比性。
 
 ## 3. 跑通路线（按推荐顺序）
 
