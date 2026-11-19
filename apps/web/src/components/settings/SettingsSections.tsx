@@ -757,7 +757,7 @@ export function AboutSettingsPage() {
       <PageHead
         eyebrow="SUPPORT / ABOUT"
         title="关于与边界"
-        description="Research Agent Workspace · 证据闭合的对话式科研工作台。"
+        description="Wellspring Agent · 证据闭合的对话式科研工作台。"
       />
 
       <Card title="版本" description="静态工作台与部署信息。">

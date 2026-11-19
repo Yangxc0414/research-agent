@@ -293,7 +293,7 @@ export function Composer() {
             value={value}
             maxLength={4000}
             placeholder={meta.placeholder}
-            aria-label="给 Research Agent 发消息"
+            aria-label="给 Wellspring Agent 发消息"
             onChange={(event) => {
               setValue(event.target.value);
               setSlashIndex(0);

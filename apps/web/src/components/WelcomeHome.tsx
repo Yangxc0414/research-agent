@@ -171,7 +171,7 @@ export function WelcomeHome() {
             rows={3}
             value={value}
             maxLength={4000}
-            placeholder="向 Research Agent 提问，使用 / 调用 Skill……"
+            placeholder="向 Wellspring Agent 提问，使用 / 调用 Skill……"
             aria-label="新会话输入"
             onChange={(event) => setValue(event.target.value)}
             onKeyDown={(event) => {
