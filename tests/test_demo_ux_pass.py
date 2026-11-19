@@ -66,6 +66,14 @@ class DemoUxPassTest(unittest.TestCase):
         # and in a static build it must run something that works
         self.assertIn("if (__STATIC_ONLY__) actions.startAuto();", COMPOSER)
 
+    def test_host_model_panel_does_not_splice_raw_runtime_errors(self):
+        # EVOLUTION tab 的 HOST MODEL 面板：静态构建下不渲染原始英文错误行，
+        # runtime 下经 describeRuntimeError 翻译（131 轮补的漏网点）。
+        host = (WEB / "components" / "HostModelPanel.tsx").read_text(encoding="utf-8")
+        self.assertNotIn('<p className="host-error">{error}</p>', host)
+        self.assertIn("describeRuntimeError(error", host)
+        self.assertIn("runtimeAvailable ? (", host)
+
     def test_guidance_and_packages_use_the_unified_empty_state(self):
         self.assertIn('title="还没有插入指导"', PANEL)
         self.assertIn('title="还没有证据包"', PANEL)
