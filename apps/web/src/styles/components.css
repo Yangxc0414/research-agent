@@ -1245,7 +1245,9 @@ select.control {
   font-family: var(--mono);
   font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 0.02em;
-  white-space: nowrap;
+  /* 长标签（ABSTRACT-ONLY / SIGNED CLAIMS）在窄面板下要断行，
+     否则会溢出到相邻格并粘连成一串。 */
+  overflow-wrap: anywhere;
 }
 
 .evidence-list {
