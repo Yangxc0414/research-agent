@@ -583,6 +583,66 @@ select.control {
   gap: 10px;
 }
 
+/* Unified empty state. The block variant reuses .context-empty-card (below) so
+   there is one visual language; only the title/action slots are added here. */
+.empty-state .empty-state-title {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text);
+  font-weight: 600;
+}
+.empty-state .empty-state-action {
+  margin-top: 3px;
+}
+
+/* Compact variant: sits inside a populated panel without competing for space. */
+.empty-state.is-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  text-align: left;
+  color: var(--faint);
+}
+.empty-state.is-note > div {
+  flex: 1;
+  min-width: 0;
+}
+.empty-state.is-note b {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--muted);
+  font-weight: 600;
+}
+.empty-state.is-note p {
+  margin: 3px 0 0;
+  color: var(--faint);
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.6;
+}
+.empty-state.is-note .empty-state-action {
+  margin-top: 0;
+  flex: none;
+}
+
+/* Base style for the inline explanation line used across the context panel.
+   This class had no rule at all, so a dozen "empty" surfaces fell back to raw
+   browser defaults and read as broken rather than intentionally empty. */
+.context-note {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.6;
+}
+.context-note code {
+  color: var(--accent-deep);
+}
+
 .context-card {
   display: grid;
   gap: 7px;

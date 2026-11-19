@@ -6,12 +6,13 @@ import type { AutopilotSnapshot, AutoStage, Card, ClosureInventory, ContextTab, 
 import { selectCurrentTask, useWorkspaceStore } from "../state/workspaceStore";
 import { claimSignCommand, closureSignCommand, experimentApproveCommands, protocolFreezeCommand } from "../domain/gateCommands";
 import { claimSignatureLabel } from "../domain/claimSignature";
-import { runtimeAvailable } from "../domain/capabilities";
+import { describeRuntimeError, runtimeAvailable } from "../domain/capabilities";
 import { hypothesisConvergence, literatureCoverage } from "../domain/researchBrief";
 import { defaultRuntimeSource, runtimeRunState, runtimeSourceLabel } from "../domain/runtimeSnapshot";
 import type { ResearchCheck } from "../domain/researchBrief";
 import { probeRuntime, loadAutopilotStatus, loadEvolutionActive, loadEvolutionObservations, loadProjectClosures, loadProjects, loadProjectExperiments } from "../adapters/runtimeApi";
 import type { EvolutionActive, EvolutionObservations, RuntimeHealth } from "../adapters/runtimeApi";
+import { EmptyState } from "./EmptyState";
 import { GateCommandItem, HumanGateCommand } from "./HumanGateCommand";
 import { Icon } from "./Icon";
 import { GovernancePanel } from "./GovernancePanel";
@@ -1106,7 +1107,9 @@ function RunContext({ task }: { task: ResearchTask }) {
               ))}
             </div>
           ) : (
-            <p className="context-empty">运行中输入任何文本都会进入指导队列，在下一阶段边界生效，并写入 trace。</p>
+            <EmptyState tone="note" icon="command" title="还没有插入指导">
+              运行中输入文本会进入队列，在下一个阶段边界生效并写入 trace；它只改执行策略，不改 claim 与门禁。
+            </EmptyState>
           )}
         </section>
       )}
@@ -1221,20 +1224,18 @@ function ProjectExperimentInventoryPanel() {
   }, [active]);
 
   if (!projects.length && !loading && !error) {
-    // An empty tab with no explanation reads as broken. State what is missing
-    // and where the real inventory comes from.
     return (
       <section className="context-section project-experiments">
         <div className="section-title">
           <span>PROJECT EXPERIMENTS</span>
           <em>EMPTY</em>
         </div>
-        <p className="context-note">
-          还没有登记项目实验链。这一栏读取 runtime 的 `project-experiments` 清单；
+        <EmptyState icon="branch" title="还没有登记项目实验链">
+          这一栏读取本地 runtime 的 project-experiments 清单。
           {runtimeAvailable
-            ? "启动本地 runtime 并登记项目后会出现在这里。"
-            : "静态演示构建不含 runtime，真实清单请在本地 CLI 工作台查看。"}
-        </p>
+            ? "启动 runtime 并登记项目后，实验链会出现在这里。"
+            : "当前是静态演示构建，真实清单请在本地 CLI 工作台查看。"}
+        </EmptyState>
       </section>
     );
   }
@@ -1262,7 +1263,14 @@ function ProjectExperimentInventoryPanel() {
         </div>
       )}
       {loading && <p className="run-hint">读取项目实验链…</p>}
-      {error && <p className="run-hint">项目实验链不可用：{error}</p>}
+      {error &&
+        (runtimeAvailable ? (
+          <p className="run-hint">{describeRuntimeError(error, "项目实验链不可用")}</p>
+        ) : (
+          <EmptyState icon="branch" title="静态构建不含项目实验链">
+            这一栏读取本地 runtime 的 /api/projects 清单；真实项目与实验包请在本地 CLI 工作台查看。
+          </EmptyState>
+        ))}
       {inventory && inventory.experiments.length === 0 && (
         <p className="run-hint">该 project 尚无 experiments；CLI 生成实验包后会出现在这里。</p>
       )}
@@ -1845,7 +1853,7 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
           ))}
         </div>
         <details className="chain-guide">
-          <summary>这五段是什么意思？什么时候需要人签？</summary>
+          <summary>五段的含义与人工签署时点</summary>
           <div className="chain-guide-body">
             <p>证据链从可定位的来源走到人签的结论，五段各管一件事：</p>
             <ul>
@@ -1900,10 +1908,10 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
             </div>
           </>
         ) : (
-          <p className="context-empty">
-            运行本地 runtime 任务后，这里会显示 S1–S13 每个证据包的状态（就绪 / 待人工 / 待签署 / 缺失）。
+          <EmptyState icon="evidence" title="还没有证据包">
+            运行本地 runtime 任务后，这里会按 S1–S13 显示每个证据包的状态（就绪 / 待人工 / 待签署 / 缺失）。
             静态预览不产生真实证据包。
-          </p>
+          </EmptyState>
         )}
       </section>
 
@@ -1940,17 +1948,31 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
       <section className="context-section">
         <div className="section-title">
           <span>ADMISSION</span>
-          <em>HUMAN GATES</em>
+          <em>{task.gates.filter((gate) => gate.status === "pass").length}/{task.gates.length} PASS</em>
         </div>
+        {/* RUN already lists every gate with its command. Here we only surface
+            the ones that are not through, so the same list is not printed twice. */}
         <div className="gate-list">
-          {task.gates.map((gate) => (
-            <div className="gate-row" key={gate.id}>
-              <span className={`gate-dot ${statusTone(gate.status)}`} />
-              <span className="gate-name"><b>{gate.id}</b><small>{gate.reason}</small></span>
-              <span className={`badge ${statusTone(gate.status)}`}>{gate.status.replace("_", " ")}</span>
-            </div>
-          ))}
+          {task.gates.filter((gate) => gate.status !== "pass").length ? (
+            task.gates
+              .filter((gate) => gate.status !== "pass")
+              .map((gate) => (
+                <div className="gate-row" key={gate.id}>
+                  <span className={`gate-dot ${statusTone(gate.status)}`} />
+                  <span className="gate-name"><b>{gate.id}</b><small>{gate.reason}</small></span>
+                  <span className={`badge ${statusTone(gate.status)}`}>{gate.status.replace("_", " ")}</span>
+                </div>
+              ))
+          ) : (
+            <EmptyState tone="note" icon="check" title="全部人工门已通过">
+              仍需在本地 CLI 完成 claim 签署与 closure 核对，导出才会解锁。
+            </EmptyState>
+          )}
         </div>
+        <button type="button" className="context-link" onClick={() => actions.setContextTab("run")}>
+          在 RUN 面板查看全部 {task.gates.length} 道门与命令
+          <Icon name="arrow" size={12} />
+        </button>
       </section>
 
       <div className="context-footnote">
