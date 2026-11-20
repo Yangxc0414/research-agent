@@ -7386,3 +7386,11 @@ select.control {
 .flow-stage.is-current .flow-stage-mark {
   color: var(--accent);
 }
+
+/* Demo bar: three storylines stack compactly in the left column. */
+.demo-bar-story {
+  gap: 2px;
+}
+.demo-story-btn {
+  padding: 2px 9px;
+}

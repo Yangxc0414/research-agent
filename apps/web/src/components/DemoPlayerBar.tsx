@@ -137,8 +137,9 @@ export function DemoPlayerBar() {
                   模拟人签（演示）
                 </button>
               )}
-              <button type="button" className="demo-ctrl" onClick={() => actions.demoExit()} title="退出演示模式">
+              <button type="button" className="demo-ctrl" onClick={() => actions.demoExit()} title="退出演示模式（转录恢复完整）">
                 <Icon name="close" size={13} />
+                退出
               </button>
             </>
           )}

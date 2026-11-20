@@ -265,9 +265,26 @@ export function ArtifactCard({ card }: { card: Card }) {
         : dialogGate === "G2"
           ? "G2 冻结协议 · 人工门"
           : "G5 闭合签署 · 人工门";
+    // The body must follow the card's own narrative (card.reason), not the claim
+    // status: a teaching S5b card above a sealed EA used to print "还没有 claim
+    // draft；先跑出 RunCapsule / EA" — contradicting the very message above it.
+    const gateStatusLabels: Record<string, string> = {
+      needs_human: "待人签",
+      blocked: "阻塞",
+      pass: "PASS",
+      not_started: "未开始"
+    };
+    const bodyText = claimLabel.demo
+      ? claimLabel.detail
+      : (card.reason ?? claimLabel.detail);
+    const metaText = claimLabel.demo
+      ? claimLabel.badge
+      : claim
+        ? claimLabel.badge
+        : (gateStatusLabels[card.status] ?? claimLabel.badge);
     return (
       <article className={`artifact gate-card${passed ? " is-pass" : ""}${claimLabel.demo ? " is-demo" : ""}`}>
-        <CardHead label={card.gate} meta={claimLabel.badge} />
+        <CardHead label={card.gate} meta={metaText} />
         <div className="gate-title">
           <span className="gate-icon">
             <Icon name={passed ? "check" : "lock"} size={16} />
@@ -280,7 +297,7 @@ export function ArtifactCard({ card }: { card: Card }) {
                   ? "claim 已签署（来源见证据面板）"
                   : card.title}
             </b>
-            <p>{claimLabel.detail}</p>
+            <p>{bodyText}</p>
           </div>
         </div>
         <Actions>

@@ -2760,7 +2760,7 @@ export function ContextPanel() {
         <span>
           {runtimeBacked
             ? `local runtime · ${runtimeCard?.route ?? runtimeCard?.taskType ?? "auto"}`
-            : `${profile.short} · ${profile.provider} · NO DATA`}
+            : `${profile.short} · ${profile.provider}`}
         </span>
         <span>
           {runtimeBacked
