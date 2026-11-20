@@ -59,7 +59,7 @@ class DemoUxPassTest(unittest.TestCase):
 
     def test_question_heading_replaced_with_a_statement(self):
         self.assertNotIn("这五段是什么意思？什么时候需要人签？", PANEL)
-        self.assertIn("五段的含义与人工签署时点", PANEL)
+        self.assertIn("六段的含义与人工签署时点", PANEL)
 
     def test_pipeline_button_does_not_promise_a_missing_runtime(self):
         self.assertIn('__STATIC_ONLY__ ? "推演一次 pipeline（演示）"', COMPOSER)

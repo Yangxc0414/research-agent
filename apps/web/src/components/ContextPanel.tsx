@@ -1821,12 +1821,16 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
   const packageMissing = packages.filter((item) =>
     ["missing", "blocked", "not_run"].includes(item.status)
   ).length;
+  // One canonical six-stage chain, shared with the guide below and with
+  // FlowDemo's CHAIN. Order is the real workflow: a claim is signed *after* the
+  // EA is sealed, so "断言" must follow "证据制品", not precede it.
   const nodes = [
     { label: "来源", title: "SOURCE HIT：检索到的文献/仓库，只是线索，不是证据", value: `${task.coverage.sources} sources`, state: task.coverage.sources ? "ok" : "idle" },
     { label: "片段", title: "SPAN：能指回原文的具体句子；摘要-only 不算证据", value: `${task.coverage.spans} located`, state: task.coverage.spans ? "ok" : "idle" },
+    { label: "运行记录", title: "CAPSULE：数据、代码版本、协议哈希与种子", value: task.run ? "1 capsule" : "not run", state: task.run ? "ok" : "idle" },
+    { label: "证据制品", title: "EA：结果文件被哈希钉住；改动会被发现", value: task.run?.ea ?? "not sealed", state: task.run ? "ok" : "idle" },
     { label: "断言", title: "CLAIM：一句可检验的话 + 数值断言；必须由人签署", value: claim ? claimLabel.short : "none", state: claimLabel.state === "signed-cli" || claimLabel.state === "signed-import" ? "ok" : claim ? "warn" : "idle" },
-    { label: "证据", title: "EA：结果文件被哈希钉住；改动会被发现", value: task.run ? task.run.ea : "not sealed", state: task.run ? "ok" : "idle" },
-    { label: "闭合", title: "CLOSURE：再核对四件产物一致；不一致就 blocked", value: closure?.status === "pass" ? "pass" : task.run ? "locked" : "n/a", state: closure?.status === "pass" ? "ok" : task.run ? "warn" : "idle" }
+    { label: "闭合", title: "CLOSURE：核对四件产物一致；不一致就 blocked", value: closure?.status === "pass" ? "pass" : task.run ? "locked" : "n/a", state: closure?.status === "pass" ? "ok" : task.run ? "warn" : "idle" }
   ];
 
   const kindLabel: Record<EvidenceItem["kind"], string> = {
@@ -1852,16 +1856,23 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
             </div>
           ))}
         </div>
+        <div className="chain-legend" aria-label="证据链状态图例">
+          <span className="ok">已就绪</span>
+          <span className="warn">待人工</span>
+          <span className="idle">未产出</span>
+          <em>箭头方向 = 证据依赖，从左到右</em>
+        </div>
         <details className="chain-guide">
-          <summary>五段的含义与人工签署时点</summary>
+          <summary>六段的含义与人工签署时点</summary>
           <div className="chain-guide-body">
-            <p>证据链从可定位的来源走到人签的结论，五段各管一件事：</p>
+            <p>证据链从可定位的来源走到人签的结论，六段各管一件事：</p>
             <ul>
               <li><b>来源</b>：检索到的文献或仓库，只是线索。</li>
               <li><b>片段</b>：能指回原文的具体句子；摘要-only 不算证据。</li>
               <li><b>运行记录</b>：这次实验的数据、代码、协议哈希与种子。</li>
               <li><b>证据制品</b>：结果文件被哈希钉住，改动会被发现。</li>
               <li><b>断言</b>：一句可检验的话 + 数值断言；必须由人签署。</li>
+              <li><b>闭合</b>：核对来源、片段、运行记录、断言四件产物一致；不一致即 blocked。</li>
             </ul>
             <p><b>待签 = 证据齐了，但你还没确认。</b> 典型情况：运行完成、EA 已封装、断言能重算，但 statement 与 human_reason 还没由人定稿。签核只能在本地 CLI 完成，网页不会代签。</p>
           </div>
