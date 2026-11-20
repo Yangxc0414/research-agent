@@ -815,6 +815,25 @@ export interface Message {
   stage?: string;
 }
 
+/**
+ * S1 literature annotation, transcribed from what a session's own artifacts and
+ * messages state (same data-layer discipline as replay.basis): the six-facet
+ * coverage is copied from the run's literature ledger statement, never inferred
+ * from keywords. Absent field = the session did not register facet coverage,
+ * and the ledger panel must say so instead of guessing.
+ */
+export interface LiteratureFacet {
+  id: "core" | "survey" | "method" | "evaluation" | "limitation" | "recent";
+  label: string;
+  covered: boolean;
+}
+
+export interface LiteratureAnnotation {
+  facets?: LiteratureFacet[];
+  /** Which artifact/message the facets were transcribed from. */
+  source?: string;
+}
+
 export interface ResearchTask {
   id: string;
   name: string;
@@ -853,6 +872,8 @@ export interface ResearchTask {
     basis: "real" | "fixture" | "demo";
     source?: string;
   };
+  /** S1 ledger annotation (six-facet coverage transcribed from artifacts). */
+  literature?: LiteratureAnnotation;
   runtime?: { source: RuntimeSource; runId?: string; appliedAt: string };
   runtimeLoop?: RuntimeLoop;
   autoPlan?: AutomationPlan | null;
@@ -909,7 +930,39 @@ export interface SettingsOrigin {
   label: string;
 }
 
+export type DemoStoryline = "teaching" | "real" | "ese";
+
+/** Gates that get a dedicated dialog. S5b/Q0 keep routing to the existing
+ * ClaimGateDialog, so the dialog id set is G1/G2/G5 only. */
+export type HumanGateDialogId = "G1" | "G2" | "G5";
+
+/**
+ * One-click full-flow demo player state. Lives on UIState only — it is NOT part
+ * of PersistedWorkspace, so a refresh always clears it and a demo can never be
+ * mistaken for persisted task state (same discipline as FlowDemo's in-memory
+ * 模拟人签).
+ */
+export interface DemoPlayerState {
+  storyline: DemoStoryline;
+  /** The seeded session whose transcript is replayed. */
+  taskId: string;
+  /** Messages revealed so far (transcript renders messages.slice(0, revealCount)). */
+  revealCount: number;
+  /** Stage tag of the most recently revealed staged message (null before S1). */
+  stageId: string | null;
+  /** Bumps whenever stageId changes, so highlight effects re-trigger. */
+  stageTick: number;
+  playing: boolean;
+  /** In-memory demo signature (teaching storyline only). Never touches the task. */
+  signed: boolean;
+  finished: boolean;
+}
+
 export interface UIState {
+  /** Non-null while the one-click demo player drives the conversation. */
+  demoPlayer: DemoPlayerState | null;
+  /** Human-gate dialog (G1/G2/G5) currently open; S5b routes to claimGateOpen. */
+  gateDialog: HumanGateDialogId | null;
   contextTab: ContextTab;
   search: string;
   expandedWorkspaces: Record<string, boolean>;

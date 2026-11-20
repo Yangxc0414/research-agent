@@ -14,6 +14,12 @@ import {
 } from "../adapters/runtimeApi";
 import { applyRuntimeSnapshot, defaultRuntimeSource, type RuntimeDemo } from "../domain/runtimeSnapshot";
 import { compactRuntimeLoop } from "../domain/runtimeLoop";
+import {
+  DEMO_STORYLINES,
+  createDemoPlayerState,
+  demoStageSpans,
+  isDemoGateStage
+} from "../domain/demoPlayer";
 import { CLI_ONLY_NOTE, protocolFreezeCommand } from "../domain/gateCommands";
 import { claimSignatureLabel, type SignedClaimRecord } from "../domain/claimSignature";
 import { ACCESS_META, AUTO_STAGE_CATALOG, DEFAULT_PREFERENCES, builtinSkills, clampModel } from "../domain/catalog";
@@ -29,6 +35,7 @@ import {
   seedArchivedTask,
   seedEseStudy,
   seedFullChainDemo,
+  SEED_LITERATURE_ANNOTATIONS,
   SEED_MEMORY_ENTRIES,
   planCard,
   writingCard
@@ -39,7 +46,9 @@ import type {
   AutoStage,
   Card,
   ContextAttachment,
+  DemoStoryline,
   EvidenceItem,
+  HumanGateDialogId,
   Gate,
   GateStatus,
   Guidance,
@@ -148,10 +157,67 @@ function ensureSeedArchiveAndMemory(snapshot: PersistedWorkspace): PersistedWork
   return snapshot;
 }
 
+/**
+ * Backfill the S1 literature facet annotations into already-persisted workspaces
+ * once (same run-once discipline as the ESE data backfill in design/137): the
+ * ledger panel reads task.literature, and older snapshots predate it. Only the
+ * two seeded sessions carry annotations; user-created tasks stay untouched.
+ */
+function ensureSeedLiteratureLedger(snapshot: PersistedWorkspace): PersistedWorkspace {
+  const missing = snapshot.tasks.some(
+    (task) => SEED_LITERATURE_ANNOTATIONS[task.id] && !task.literature
+  );
+  if (!missing) return snapshot;
+  const next: PersistedWorkspace = {
+    ...snapshot,
+    tasks: snapshot.tasks.map((task) =>
+      SEED_LITERATURE_ANNOTATIONS[task.id] && !task.literature
+        ? { ...task, literature: SEED_LITERATURE_ANNOTATIONS[task.id] }
+        : task
+    )
+  };
+  try {
+    staticAdapter.save(next);
+  } catch {
+    /* quota / private mode: keep the in-memory snapshot */
+  }
+  return next;
+}
+
+/**
+ * Refresh the ESE replay to the closed-loop version once. Older persisted
+ * snapshots hold the fragmented pre-stage-tag transcript (9 untagged messages
+ * stopping at G5); the extended replay narrates S1→META with stage tags. The
+ * detector is structural — no message carries a stage tag — so a user who has
+ * genuinely edited the session is not clobbered unless it predates the tags.
+ */
+function ensureEseClosedLoop(snapshot: PersistedWorkspace): PersistedWorkspace {
+  const stale = snapshot.tasks.find(
+    (task) => task.id === ESE_REPLAY_TASK_ID && !task.messages.some((message) => message.stage)
+  );
+  if (!stale) return snapshot;
+  const next: PersistedWorkspace = {
+    ...snapshot,
+    tasks: snapshot.tasks.map((task) => (task.id === ESE_REPLAY_TASK_ID ? seedEseStudy() : task))
+  };
+  try {
+    staticAdapter.save(next);
+  } catch {
+    /* quota / private mode: keep the in-memory snapshot */
+  }
+  return next;
+}
+
 const seededSnapshot = loadedSnapshot ? ensureSeedEseTask(loadedSnapshot) : createSeedWorkspace();
-const initialSnapshot = ensureSeedArchiveAndMemory(ensureSeedFullChainDemo(seededSnapshot));
+const initialSnapshot = ensureSeedLiteratureLedger(
+  ensureSeedArchiveAndMemory(
+    ensureSeedFullChainDemo(ensureEseClosedLoop(seededSnapshot))
+  )
+);
 
 const defaultUI: UIState = {
+  demoPlayer: null,
+  gateDialog: null,
   contextTab: "flow",
   search: "",
   expandedWorkspaces: {},
@@ -239,6 +305,8 @@ interface WorkspaceActions {
   signClaim: () => void;
   closeClaimGate: () => void;
   openClaimGate: () => void;
+  openGateDialog: (id: HumanGateDialogId) => void;
+  closeGateDialog: () => void;
   previewDemoClaim: () => void;
   resetDemoClaim: () => void;
   importSignedClaim: (record: SignedClaimRecord, scopeWarning?: string) => void;
@@ -273,6 +341,14 @@ interface WorkspaceActions {
   autoStep: () => void;
   stepAuto: () => void;
   stopAuto: () => void;
+  startDemoPlayer: (storyline?: DemoStoryline) => void;
+  demoTick: () => void;
+  demoTogglePlay: () => void;
+  demoStep: (direction: -1 | 1) => void;
+  demoSeekStage: (stageId: string) => void;
+  demoSignGate: () => void;
+  demoSwitch: (storyline: DemoStoryline) => void;
+  demoExit: () => void;
   previewCandidate: () => void;
   approveCandidate: () => void;
   rejectCandidate: () => void;
@@ -1148,6 +1224,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           activeWorkspaceId: task.workspaceId,
           ui: {
             ...state.ui,
+            // The demo player is bound to its storyline task; selecting a
+            // different task silently exits so no half-played demo lingers.
+            demoPlayer:
+              state.ui.demoPlayer && state.ui.demoPlayer.taskId !== id ? null : state.ui.demoPlayer,
             // 演示流程 is a generic teaching template. Carrying it across a task
             // switch means the first panel a viewer reads describes a different
             // project, so fall back to that task's own brief. An explicit choice
@@ -1493,7 +1573,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             pluginsOpen: false,
             skillsOpen: false,
             paletteOpen: false,
-            claimGateOpen: false
+            claimGateOpen: false,
+            gateDialog: null
           }
         }));
       },
@@ -2143,6 +2224,14 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         // Read-only entry: opening the panel to inspect where a signature came
         // from must not pause an autopilot run or roll G5 back to blocked.
         set((state) => ({ ui: { ...state.ui, claimGateOpen: true, paletteOpen: false } }));
+      },
+      openGateDialog: (id) => {
+        // Read-only: the dialog collects the human's decision and reason and
+        // surfaces the CLI command. It never mutates gates/evidence/claim.
+        set((state) => ({ ui: { ...state.ui, gateDialog: id, paletteOpen: false } }));
+      },
+      closeGateDialog: () => {
+        set((state) => ({ ui: { ...state.ui, gateDialog: null } }));
       },
       previewDemoClaim: () => {
         if (!__STATIC_ONLY__) {
@@ -3006,6 +3095,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
       startAuto: () => {
         const task = currentTask();
         if (!task) return;
+        // The demo player is a replay; starting governed auto means leaving it.
+        if (get().ui.demoPlayer) {
+          set((state) => ({ ui: { ...state.ui, demoPlayer: null } }));
+        }
         if (task.auto.running) {
           notify(task.auto.paused ? "全自动已暂停；请使用继续或停止" : "全自动正在运行");
           return;
@@ -3123,6 +3216,174 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
           messages: [...item.messages, message("system", "全自动已停止。已封存证据保留；未签 claim 不会产生。")]
         }));
         notify("已停止全自动");
+      },
+      // ------------------------------------------------------------------
+      // One-click demo player: replays a seeded transcript message by message.
+      // Every action below only touches ui.demoPlayer (in-memory, not
+      // persisted); task fields (gates/evidence/claim/messages) are never
+      // written, so a demo can never be mistaken for real task state.
+      // ------------------------------------------------------------------
+      startDemoPlayer: (storyline) => {
+        const meta = DEMO_STORYLINES[storyline ?? "teaching"];
+        const task = get().tasks.find((item) => item.id === meta.taskId);
+        if (!task) {
+          notify("演示会话不存在；可用命令面板「重置示例」恢复种子会话");
+          return;
+        }
+        set((state) => ({
+          selectedTaskId: meta.taskId,
+          activeWorkspaceId: task.workspaceId,
+          ui: {
+            ...state.ui,
+            demoPlayer: createDemoPlayerState(meta.id),
+            welcomeOpen: false,
+            sidebarOpen: false,
+            contextOpen: true,
+            contextCollapsed: false,
+            contextTab: "flow",
+            focusStage: null,
+            expandedWorkspaces: {
+              ...state.ui.expandedWorkspaces,
+              [task.workspaceId]: true
+            }
+          }
+        }));
+      },
+      demoTick: () => {
+        const state = get();
+        const player = state.ui.demoPlayer;
+        if (!player || !player.playing || player.finished) return;
+        const task = state.tasks.find((item) => item.id === player.taskId);
+        if (!task) return;
+        const next = task.messages[player.revealCount];
+        if (!next) {
+          set((s) => ({
+            ui: { ...s.ui, demoPlayer: { ...player, playing: false, finished: true } }
+          }));
+          return;
+        }
+        const stageChanged = Boolean(next.stage) && next.stage !== player.stageId;
+        // The gate pause fires when the gate stage's WHOLE span is revealed —
+        // some sessions tag several messages inside S5b (verdict + gate card),
+        // and pausing on the first would stop before the gate card itself.
+        const gateSpan = demoStageSpans(task.messages).find(
+          (span) => span.stage === next.stage
+        );
+        const atGate =
+          isDemoGateStage(player.storyline, next.stage ?? null) &&
+          gateSpan !== undefined &&
+          player.revealCount === gateSpan.last;
+        const wasLast = player.revealCount + 1 >= task.messages.length;
+        set((s) => ({
+          ui: {
+            ...s.ui,
+            demoPlayer: {
+              ...player,
+              revealCount: player.revealCount + 1,
+              stageId: next.stage ?? player.stageId,
+              stageTick: stageChanged ? player.stageTick + 1 : player.stageTick,
+              // The claim human gate is the demo's centerpiece: reveal the gate
+              // message, then stop so the presenter can narrate it.
+              playing: atGate || wasLast ? false : player.playing,
+              finished: wasLast
+            }
+          }
+        }));
+      },
+      demoTogglePlay: () => {
+        const player = get().ui.demoPlayer;
+        if (!player || player.finished) return;
+        set((s) => ({
+          ui: { ...s.ui, demoPlayer: { ...player, playing: !player.playing } }
+        }));
+      },
+      demoStep: (direction) => {
+        const state = get();
+        const player = state.ui.demoPlayer;
+        if (!player) return;
+        const task = state.tasks.find((item) => item.id === player.taskId);
+        if (!task) return;
+        const spans = demoStageSpans(task.messages);
+        if (!spans.length) return;
+        const stageIndex = spans.findIndex((span) => span.stage === player.stageId);
+        const targetIndex = stageIndex < 0 ? 0 : stageIndex + direction;
+        // Stepping past the edges clamps: before the first stage rewinds to the
+        // transcript head; past the last stage finishes the replay.
+        if (targetIndex < 0) {
+          set((s) => ({
+            ui: {
+              ...s.ui,
+              demoPlayer: { ...player, revealCount: 0, stageId: null, stageTick: player.stageTick + 1, playing: false, finished: false }
+            }
+          }));
+          return;
+        }
+        if (targetIndex >= spans.length) {
+          set((s) => ({
+            ui: {
+              ...s.ui,
+              demoPlayer: { ...player, revealCount: task.messages.length, playing: false, finished: true }
+            }
+          }));
+          return;
+        }
+        const target = spans[targetIndex];
+        set((s) => ({
+          ui: {
+            ...s.ui,
+            demoPlayer: {
+              ...player,
+              revealCount: target.last + 1,
+              stageId: target.stage,
+              stageTick: player.stageTick + 1,
+              finished: false
+            }
+          }
+        }));
+      },
+      demoSeekStage: (stageId) => {
+        const state = get();
+        const player = state.ui.demoPlayer;
+        if (!player) return;
+        const task = state.tasks.find((item) => item.id === player.taskId);
+        if (!task) return;
+        const span = demoStageSpans(task.messages).find((item) => item.stage === stageId);
+        if (!span) return;
+        set((s) => ({
+          ui: {
+            ...s.ui,
+            demoPlayer: {
+              ...player,
+              revealCount: span.last + 1,
+              stageId: span.stage,
+              stageTick: player.stageTick + 1,
+              playing: false,
+              finished: false
+            }
+          }
+        }));
+      },
+      demoSignGate: () => {
+        const player = get().ui.demoPlayer;
+        if (!player) return;
+        // Teaching storyline only: the real replay's on-disk signature is a
+        // delegated one and must not be presented as a human signature.
+        if (!DEMO_STORYLINES[player.storyline].allowDemoSign) {
+          notify("真实闭环回放不提供模拟人签；盘上签名是委托签，不是人签");
+          return;
+        }
+        // In-memory demo state only; the claim/gates on the task stay untouched.
+        set((s) => ({
+          ui: { ...s.ui, demoPlayer: { ...player, signed: true, playing: true } }
+        }));
+      },
+      demoSwitch: (storyline) => {
+        const player = get().ui.demoPlayer;
+        if (player && player.storyline === storyline) return;
+        get().actions.startDemoPlayer(storyline);
+      },
+      demoExit: () => {
+        set((state) => ({ ui: { ...state.ui, demoPlayer: null } }));
       },
       previewCandidate: () => {
         const task = currentTask();

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { Card } from "../domain/types";
 import { runtimeUrl } from "../adapters/runtimeApi";
 import { experimentApproveCommands, protocolFreezeCommand } from "../domain/gateCommands";
+import { gateIdForCard } from "../domain/gateContracts";
 import { claimSignatureLabel } from "../domain/claimSignature";
 import { selectCurrentTask, useWorkspaceStore } from "../state/workspaceStore";
 import { usePreviewStore } from "../state/previewStore";
@@ -246,6 +247,24 @@ export function ArtifactCard({ card }: { card: Card }) {
     const claim = task?.evidence.find((item) => item.kind === "claim");
     const claimLabel = claimSignatureLabel(claim);
     const passed = claimLabel.state === "signed-cli" || claimLabel.state === "signed-import";
+    // Each gate card routes to ITS OWN human gate. Every card used to open the
+    // claim panel — a G1 card asking the viewer to "签署 claim" contradicted the
+    // backend, where G1 converges candidates and S5b signs claims.
+    const dialogGate = gateIdForCard(card.gate);
+    const isClaimGate = dialogGate === "S5b" || dialogGate === null;
+    const openOwnGate = () => {
+      if (dialogGate && dialogGate !== "S5b") actions.openGateDialog(dialogGate);
+      else actions.signClaim();
+    };
+    const primaryLabel = isClaimGate
+      ? claimLabel.state === "unsigned" || claimLabel.state === "missing"
+        ? "签署 claim · 人工门"
+        : "查看 claim 签署来源"
+      : dialogGate === "G1"
+        ? "G1 收敛候选 · 人工门"
+        : dialogGate === "G2"
+          ? "G2 冻结协议 · 人工门"
+          : "G5 闭合签署 · 人工门";
     return (
       <article className={`artifact gate-card${passed ? " is-pass" : ""}${claimLabel.demo ? " is-demo" : ""}`}>
         <CardHead label={card.gate} meta={claimLabel.badge} />
@@ -265,10 +284,8 @@ export function ArtifactCard({ card }: { card: Card }) {
           </div>
         </div>
         <Actions>
-          <ActionButton variant="primary" onClick={actions.signClaim}>
-            {claimLabel.state === "unsigned" || claimLabel.state === "missing"
-              ? "签署 claim · 人工门"
-              : "查看 claim 签署来源"}
+          <ActionButton variant="primary" onClick={openOwnGate}>
+            {primaryLabel}
           </ActionButton>
           <ActionButton onClick={() => actions.setContextTab("evidence")}>查看证据链</ActionButton>
         </Actions>

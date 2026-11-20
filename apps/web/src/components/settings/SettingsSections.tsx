@@ -638,6 +638,15 @@ export function GuideSettingsPage() {
 
   const steps = [
     {
+      title: "一键演示完整流程",
+      text: "回放教学版九阶段（S1→META）：自动逐步揭示、S5b 停在人工门、可切真实闭环版；不调用模型、不写盘、不生成签名。",
+      action: "播放演示",
+      run: () => {
+        actions.closeSettings();
+        actions.startDemoPlayer("teaching");
+      }
+    },
+    {
       title: "新建一个任务",
       text: "命名目标并选择工作区；所有任务都会出现在左侧工作区树。",
       action: "新建任务",

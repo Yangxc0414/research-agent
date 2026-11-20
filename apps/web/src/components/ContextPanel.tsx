@@ -14,6 +14,8 @@ import { probeRuntime, loadAutopilotStatus, loadEvolutionActive, loadEvolutionOb
 import type { EvolutionActive, EvolutionObservations, RuntimeHealth } from "../adapters/runtimeApi";
 import { EmptyState } from "./EmptyState";
 import { GateCommandItem, HumanGateCommand } from "./HumanGateCommand";
+import { gateIdForCard } from "../domain/gateContracts";
+import { buildLiteratureLedger, hasLiteratureLayer } from "../domain/literatureLedger";
 import { Icon } from "./Icon";
 import { GovernancePanel } from "./GovernancePanel";
 import { RsiStoryPanel } from "./RsiStoryPanel";
@@ -1846,6 +1848,10 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
     hypothesis: "HYPOTHESIS",
     claim: "CLAIM"
   };
+  // S1 literature ledger: a read-only projection of coverage counts, six-facet
+  // audit, gap registry and the query plan. Only rendered for tasks that have a
+  // literature layer at all (repo-mining runs on RUN-CAPSULE evidence).
+  const ledger = hasLiteratureLayer(task) ? buildLiteratureLedger(task) : null;
 
   return (
     <div className="context-stack">
@@ -1895,6 +1901,91 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
           <div><b>{claimLabel.state === "signed-cli" || claimLabel.state === "signed-import" ? 1 : 0}</b><span>SIGNED CLAIMS</span></div>
         </div>
       </section>
+
+      {ledger && (
+        <section className="context-card literature-ledger">
+          <div className="card-label">
+            <span>LITERATURE LEDGER · S1</span>
+            <em>{ledger.facetBasis === "registered" ? "六面向已登记" : "六面向未登记"}</em>
+          </div>
+
+          <div className="ledger-composition">
+            <div><b>{ledger.composition.total}</b><span>来源</span></div>
+            <div><b>{ledger.composition.fullText}</b><span>全文</span></div>
+            <div className={ledger.composition.abstractOnly ? "is-warn" : ""}>
+              <b>{ledger.composition.abstractOnly}</b><span>摘要-only</span>
+            </div>
+            <div><b>{ledger.composition.spans}</b><span>可定位 span</span></div>
+            <div><b>{ledger.composition.gapCount}</b><span>coverage gap</span></div>
+          </div>
+          <p className="ledger-rule">
+            摘要-only 只作 SourceHit 线索，不生成 span、不进入 claim；gap 单独登记（modules/literature 契约）。
+          </p>
+
+          <div className="ledger-block">
+            <b>六面向覆盖核对</b>
+            <div className="ledger-facets">
+              {ledger.facets.map((facet) => (
+                <div className={`ledger-facet is-${facet.state}`} key={facet.id}>
+                  <span>{facet.label}</span>
+                  <i>{facet.state === "covered" ? "✓ 已覆盖" : facet.state === "missing" ? "✗ 未覆盖" : "— 未登记"}</i>
+                </div>
+              ))}
+            </div>
+            <small>
+              {ledger.facetBasis === "registered"
+                ? `面向状态转录自：${ledger.facetSource ?? "该会话产物"}；覆盖不足时由 literature-brief 技能显式提示补检索。`
+                : "该会话未登记面向覆盖（未登记 ≠ 未覆盖）；面向核对由 literature-brief 技能按此六项执行。"}
+            </small>
+          </div>
+
+          {ledger.plan && (
+            <details className="ledger-plan">
+              <summary>检索计划（plan 卡）· {ledger.plan.queries.length} 个子查询</summary>
+              <div className="ledger-plan-body">
+                <ol>
+                  {ledger.plan.queries.map((query) => <li key={query}>{query}</li>)}
+                </ol>
+                <p>范围：{ledger.plan.scope}</p>
+                <p>{ledger.plan.note}</p>
+              </div>
+            </details>
+          )}
+
+          <div className="ledger-block">
+            <b>gap 登记（{ledger.gaps.length}）</b>
+            {ledger.gaps.length ? (
+              <div className="ledger-gap-list">
+                {ledger.gaps.map((gap) => (
+                  <div className="ledger-gap" key={gap.id}>
+                    <span className="ledger-gap-id">{gap.id}</span>
+                    <div>
+                      <p>{gap.text}</p>
+                      {gap.note && <small>{gap.note}</small>}
+                      {gap.refs.length > 0 && (
+                        <div className="ledger-gap-refs">
+                          {gap.refs.map((ref) => <code key={ref}>{ref}</code>)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : ledger.composition.gapCount > 0 ? (
+              <small className="ledger-gap-empty">
+                coverage 登记 {ledger.composition.gapCount} 个 gap，但该会话没有逐条的 gap 证据行；逐条清单在 CLI 产物
+                literature.json 的 coverage.gaps（e2e 会话的 4 个 gap 即四个未覆盖面向）。
+              </small>
+            ) : (
+              <small className="ledger-gap-empty">没有登记的 gap；coverage gap 由检索审计单独登记，不与 span 混算。</small>
+            )}
+          </div>
+
+          <p className="ledger-boundary">
+            台账是任务状态的只读投影，不创建新的证据；真实检索台账在 <code>literature.json / literature-ledger.json</code>。
+          </p>
+        </section>
+      )}
 
       <section className="context-section evidence-package-section">
         <div className="section-title">
@@ -2539,12 +2630,26 @@ function BriefContext({ task }: { task: ResearchTask }) {
         <div className="section-title"><span>BLOCKERS</span><em>{blockers.length}</em></div>
         {blockers.length ? (
           <div className="brief-list">
-            {blockers.map((gate) => (
-              <div className="brief-row" key={gate.id}>
-                <b>{gate.id} · {gate.waiting ? "等待人工" : "阻塞"}</b>
-                <p>{gate.reason}</p>
-              </div>
-            ))}
+            {blockers.map((gate) => {
+              // A blocker you can act on: gate rows open their own human-gate
+              // dialog; the run-contract row points at the RUN panel where the
+              // not_verifiable checks live.
+              const gateId = gateIdForCard(gate.id);
+              const action = gateId
+                ? gateId === "S5b"
+                  ? { label: "进入人签面板", run: () => actions.signClaim() }
+                  : { label: `进入 ${gateId} 对话`, run: () => actions.openGateDialog(gateId) }
+                : { label: "查看 RUN", run: () => actions.setContextTab("run") };
+              return (
+                <div className="brief-row" key={gate.id}>
+                  <b>{gate.id} · {gate.waiting ? "等待人工" : "阻塞"}</b>
+                  <p>{gate.reason}</p>
+                  <button type="button" className="brief-row-action" onClick={action.run}>
+                    {action.label}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="brief-row"><b>当前没有登记的 blocker</b><p>仍需检查 claim、closure 与导出签名。</p></div>
