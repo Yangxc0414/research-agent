@@ -7495,3 +7495,37 @@ select.control {
   color: #7c3aed;
   font-weight: 600;
 }
+
+/* Claim statement under the 断言 chain node: what it asserts + scope. */
+.chain-claim {
+  margin-top: 7px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: var(--radius);
+  padding: 7px 9px;
+  background: var(--accent-dim);
+}
+.chain-claim b {
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.chain-claim p {
+  margin: 3px 0 0;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.55;
+  color: var(--text);
+}
+.chain-claim small {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.brief-claim small {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.brief-claim p {
+  margin: 3px 0 0;
+}

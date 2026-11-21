@@ -1881,6 +1881,16 @@ function EvidenceContext({ task }: { task: ResearchTask }) {
           <span className="idle">未产出</span>
           <em>箭头方向 = 证据依赖，从左到右</em>
         </div>
+        {/* What the claim is ABOUT, right under the 断言 node: a bare
+            "待签/signed" badge never says what the claim asserts or where it
+            holds (design/147). */}
+        {claim && (
+          <div className="chain-claim">
+            <b>断言 {claim.id} · {claimLabel.badge}</b>
+            <p>{claim.text}</p>
+            <small>范围：{claim.scope}</small>
+          </div>
+        )}
         <details className="chain-guide">
           <summary>六段的含义与人工签署时点</summary>
           <div className="chain-guide-body">
@@ -2595,6 +2605,12 @@ function BriefContext({ task }: { task: ResearchTask }) {
   const reviews = task.reviewPack;
   // The person's own words in this task, projected per stage (design/145).
   const humanTurnRows = humanTurns(task.messages);
+  // Every claim with its statement + scope, so "CLAIM none/signed" in the KPI
+  // always has the WHAT nearby: a claim is a checkable sentence + numeric
+  // assertion + the scope it holds in (design/147).
+  const claimRows = task.evidence
+    .filter((item) => item.kind === "claim")
+    .map((claim) => ({ claim, label: claimSignatureLabel(claim) }));
   const artifacts = [
     task.run?.id ? `run ${task.run.id}` : "",
     task.run?.ea ? `EA ${task.run.ea}` : "",
@@ -2628,6 +2644,31 @@ function BriefContext({ task }: { task: ResearchTask }) {
             <span><b>{closure?.status ?? "not_started"}</b>CLOSURE</span>
           </div>
         </div>
+      </section>
+
+      <section className="context-section">
+        <div className="section-title"><span>CLAIMS · 断言</span><em>{claimRows.length}</em></div>
+        {claimRows.length ? (
+          <div className="brief-list">
+            {claimRows.map(({ claim, label }) => (
+              <div className="brief-row brief-claim" key={claim.id}>
+                <b>{claim.id} · {label.badge}</b>
+                <p>{claim.text}</p>
+                <small>范围：{claim.scope}</small>
+                {claim.refs.length > 0 && <small>依据：{claim.refs.join(" · ")}</small>}
+                <small>{label.detail}</small>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="brief-row">
+            <b>本会话还没有登记 claim</b>
+            <p>
+              claim = 一句可检验的话 + 数值断言 + 它成立的范围（scope）。
+              它的位置在证据链「断言」段；EA 封存后由人决定是否签署，签署前后都登记在这里。
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="context-section">
