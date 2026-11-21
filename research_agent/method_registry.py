@@ -24,8 +24,24 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-SCHEMA = "ese-method-registry-0.3"
+SCHEMA = "ese-method-registry-0.4"
 SEVERITIES = ("blocker", "warn")
+
+# The closed port-type vocabulary for the element/composition layer (design/156).
+PORT_TYPES = (
+    "研究问题",
+    "候选假设（可判别）",
+    "提炼式假设（事后）",
+    "探索式数据收集设计",
+    "判别式协议",
+    "数据收集协议",
+    "RunCapsule + EA",
+    "ClaimRecord",
+    "图 manifest",
+    "稿件绑定",
+    "closure + 导出",
+    "任务反馈",
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REGISTRY = ROOT / "modules" / "method-registry" / "registry.json"
@@ -119,6 +135,69 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
         _require(isinstance(tags, list) and tags, method_id + ": tags must be a non-empty list")
         unknown = [tag for tag in tags if tag not in vocab_tags]
         _require(not unknown, method_id + ": tags missing from vocabulary: " + ", ".join(unknown))
+
+    # design/156: the element/composition layer — the meta-model (elements with
+    # typed ports) plus reference wirings, all fail-closed so the "framework is
+    # data" claim is backed by an executable loader.
+    elements_list = registry.get("elements")
+    _require(isinstance(elements_list, list) and elements_list, "registry needs an elements list")
+    elements = {}
+    for element in elements_list:
+        element_id = str(element.get("id") or "")
+        _require(bool(element_id), "element id cannot be empty")
+        _require(element_id not in elements, "duplicate element id: " + element_id)
+        elements[element_id] = element
+        _require(bool(str(element.get("label") or "")), element_id + ": label required")
+        input_kinds = element.get("input_kinds")
+        _require(isinstance(input_kinds, list), element_id + ": input_kinds must be a list")
+        for kind in input_kinds:
+            _require(kind in PORT_TYPES, element_id + ": unknown input port " + str(kind))
+        outputs = element.get("outputs")
+        _require(isinstance(outputs, list) and outputs, element_id + ": outputs must be non-empty")
+        for rule in outputs:
+            consumes = rule.get("consumes")
+            produces = rule.get("produces")
+            _require(consumes is None or consumes in PORT_TYPES, element_id + ": unknown consumes port")
+            _require(produces in PORT_TYPES, element_id + ": unknown produces port")
+            _require(
+                consumes is None or consumes in input_kinds,
+                element_id + ": output rule consumes undeclared input " + str(consumes),
+            )
+        _require(isinstance(element.get("human"), bool), element_id + ": human must be bool")
+
+    compositions = registry.get("compositions")
+    _require(isinstance(compositions, list) and compositions, "registry needs compositions")
+    composition_ids = []
+    for composition in compositions:
+        composition_id = str(composition.get("id") or "")
+        _require(bool(composition_id), "composition id cannot be empty")
+        _require(composition_id not in composition_ids, "duplicate composition id: " + composition_id)
+        composition_ids.append(composition_id)
+        wiring = composition.get("wiring")
+        _require(isinstance(wiring, list) and wiring, composition_id + ": wiring must be non-empty")
+        available = ["研究问题"]
+        for index, step in enumerate(wiring):
+            element_id = str(step.get("element") or "")
+            _require(element_id in elements, composition_id + ": wiring references unknown element " + element_id)
+            element = elements[element_id]
+            consumed = step.get("consumes")
+            if consumed:
+                _require(
+                    consumed in element["input_kinds"],
+                    composition_id + ": element " + element_id + " does not declare port " + str(consumed),
+                )
+                _require(
+                    consumed in available,
+                    composition_id + ": port " + str(consumed) + " has not been produced upstream",
+                )
+            rule = None
+            for candidate in element["outputs"]:
+                if candidate.get("consumes") == consumed:
+                    rule = candidate
+                    break
+            _require(rule is not None, composition_id + ": no output rule for " + str(consumed))
+            if rule["produces"] not in available:
+                available.append(rule["produces"])
     return registry
 
 
@@ -160,6 +239,15 @@ def get_method(method_id: str, registry: Optional[Dict[str, Any]] = None) -> Dic
             return method
     known = ", ".join(item["id"] for item in data["methods"])
     raise MethodRegistryError("unknown method: {0}; known: {1}".format(method_id, known))
+
+
+def get_composition(composition_id: str, registry: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    data = registry or load_registry()
+    for composition in data.get("compositions", []):
+        if composition["id"] == composition_id:
+            return composition
+    known = ", ".join(item["id"] for item in data.get("compositions", []))
+    raise MethodRegistryError("unknown composition: {0}; known: {1}".format(composition_id, known))
 
 
 def matrix(registry: Optional[Dict[str, Any]] = None, stage: Optional[str] = None) -> Dict[str, Any]:

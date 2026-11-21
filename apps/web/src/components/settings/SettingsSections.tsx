@@ -886,11 +886,11 @@ export function MethodModelSettingsPage() {
           非法接线（如探索式里让方案消费尚不存在的假设）会被端口校验拒绝。
         </p>
         <div className="composition-grid">
-          {COMPOSITION_ORDER.map((id) => {
-            const composition = COMPOSITIONS[id];
-            const violations = validateComposition(composition);
+          {(registry.compositions ??
+            COMPOSITION_ORDER.map((id) => COMPOSITIONS[id])).map((composition) => {
+            const violations = validateComposition(composition as Parameters<typeof validateComposition>[0]);
             return (
-              <div className="composition-col" key={id}>
+              <div className="composition-col" key={composition.id}>
                 <div className="composition-head">
                   <b>{composition.label}</b>
                   <span>{composition.sub}</span>

@@ -1,5 +1,5 @@
 {
-  "schema": "ese-method-registry-0.3",
+  "schema": "ese-method-registry-0.4",
   "boundary": "方法注册表是数据不是门禁：它给出阶段×方法的任务卡、必填字段与检查项，检查结果只作 advisory，不改变任何 gate/claim/signature 语义。",
   "stages": [
     {
@@ -1392,6 +1392,233 @@
       "tag": "预试记录",
       "definition": "测量工具的试测记录",
       "basis": "survey 协议字段（pilot）"
+    }
+  ],
+  "elements": [
+    {
+      "id": "问题",
+      "label": "研究问题",
+      "input_kinds": [],
+      "outputs": [
+        {
+          "consumes": null,
+          "produces": "研究问题"
+        }
+      ],
+      "human": false
+    },
+    {
+      "id": "假设",
+      "label": "问题与假设",
+      "input_kinds": [
+        "研究问题",
+        "RunCapsule + EA"
+      ],
+      "outputs": [
+        {
+          "consumes": "研究问题",
+          "produces": "候选假设（可判别）"
+        },
+        {
+          "consumes": "RunCapsule + EA",
+          "produces": "提炼式假设（事后）"
+        }
+      ],
+      "human": true
+    },
+    {
+      "id": "方案",
+      "label": "研究方案（设计冻结）",
+      "input_kinds": [
+        "候选假设（可判别）",
+        "研究问题"
+      ],
+      "outputs": [
+        {
+          "consumes": "候选假设（可判别）",
+          "produces": "判别式协议"
+        },
+        {
+          "consumes": "研究问题",
+          "produces": "数据收集协议"
+        }
+      ],
+      "human": true
+    },
+    {
+      "id": "证据",
+      "label": "证据生产（执行）",
+      "input_kinds": [
+        "判别式协议",
+        "数据收集协议"
+      ],
+      "outputs": [
+        {
+          "consumes": "判别式协议",
+          "produces": "RunCapsule + EA"
+        },
+        {
+          "consumes": "数据收集协议",
+          "produces": "RunCapsule + EA"
+        }
+      ],
+      "human": false
+    },
+    {
+      "id": "判定",
+      "label": "断言与签核",
+      "input_kinds": [
+        "RunCapsule + EA"
+      ],
+      "outputs": [
+        {
+          "consumes": "RunCapsule + EA",
+          "produces": "ClaimRecord"
+        }
+      ],
+      "human": true
+    },
+    {
+      "id": "图表",
+      "label": "结果图表",
+      "input_kinds": [
+        "RunCapsule + EA"
+      ],
+      "outputs": [
+        {
+          "consumes": "RunCapsule + EA",
+          "produces": "图 manifest"
+        }
+      ],
+      "human": false
+    },
+    {
+      "id": "写作",
+      "label": "写作与评审",
+      "input_kinds": [
+        "ClaimRecord",
+        "图 manifest"
+      ],
+      "outputs": [
+        {
+          "consumes": "ClaimRecord",
+          "produces": "稿件绑定"
+        }
+      ],
+      "human": true
+    },
+    {
+      "id": "闭包",
+      "label": "闭包与导出签核",
+      "input_kinds": [
+        "ClaimRecord",
+        "RunCapsule + EA"
+      ],
+      "outputs": [
+        {
+          "consumes": "ClaimRecord",
+          "produces": "closure + 导出"
+        }
+      ],
+      "human": true
+    },
+    {
+      "id": "经验",
+      "label": "经验与自改进",
+      "input_kinds": [
+        "closure + 导出"
+      ],
+      "outputs": [
+        {
+          "consumes": "closure + 导出",
+          "produces": "任务反馈"
+        }
+      ],
+      "human": true
+    }
+  ],
+  "compositions": [
+    {
+      "id": "confirmatory",
+      "label": "验证式组合",
+      "sub": "假设在前：方案消费假设，成为判别式协议",
+      "wiring": [
+        {
+          "element": "问题",
+          "consumes": null
+        },
+        {
+          "element": "假设",
+          "consumes": "研究问题"
+        },
+        {
+          "element": "方案",
+          "consumes": "候选假设（可判别）"
+        },
+        {
+          "element": "证据",
+          "consumes": "判别式协议"
+        },
+        {
+          "element": "判定",
+          "consumes": "RunCapsule + EA"
+        },
+        {
+          "element": "图表",
+          "consumes": "RunCapsule + EA"
+        },
+        {
+          "element": "写作",
+          "consumes": "ClaimRecord"
+        },
+        {
+          "element": "闭包",
+          "consumes": "ClaimRecord"
+        },
+        {
+          "element": "经验",
+          "consumes": "closure + 导出"
+        }
+      ]
+    },
+    {
+      "id": "exploratory",
+      "label": "探索式组合",
+      "sub": "证据在前：方案只消费问题（数据收集设计），假设从证据中提炼",
+      "wiring": [
+        {
+          "element": "问题",
+          "consumes": null
+        },
+        {
+          "element": "方案",
+          "consumes": "研究问题"
+        },
+        {
+          "element": "证据",
+          "consumes": "数据收集协议"
+        },
+        {
+          "element": "假设",
+          "consumes": "RunCapsule + EA"
+        },
+        {
+          "element": "判定",
+          "consumes": "RunCapsule + EA"
+        },
+        {
+          "element": "写作",
+          "consumes": "ClaimRecord"
+        },
+        {
+          "element": "闭包",
+          "consumes": "ClaimRecord"
+        },
+        {
+          "element": "经验",
+          "consumes": "closure + 导出"
+        }
+      ]
     }
   ]
 }

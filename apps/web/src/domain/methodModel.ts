@@ -60,6 +60,20 @@ export interface MethodRegistryData {
   methods: MethodRegistryMethod[];
   /** design/155: shared tag vocabulary (tag -> definition + basis). */
   tag_vocabulary?: TagVocabularyEntry[];
+  /** design/156: the element port model + reference wirings (framework as data). */
+  elements?: Array<{
+    id: string;
+    label: string;
+    input_kinds: string[];
+    outputs: Array<{ consumes: string | null; produces: string }>;
+    human: boolean;
+  }>;
+  compositions?: Array<{
+    id: string;
+    label: string;
+    sub: string;
+    wiring: Array<{ element: string; consumes: string | null }>;
+  }>;
 }
 
 let cache: MethodRegistryData | null | undefined;
@@ -72,7 +86,7 @@ export async function loadMethodRegistry(): Promise<MethodRegistryData | null> {
     const response = await fetch("./method-registry.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
     const data = (await response.json()) as MethodRegistryData;
-    cache = data.schema === "ese-method-registry-0.3" ? data : null;
+    cache = data.schema === "ese-method-registry-0.4" ? data : null;
   } catch {
     cache = null;
   }

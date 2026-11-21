@@ -83,6 +83,48 @@ class RegistryIntegrityTest(unittest.TestCase):
         with self.assertRaises(method_registry.MethodRegistryError):
             method_registry.validate(payload)
 
+
+class ElementCompositionTest(unittest.TestCase):
+    """design/156: the meta-model (elements with typed ports) and reference
+    wirings are registry data, fail-closed at load."""
+
+    def setUp(self):
+        self.registry = method_registry.load_registry()
+
+    def test_reference_compositions_are_legal_wirings(self):
+        for composition in self.registry["compositions"]:
+            method_registry.validate(self.registry)  # loader-level port matching
+        wiring_ids = [
+            (c["id"], [step["element"] for step in c["wiring"]])
+            for c in self.registry["compositions"]
+        ]
+        confirmatory = dict(wiring_ids)["confirmatory"]
+        self.assertIn("假设", confirmatory)
+        self.assertIn("方案", confirmatory)
+
+    def test_registry_rejects_illegal_wiring(self):
+        # 探索式组合里让方案消费假设：假设在该接线上尚未产出 → 数据层拒绝。
+        payload = json.loads(json.dumps(self.registry))
+        exploratory = [c for c in payload["compositions"] if c["id"] == "exploratory"][0]
+        exploratory["wiring"].insert(
+            2, {"element": "方案", "consumes": "候选假设（可判别）"}
+        )
+        with self.assertRaises(method_registry.MethodRegistryError) as context:
+            method_registry.validate(payload)
+        self.assertIn("has not been produced upstream", str(context.exception))
+
+    def test_registry_rejects_unknown_port(self):
+        payload = json.loads(json.dumps(self.registry))
+        payload["elements"][0]["outputs"][0]["produces"] = "不属于词表的端口"
+        with self.assertRaises(method_registry.MethodRegistryError):
+            method_registry.validate(payload)
+
+    def test_get_composition_round_trip(self):
+        composition = method_registry.get_composition("confirmatory", self.registry)
+        self.assertEqual(composition["id"], "confirmatory")
+        with self.assertRaises(method_registry.MethodRegistryError):
+            method_registry.get_composition("no-such-composition", self.registry)
+
     def test_every_method_stage_task_is_inside_fit_stages(self):
         for method in self.registry["methods"]:
             for stage in method["stage_tasks"]:
