@@ -7529,3 +7529,158 @@ select.control {
 .brief-claim p {
   margin: 3px 0 0;
 }
+
+/* ------------------------------------------------------------------ */
+/* Method model (方法原模型, design/149): shared governance slots ×     */
+/* method profiles, rendered from the exported registry snapshot.      */
+/* ------------------------------------------------------------------ */
+.settings-callout {
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  background: var(--surface-2);
+}
+.settings-callout b {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.settings-callout p {
+  margin: 3px 0 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.55;
+  color: var(--text);
+}
+.settings-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.66);
+}
+.settings-card + .settings-card {
+  margin-top: 9px;
+}
+.settings-card-title {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text);
+}
+.settings-card-title small {
+  color: var(--faint);
+  font-weight: 400;
+  margin-left: 6px;
+}
+.method-slots {
+  margin-top: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.method-slot {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--surface-2);
+}
+.method-slot b {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.method-slot span {
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.method-matrix {
+  margin-top: 7px;
+  display: grid;
+  gap: 2px;
+}
+.method-matrix-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.4fr) repeat(10, minmax(0, 1fr));
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  padding: 2px 4px;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.method-matrix-row:hover {
+  background: var(--accent-dim);
+}
+.method-matrix-row.is-on {
+  border-color: rgba(37, 99, 235, 0.35);
+  background: var(--accent-dim);
+}
+.method-matrix-head {
+  cursor: default;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.method-matrix-name {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.method-matrix-cell {
+  text-align: center;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.method-matrix-cell.is-fit {
+  color: var(--teal);
+  font-weight: 700;
+}
+.method-detail-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.method-detail-grid > div > b {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text);
+}
+.method-chips {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.method-chips code {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--accent-deep);
+  background: var(--accent-dim);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.method-chips code.is-blocker {
+  color: var(--coral);
+  background: rgba(217, 45, 85, 0.08);
+}
+.method-limits {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 3px;
+}
+.method-limits li {
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--muted);
+}
+.flow-state.is-method {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.3);
+}

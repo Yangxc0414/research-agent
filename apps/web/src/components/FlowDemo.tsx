@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AUTO_STAGE_CATALOG } from "../domain/catalog";
 import { demoStagePlan, stageLabel } from "../domain/demoPlayer";
+import { methodForSession, loadMethodRegistry, type MethodRegistryData } from "../domain/methodModel";
 import { STAGE_MODULE_CONTRACTS } from "../domain/gateContracts";
 import { humanTurns, turnsForStage } from "../domain/humanTurns";
 import { useWorkspaceStore } from "../state/workspaceStore";
@@ -186,6 +187,18 @@ export function FlowDemo() {
     demoPlayer && demoPlayer.taskId === selectedTaskId && !demoPlayer.finished
   );
   const playerStageId = playerActive ? (demoPlayer?.stageId ?? null) : null;
+  // Which method profile this session demonstrates (from the registry snapshot).
+  const [registry, setRegistry] = useState<MethodRegistryData | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void loadMethodRegistry().then((data) => {
+      if (!cancelled) setRegistry(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const sessionMethod = methodForSession(selectedTaskId, registry);
 
   // Clicking a flow node expands its detail AND jumps the conversation thread
   // to the first message tagged with that stage, so a presenter can point at a
@@ -212,12 +225,17 @@ export function FlowDemo() {
           </p>
         </div>
 
-        <div className="flow-controls is-player">
+          <div className="flow-controls is-player">
           <span className="flow-state">
             {playerActive && playerStageId
               ? `播放中 · 当前 ${playerStageId} ${stageLabel(playerStageId)}`
               : `${sessionStageIds.length} 个阶段 · 点击节点跳到会话对应位置`}
           </span>
+          {sessionMethod && (
+            <span className="flow-state is-method" title={`该方法的方法学协议字段与能力边界见 设置 → 方法模型`}>
+              方法 · {sessionMethod.name_zh}
+            </span>
+          )}
         </div>
 
         <section className="context-card">

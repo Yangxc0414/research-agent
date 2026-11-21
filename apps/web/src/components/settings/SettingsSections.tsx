@@ -12,6 +12,12 @@ import {
   modelProfile,
   thinkingLabel
 } from "../../domain/catalog";
+import {
+  blockerCount,
+  fitMap,
+  loadMethodRegistry,
+  type MethodRegistryData
+} from "../../domain/methodModel";
 import { siteHref } from "../../domain/links";
 import { folderStorage, folderStorageFileName } from "../../adapters/folderStorage";
 import type { ModelProfile } from "../../domain/types";
@@ -734,6 +740,174 @@ export function GuideSettingsPage() {
         ))}
       </div>
       <p className="settings-inline-note">引导步骤使用本地演示状态；真实 pipeline 请用 /live 或 RUN 面板的「运行任务」。人工门只在本地 CLI 完成，浏览器不会代为签署。</p>
+    </div>
+  );
+}
+
+/**
+ * 方法模型（design/149）： ten governance slots × nine research methods, from
+ * the method registry EXPORTED AS DATA (workspace export -> method-registry.json).
+ * This page renders the 共性/差异 split the thesis asks for: the slots and their
+ * governance never move; what changes per method is where it fits, which
+ * protocol fields it must freeze, and what it cannot support.
+ */
+export function MethodModelSettingsPage() {
+  const [registry, setRegistry] = useState<MethodRegistryData | null>(null);
+  const [missing, setMissing] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadMethodRegistry().then((data) => {
+      if (cancelled) return;
+      if (data) {
+        setRegistry(data);
+        setSelected(data.methods[0]?.id ?? null);
+      } else {
+        setMissing(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (missing) {
+    return (
+      <div className="settings-section-body">
+        <PageHead
+          eyebrow="EVIDENCE / METHOD MODEL"
+          title="方法模型"
+          description="方法注册表快照缺失：运行 python -m research_agent workspace export 重新导出 method-registry.json。"
+        />
+      </div>
+    );
+  }
+  if (!registry) {
+    return (
+      <div className="settings-section-body">
+        <PageHead eyebrow="EVIDENCE / METHOD MODEL" title="方法模型" description="正在载入方法注册表…" />
+      </div>
+    );
+  }
+
+  const active = registry.methods.find((method) => method.id === selected) ?? registry.methods[0];
+
+  return (
+    <div className="settings-section-body">
+      <PageHead
+        eyebrow="EVIDENCE / METHOD MODEL"
+        title="方法模型"
+        description="十个治理槽位对所有方法不变；每种方法声明它落在哪些槽位、要冻结哪些协议字段、不能支持什么——模型驱动复用，不为每种方法单设流程。"
+      />
+
+      <div className="settings-callout">
+        <b>注册表边界</b>
+        <p>{registry.boundary}</p>
+      </div>
+
+      <div className="settings-card">
+        <div className="settings-card-title">共性槽位（治理不变）</div>
+        <div className="method-slots">
+          {registry.stages.map((slot) => (
+            <span className="method-slot" key={slot.id} title={slot.name}>
+              <b>{slot.id}</b>
+              <span>{slot.name}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-card">
+        <div className="settings-card-title">方法 × 槽位矩阵（差异）</div>
+        <div className="method-matrix" role="table" aria-label="方法与槽位的适配矩阵">
+          <div className="method-matrix-row method-matrix-head">
+            <span className="method-matrix-name">方法</span>
+            {registry.stages.map((slot) => (
+              <span key={slot.id} className="method-matrix-cell" title={slot.name}>
+                {slot.id}
+              </span>
+            ))}
+          </div>
+          {registry.methods.map((method) => {
+            const fit = fitMap(method);
+            return (
+              <button
+                type="button"
+                key={method.id}
+                className={`method-matrix-row${selected === method.id ? " is-on" : ""}`}
+                onClick={() => setSelected(method.id)}
+                title={`${method.name_zh}（${method.name_en}）`}
+              >
+                <span className="method-matrix-name">{method.name_zh}</span>
+                {registry.stages.map((slot) => (
+                  <span
+                    key={slot.id}
+                    className={`method-matrix-cell${fit[slot.id] ? " is-fit" : ""}`}
+                    title={fit[slot.id] ? "该方法在此槽位有核心活动" : "非核心槽位"}
+                  >
+                    {fit[slot.id] ? "●" : "·"}
+                  </span>
+                ))}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {active && (
+        <div className="settings-card">
+          <div className="settings-card-title">
+            {active.name_zh} <small>{active.name_en}</small>
+          </div>
+          <div className="method-detail-grid">
+            <div>
+              <b>须冻结的协议字段</b>
+              <div className="method-chips">
+                {active.protocol_fields.map((field) => (
+                  <code key={field}>{field}</code>
+                ))}
+              </div>
+            </div>
+            <div>
+              <b>产物</b>
+              <div className="method-chips">
+                {active.artifacts.map((artifact) => (
+                  <code key={artifact}>{artifact}</code>
+                ))}
+              </div>
+            </div>
+            <div>
+              <b>检查（blocker {blockerCount(active)}/{active.checks.length}）</b>
+              <div className="method-chips">
+                {active.checks.map((check) => (
+                  <code key={check.id} className={check.severity === "blocker" ? " is-blocker" : ""}>
+                    {check.id}
+                  </code>
+                ))}
+              </div>
+            </div>
+            <div>
+              <b>不能支持（能力边界）</b>
+              <ul className="method-limits">
+                {active.cannot_support.map((limit) => (
+                  <li key={limit}>{limit}</li>
+                ))}
+              </ul>
+            </div>
+            {active.guidelines && active.guidelines.length > 0 && (
+              <div>
+                <b>方法学依据</b>
+                <ul className="method-limits">
+                  {active.guidelines.map((guideline) => (
+                    <li key={guideline.key}>{guideline.citation}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

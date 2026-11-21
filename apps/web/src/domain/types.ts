@@ -17,6 +17,7 @@ export type SettingsSection =
   | "runtime"
   | "usage"
   | "lineage"
+  | "methodModel"
   | "archive"
   | "data"
   | "guide"
