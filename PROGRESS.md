@@ -53,8 +53,8 @@
 | 161 | 对比表补标签差异行（单方法独有标签计算化呈现） | fb92d51 | ✅ |
 | 162 | 组合驱动计划（每方法解析出自己的流程顺序；python stage_plan + web stagePlanFor 双实现） | ed29c22 | ✅ |
 | 163 | 变与不变控制表（五维三列 + 控制层级 L3/L2/L1） | 74931d8 | ✅ |
-| 164 | 组合解析 advisory 层：`PipelineRequest.method_id` + `pipeline_stage_plan` + `stage_skip` 事件（**阶段块仍全部执行，非真实跳过**） | 本轮 | ✅ |
-| 165 | 执行层反思：计划可变不等于流程可变；给出可证伪判据 A/B | 本轮 | ✅ |
+| 164 | 组合解析 advisory 层：`PipelineRequest.method_id` + `pipeline_stage_plan` + `stage_skip` 事件（**阶段块仍全部执行，非真实跳过**） | 7a0d5f3 | ✅ |
+| 165 | 执行层反思：计划可变不等于流程可变；给出可证伪判据 A/B | 7a0d5f3 | ✅ |
 
 ---
 
