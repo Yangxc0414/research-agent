@@ -16,6 +16,8 @@ import { EmptyState } from "./EmptyState";
 import { GateCommandItem, HumanGateCommand } from "./HumanGateCommand";
 import { gateIdForCard } from "../domain/gateContracts";
 import { buildLiteratureLedger, hasLiteratureLayer } from "../domain/literatureLedger";
+import { humanTurns } from "../domain/humanTurns";
+import { stageLabel } from "../domain/demoPlayer";
 import { Icon } from "./Icon";
 import { GovernancePanel } from "./GovernancePanel";
 import { RsiStoryPanel } from "./RsiStoryPanel";
@@ -2591,6 +2593,8 @@ function BriefContext({ task }: { task: ResearchTask }) {
   const closure = task.gates.find((gate) => gate.id === "G5");
   const blockers = briefBlockers(task);
   const reviews = task.reviewPack;
+  // The person's own words in this task, projected per stage (design/145).
+  const humanTurnRows = humanTurns(task.messages);
   const artifacts = [
     task.run?.id ? `run ${task.run.id}` : "",
     task.run?.ea ? `EA ${task.run.ea}` : "",
@@ -2659,6 +2663,33 @@ function BriefContext({ task }: { task: ResearchTask }) {
       <section className="context-section">
         <div className="section-title"><span>NEXT</span><em>{task.auto.running ? "AUTO" : "MANUAL"}</em></div>
         <div className="brief-next">{briefNext(task)}</div>
+      </section>
+
+      <section className="context-section">
+        <div className="section-title"><span>HUMAN TURNS · 人的表述</span><em>{humanTurnRows.length}</em></div>
+        {humanTurnRows.length ? (
+          <div className="brief-list">
+            {humanTurnRows.map((turn) => (
+              <button
+                type="button"
+                className="brief-row brief-turn"
+                key={turn.id}
+                onClick={() => actions.focusMessage(turn.id)}
+                title="定位到会话中这条发言"
+              >
+                <b>
+                  {turn.stage ? stageLabel(turn.stage) : "开场"} · {turn.at}
+                </b>
+                <p>{turn.text.length > 64 ? `${turn.text.slice(0, 64)}…` : turn.text}</p>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="brief-row">
+            <b>本会话还没有人的发言</b>
+            <p>人在会话里的决策、追问与确认会按阶段显示在这里，点击定位到原话。</p>
+          </div>
+        )}
       </section>
 
       <section className="context-section">

@@ -150,7 +150,7 @@ const MessageView = memo(function MessageView({
 }) {
   if (item.role === "system") {
     return (
-      <div className={`system-line${isCurrent ? " is-demo-current" : ""}`}>
+      <div className={`system-line${isCurrent ? " is-demo-current" : ""}`} data-mid={item.id}>
         <span className="system-dot" />
         <span>{item.text}</span>
       </div>
@@ -159,7 +159,11 @@ const MessageView = memo(function MessageView({
 
   const isUser = item.role === "user";
   return (
-    <div className={`message${isUser ? " is-user" : ""}${isCurrent ? " is-demo-current" : ""}`} data-stage={item.stage}>
+    <div
+      className={`message${isUser ? " is-user" : ""}${isCurrent ? " is-demo-current" : ""}`}
+      data-stage={item.stage}
+      data-mid={item.id}
+    >
       <div className="avatar" aria-hidden="true">
         {isUser ? "YOU" : <Icon name="logo" size={14} />}
       </div>
@@ -210,6 +214,7 @@ export function Conversation() {
   const autoScroll = useWorkspaceStore((state) => state.preferences.autoScroll);
   const reduceMotion = useWorkspaceStore((state) => state.preferences.reduceMotion);
   const focusStage = useWorkspaceStore((state) => state.ui.focusStage);
+  const focusMessage = useWorkspaceStore((state) => state.ui.focusMessage);
   const threadRef = useRef<HTMLDivElement>(null);
   // Demo replay reveals the transcript progressively; without the player the
   // full transcript renders unchanged.
@@ -265,6 +270,20 @@ export function Conversation() {
     const timer = window.setTimeout(() => target.classList.remove("is-stage-focused"), 2200);
     return () => window.clearTimeout(timer);
   }, [focusStage, reduceMotion]);
+
+  // Human-turn -> conversation jump: same mechanics for a specific message id,
+  // driven by BRIEF's 人的表述 rows and the flow panel's human-turn quotes.
+  useEffect(() => {
+    if (!focusMessage || !threadRef.current) return;
+    const target = threadRef.current.querySelector<HTMLElement>(
+      `[data-mid="${focusMessage.id}"]`
+    );
+    if (!target) return;
+    target.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+    target.classList.add("is-stage-focused");
+    const timer = window.setTimeout(() => target.classList.remove("is-stage-focused"), 2200);
+    return () => window.clearTimeout(timer);
+  }, [focusMessage, reduceMotion]);
 
   return (
     <main className="conversation">

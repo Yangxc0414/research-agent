@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AUTO_STAGE_CATALOG } from "../domain/catalog";
 import { demoStagePlan, stageLabel } from "../domain/demoPlayer";
 import { STAGE_MODULE_CONTRACTS } from "../domain/gateContracts";
+import { humanTurns, turnsForStage } from "../domain/humanTurns";
 import { useWorkspaceStore } from "../state/workspaceStore";
 
 
@@ -169,11 +170,13 @@ export function FlowDemo() {
   const [localOpen, setOpen] = useState<number | null>(0);
   const setUI = useWorkspaceStore((state) => state.actions.setUI);
   const notify = useWorkspaceStore((state) => state.actions.notify);
+  const actions = useWorkspaceStore((state) => state.actions);
   const currentMessages = useWorkspaceStore(
     (state) => state.tasks.find((t) => t.id === state.selectedTaskId)?.messages ?? []
   );
   const selectedTaskId = useWorkspaceStore((state) => state.selectedTaskId);
   const demoPlayer = useWorkspaceStore((state) => state.ui.demoPlayer);
+  const allTurns = humanTurns(currentMessages);
 
   // SESSION PATH: stage tags on this transcript define the list, so the panel
   // tells THIS session's story and every node has a real jump target.
@@ -228,6 +231,7 @@ export function FlowDemo() {
               const gate = GATE_FOR_STAGE[stageId];
               const isCurrent = playerStageId === stageId;
               const expanded = localOpen === i || isCurrent;
+              const stageTurns = turnsForStage(allTurns, stageId);
               return (
                 <li
                   key={stageId}
@@ -246,6 +250,7 @@ export function FlowDemo() {
                     <span className="flow-stage-mark">✓</span>
                     <span className="flow-stage-id">{stageId}</span>
                     <span className="flow-stage-label">{stageLabel(stageId)}</span>
+                    {stageTurns.length > 0 && <span className="flow-stage-human">人×{stageTurns.length}</span>}
                     {gate ? <span className="flow-stage-gate">{gate}</span> : null}
                     <span
                       className="flow-stage-jump"
@@ -270,6 +275,23 @@ export function FlowDemo() {
                   </button>
                   {expanded ? (
                     <div className="flow-stage-body">
+                      {stageTurns.length > 0 && (
+                        <div className="flow-human-turns">
+                          <span>人的表述</span>
+                          {stageTurns.map((turn) => (
+                            <button
+                              type="button"
+                              key={turn.id}
+                              className="flow-human-turn"
+                              onClick={() => actions.focusMessage(turn.id)}
+                              title="定位到会话中这条发言"
+                            >
+                              <i>{turn.at}</i>
+                              {turn.text.length > 80 ? `${turn.text.slice(0, 80)}…` : turn.text}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                       {meta?.cmd && (
                         <div className="flow-kv">
                           <span>命令</span>

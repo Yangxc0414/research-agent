@@ -2,9 +2,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GATE_CONTRACTS, type HumanGateId } from "../domain/gateContracts";
 import { CLI_ONLY_NOTE } from "../domain/gateCommands";
 import { claimSignatureLabel } from "../domain/claimSignature";
+import { gateDecisionQuote, humanTurns, turnsForStage } from "../domain/humanTurns";
 import { selectCurrentTask, useWorkspaceStore } from "../state/workspaceStore";
 import { GateCommandItem } from "./HumanGateCommand";
 import { Icon } from "./Icon";
+
+/** Which transcript stage owns each gate's human decision. */
+const GATE_STAGE: Record<HumanGateId, string> = {
+  G1: "S2–S3",
+  G2: "S4",
+  S5b: "S5b",
+  G5: "S13–S16"
+};
 
 /**
  * Human-gate dialog for G1 (候选收敛) / G2 (协议冻结) / G5 (闭合签署).
@@ -35,7 +44,12 @@ export function GateDialog() {
     if (!open) return;
     restoreRef.current = document.activeElement as HTMLElement | null;
     setIdeaId("");
+    // The human often states their decision in the transcript already
+    // (「G1：收敛到 H1…」); seeding the reason with their own words keeps the
+    // dialog honest — questions are never pre-filled (gateDecisionQuote rule).
     setReason("");
+    const quote = open ? gateDecisionQuote(humanTurns(task?.messages ?? []), GATE_STAGE[open as HumanGateId], open) : null;
+    if (quote) setReason(quote.text);
     setConfirmed(false);
     setCopied(false);
     closeRef.current?.focus();
@@ -67,6 +81,16 @@ export function GateDialog() {
   const candidates = useMemo(
     () => task?.evidence.filter((item) => item.kind === "hypothesis") ?? [],
     [task]
+  );
+  // The person's own words in this session, projected per stage (design/145).
+  const stageId = open ? GATE_STAGE[open as HumanGateId] : null;
+  const stageTurns = useMemo(
+    () => (open && task ? turnsForStage(humanTurns(task.messages), stageId ?? "") : []),
+    [open, task, stageId]
+  );
+  const decisionQuote = useMemo(
+    () => (open ? gateDecisionQuote(humanTurns(task?.messages ?? []), stageId ?? "", open) : null),
+    [open, task, stageId]
   );
 
   if (!open) return null;
@@ -231,6 +255,23 @@ export function GateDialog() {
             </>
           )}
 
+          {stageTurns.length > 0 && (
+            <div className="gate-quote">
+              <b>本会话里人的原话</b>
+              {stageTurns.map((turn) => (
+                <button
+                  type="button"
+                  key={turn.id}
+                  className={`gate-quote-line${decisionQuote?.id === turn.id ? " is-decision" : ""}`}
+                  onClick={() => actions.focusMessage(turn.id)}
+                  title="定位到会话中这条发言"
+                >
+                  <i>{turn.at}</i>
+                  {turn.text.length > 90 ? `${turn.text.slice(0, 90)}…` : turn.text}
+                </button>
+              ))}
+            </div>
+          )}
           <label className="gate-confirm">
             <input
               type="checkbox"

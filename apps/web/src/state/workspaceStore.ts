@@ -218,6 +218,7 @@ const initialSnapshot = ensureSeedLiteratureLedger(
 const defaultUI: UIState = {
   demoPlayer: null,
   gateDialog: null,
+  focusMessage: null,
   contextTab: "flow",
   search: "",
   expandedWorkspaces: {},
@@ -307,6 +308,7 @@ interface WorkspaceActions {
   openClaimGate: () => void;
   openGateDialog: (id: HumanGateDialogId) => void;
   closeGateDialog: () => void;
+  focusMessage: (id: string) => void;
   previewDemoClaim: () => void;
   resetDemoClaim: () => void;
   importSignedClaim: (record: SignedClaimRecord, scopeWarning?: string) => void;
@@ -2232,6 +2234,11 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
       },
       closeGateDialog: () => {
         set((state) => ({ ui: { ...state.ui, gateDialog: null } }));
+      },
+      focusMessage: (id) => {
+        set((state) => ({
+          ui: { ...state.ui, focusMessage: { id, tick: Date.now() } }
+        }));
       },
       previewDemoClaim: () => {
         if (!__STATIC_ONLY__) {

@@ -989,6 +989,8 @@ export interface UIState {
   claimGateOpen: boolean;
   /** Flow-node -> conversation jump. tick forces re-trigger on repeated clicks. */
   focusStage: { id: string; tick: number } | null;
+  /** Human-turn -> conversation jump (BRIEF/panels quote the person's own words). */
+  focusMessage: { id: string; tick: number } | null;
 }
 
 export interface PersistedWorkspace {

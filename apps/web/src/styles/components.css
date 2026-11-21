@@ -7394,3 +7394,104 @@ select.control {
 .demo-story-btn {
   padding: 2px 9px;
 }
+
+/* ------------------------------------------------------------------ */
+/* Human turns (design/145): the person's own words projected per      */
+/* stage — BRIEF rows, session-path quotes, gate-dialog quotes.        */
+/* ------------------------------------------------------------------ */
+.brief-turn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.brief-turn:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+  background: #fff;
+}
+.flow-stage-human {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--violet, #7c3aed);
+  background: rgba(124, 58, 237, 0.08);
+  border-radius: 999px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.flow-human-turns {
+  margin-top: 8px;
+  border-top: 1px dashed var(--line-strong);
+  padding-top: 7px;
+}
+.flow-human-turns > span {
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  letter-spacing: 0.05em;
+  color: #7c3aed;
+  text-transform: uppercase;
+}
+.flow-human-turn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(124, 58, 237, 0.04);
+  padding: 5px 8px;
+  margin-top: 4px;
+  font: inherit;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+  cursor: pointer;
+}
+.flow-human-turn:hover {
+  border-color: rgba(124, 58, 237, 0.35);
+}
+.flow-human-turn i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+  margin-right: 6px;
+}
+.gate-quote {
+  margin-top: 10px;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  background: rgba(124, 58, 237, 0.04);
+}
+.gate-quote > b {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: #7c3aed;
+}
+.gate-quote-line {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px 0;
+  font: inherit;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.55;
+  color: var(--text);
+  cursor: pointer;
+}
+.gate-quote-line:hover {
+  text-decoration: underline;
+}
+.gate-quote-line i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+  margin-right: 6px;
+}
+.gate-quote-line.is-decision {
+  color: #7c3aed;
+  font-weight: 600;
+}
