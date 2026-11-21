@@ -8117,3 +8117,43 @@ select.control {
   padding: 1px 5px;
   margin-right: 4px;
 }
+
+/* Task-card matrix view (design/159): the advisor's 阶段×方法 two-dimensional
+   model — cross cells carry the methodology-constrained stage task text. */
+.matrix-view-switch {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.matrix-view-btn {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.matrix-view-btn.is-on {
+  background: var(--accent);
+  color: #fff;
+}
+.method-matrix-cell-task {
+  text-align: left;
+  font-size: calc(8px * var(--font-scale, 1));
+  line-height: 1.4;
+  color: var(--faint);
+  min-height: 30px;
+}
+.method-matrix-cell-task.has-task {
+  color: var(--text);
+  background: rgba(37, 99, 235, 0.04);
+}
+.method-matrix-cell-task.is-fit.has-task {
+  color: var(--accent-deep);
+  background: var(--accent-dim);
+}

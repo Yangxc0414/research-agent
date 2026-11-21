@@ -765,6 +765,9 @@ export function MethodModelSettingsPage() {
   const [registry, setRegistry] = useState<MethodRegistryData | null>(null);
   const [missing, setMissing] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  // design/159: 任务卡矩阵视图 — the advisor's 阶段×方法 two-dimensional model
+  // rendered as data (cross cells = 方法论约束下的阶段性任务 from stage_tasks).
+  const [taskMatrixView, setTaskMatrixView] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -968,7 +971,31 @@ export function MethodModelSettingsPage() {
       </div>
 
       <div className="settings-card">
-        <div className="settings-card-title">方法 × 槽位矩阵（差异）</div>
+        <div className="settings-card-title">
+          方法 × 槽位矩阵（差异）
+          <span className="matrix-view-switch" role="group" aria-label="矩阵视图切换">
+            <button
+              type="button"
+              className={`matrix-view-btn${!taskMatrixView ? " is-on" : ""}`}
+              onClick={() => setTaskMatrixView(false)}
+            >
+              适配点阵
+            </button>
+            <button
+              type="button"
+              className={`matrix-view-btn${taskMatrixView ? " is-on" : ""}`}
+              onClick={() => setTaskMatrixView(true)}
+              title="交叉格 = 方法论约束下的阶段性任务卡（stage_tasks）"
+            >
+              任务卡
+            </button>
+          </span>
+        </div>
+        <p className="method-contrast-note" style={{ margin: "0 0 7px" }}>
+          二维模型：行 = <b>研究阶段</b>（治理不变），列 = <b>研究方法</b>（数据声明）；
+          交叉点 = 方法论约束下的阶段性任务。一个任务 = 选一列方法，按行走有效格——
+          流程不是固定的链，而是这张矩阵上的走法。
+        </p>
         <div className="method-matrix" role="table" aria-label="方法与槽位的适配矩阵">
           <div className="method-matrix-row method-matrix-head">
             <span className="method-matrix-name">方法</span>
@@ -989,19 +1016,29 @@ export function MethodModelSettingsPage() {
                 title={`${method.name_zh}（${method.name_en}）`}
               >
                 <span className="method-matrix-name">{method.name_zh}</span>
-                {registry.stages.map((slot) => (
-                  <span
-                    key={slot.id}
-                    className={`method-matrix-cell${fit[slot.id] ? " is-fit" : ""}`}
-                    title={fit[slot.id] ? "该方法在此槽位有核心活动" : "非核心槽位"}
-                  >
-                    {fit[slot.id] ? "●" : "·"}
-                  </span>
-                ))}
+                {registry.stages.map((slot) => {
+                  const taskText = taskMatrixView ? (method.stage_tasks?.[slot.id] ?? "") : "";
+                  const cellClass = taskMatrixView
+                    ? `method-matrix-cell method-matrix-cell-task${taskText ? " has-task" : ""}${fit[slot.id] ? " is-fit" : ""}`
+                    : `method-matrix-cell${fit[slot.id] ? " is-fit" : ""}`;
+                  return (
+                    <span
+                      key={slot.id}
+                      className={cellClass}
+                      title={taskMatrixView && taskText ? taskText : fit[slot.id] ? "核心槽位" : "非核心槽位"}
+                    >
+                      {taskMatrixView ? (taskText ? taskText.slice(0, 46) : "—") : fit[slot.id] ? "●" : "·"}
+                    </span>
+                  );
+                })}
               </button>
             );
           })}
         </div>
+        <small className="method-contrast-note">
+          任务卡文本逐字来自注册表 stage_tasks（advisor 待办"标签化梳理"的落点之一）；
+          自改进的层级：改 skill = 微观，修订本矩阵交叉点 = <b>流程级</b>（须走组合提案租约）。
+        </small>
       </div>
 
       {tags.length > 0 && (
