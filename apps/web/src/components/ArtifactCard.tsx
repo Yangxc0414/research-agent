@@ -153,9 +153,16 @@ export function ArtifactCard({ card }: { card: Card }) {
 
   if (card.type === "protocol") {
     const frozen = task?.protocolFrozen ?? false;
+    // The frozen state must follow the task's replay basis: a real run's
+    // protocol card is a real frozen artifact, not "演示已推进" (design/137's
+    // mislabeling class), and a genuinely frozen protocol is not 待人工冻结.
+    const realBasis = task?.replay?.basis === "real" || task?.replay?.basis === "fixture";
     return (
       <article className="artifact">
-        <CardHead label="PROTOCOL / S4" meta={frozen ? "DRAFT · 演示已推进" : "DRAFT"} />
+        <CardHead
+          label="PROTOCOL / S4"
+          meta={frozen ? (realBasis ? "FROZEN · 真实产物" : "FROZEN · 演示推进") : "DRAFT"}
+        />
         <p className="artifact-lede">{card.hypothesis}</p>
         <dl className="artifact-kv">
           <dt>Baseline</dt>
@@ -167,10 +174,21 @@ export function ArtifactCard({ card }: { card: Card }) {
           <dt>对照</dt>
           <dd>{card.controls.join(" · ")}</dd>
         </dl>
-        <div className="artifact-status-row">
-          <span className="badge warn">待人工冻结</span>
-          <span>G2 由人工在终端冻结；冻结后不得改写主指标、对照与 seeds</span>
-        </div>
+        {frozen ? (
+          <div className="artifact-status-row">
+            <span className="badge ok">已冻结</span>
+            <span>
+              {realBasis
+                ? "G2 已通过（真实产物，capsule 绑定 protocol sha256）；主指标、对照与 seeds 不得改写"
+                : "G2 已按演示推进冻结；主指标、对照与 seeds 不得改写，改协议须重新走 G2"}
+            </span>
+          </div>
+        ) : (
+          <div className="artifact-status-row">
+            <span className="badge warn">待人工冻结</span>
+            <span>G2 由人工在终端冻结；冻结后不得改写主指标、对照与 seeds</span>
+          </div>
+        )}
         <Actions>
           <ActionButton variant="primary" onClick={() => setGateRevealed((open) => !open)} disabled={autoBusy}>
             {gateRevealed ? "收起 G2 命令" : "G2 人工冻结命令"}

@@ -305,6 +305,33 @@ export function GateDialog() {
           </button>
         </section>
 
+        {__STATIC_ONLY__ && (
+          <section className="claim-gate-block is-demo">
+            <b>在网页上应用决策（演示预览）</b>
+            <p>
+              演示时不必离开工作台：点下面的按钮，这条门会按你的决策在<b>页面内存</b>里推进——会话出现签署卡片、证据链与面板随之点亮。
+              不产生真实签名或决策文件，刷新页面即回待签；真实签署仍以下方的 CLI 命令为准。
+            </p>
+            <button
+              type="button"
+              className="solid-button"
+              disabled={!readyToRecord}
+              onClick={() => actions.applyDemoGateDecision(open)}
+            >
+              应用决策（演示预览）→
+            </button>
+            {!readyToRecord && (
+              <p className="claim-gate-error">
+                {open === "G1" && !ideaId
+                  ? "先选择收敛的候选。"
+                  : !confirmed
+                    ? "先勾选确认项。"
+                    : "先写下 human_reason。"}
+              </p>
+            )}
+          </section>
+        )}
+
         <section className="claim-gate-block">
           <b>真实生效（本地 CLI）</b>
           <p>决策与理由已填入命令；在终端执行后，产物（g1-decision.json / protocol-card.json / closure-signature）写回项目目录。占位符替换为本项目的实际路径。</p>

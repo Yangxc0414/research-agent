@@ -79,7 +79,9 @@ function TaskHeader() {
           <i>/</i>
           <span>{stageKicker}</span>
           <span className={`run-led ${task.auto.running && !task.auto.paused ? "is-live" : ""}`} />
-          <span>{statusLabel}</span>
+          {/* Blocked tasks already say 人签门待人签 in the kicker and gate pending
+              in the chips — a third "HUMAN GATE" here is pure repetition. */}
+          {!(task.status === "blocked" && !runtimeCard && !task.auto.running) && <span>{statusLabel}</span>}
         </div>
         <div className="task-title-line">
           <span className="task-tag">TASK</span>

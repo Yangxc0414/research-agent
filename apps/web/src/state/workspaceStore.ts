@@ -309,6 +309,7 @@ interface WorkspaceActions {
   openGateDialog: (id: HumanGateDialogId) => void;
   closeGateDialog: () => void;
   focusMessage: (id: string) => void;
+  applyDemoGateDecision: (gate: HumanGateDialogId) => void;
   previewDemoClaim: () => void;
   resetDemoClaim: () => void;
   importSignedClaim: (record: SignedClaimRecord, scopeWarning?: string) => void;
@@ -1230,12 +1231,17 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
             // different task silently exits so no half-played demo lingers.
             demoPlayer:
               state.ui.demoPlayer && state.ui.demoPlayer.taskId !== id ? null : state.ui.demoPlayer,
-            // 演示流程 is a generic teaching template. Carrying it across a task
-            // switch means the first panel a viewer reads describes a different
-            // project, so fall back to that task's own brief. An explicit choice
-            // (EVIDENCE / RUN / ...) is left alone.
-            contextTab:
-              state.ui.contextTab === "flow" && id !== "full-chain-demo" ? "brief" : state.ui.contextTab,
+            // 演示流程 used to be a generic template, so it fell back to BRIEF on
+            // other tasks (design/137). Since design/143 the flow panel derives
+            // the SESSION PATH from the transcript's own stage tags — switching
+            // to a tagged session lands on that session's own path so the
+            // panel-thread correspondence is always visible; untagged tasks
+            // fall back to the brief.
+            contextTab: task.messages.some((m) => m.stage)
+              ? "flow"
+              : state.ui.contextTab === "flow"
+                ? "brief"
+                : state.ui.contextTab,
             welcomeOpen: false,
             sidebarOpen: false,
             contextOpen: false,
@@ -2239,6 +2245,57 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => {
         set((state) => ({
           ui: { ...state.ui, focusMessage: { id, tick: Date.now() } }
         }));
+      },
+      applyDemoGateDecision: (gateId) => {
+        // Demo-only in-page decision (design/146): the presenter signs the gate
+        // IN the workbench and the UI reacts — the thread gets a gate card, the
+        // panels re-derive from it. Never a real signature: origin stays in
+        // memory, refresh resets, and the honest wording says so everywhere.
+        if (!__STATIC_ONLY__) {
+          notify("网页签署只在静态演示构建可用；真实签署请在本地 CLI 执行");
+          return;
+        }
+        const task = currentTask();
+        if (!task) return;
+        const wording: Record<HumanGateDialogId, { title: string; detail: string; hint: string }> = {
+          G1: {
+            title: "G1 · 候选收敛已在网页应用（演示）",
+            detail: "候选收敛由人确认（human_reason 来自会话原话）；候选不写入 claim。",
+            hint: "真实生效仍须本地 CLI `flow g1`，产物为 g1-decision.json。"
+          },
+          G2: {
+            title: "G2 · 协议冻结已在网页应用（演示）",
+            detail: "主指标、seeds 与对照已按人确认的协议冻结；执行器无权改写。",
+            hint: "真实生效仍须本地 CLI `protocol freeze`，产物为 protocol-card.json。"
+          },
+          G5: {
+            title: "G5 · 闭合签署已在网页预演（演示）",
+            detail: "closure 检查由人复核、导出签名已预演；证据链与面板随演示推进点亮。",
+            hint: "页面内存演示：未写 closure-signature.json，刷新即回待签；真实签名仍须 `closure sign`。"
+          }
+        };
+        const w = wording[gateId];
+        mutateTask(task.id, (item) => ({
+          ...item,
+          status: gateId === "G5" ? "active" : item.status,
+          gates: gate(item.gates, gateId, "pass", `（演示预览）人在网页应用了 ${gateId} 决策——页面内存，非真实签名`),
+          messages: [
+            ...item.messages,
+            message(
+              "agent",
+              `**${w.title}**\n\n- ${w.detail}\n- ${w.hint}\n\n> 这是页面内存里的演示预览：浏览器没有产生签名或决策文件；刷新页面即回到待签。`,
+              {
+                type: "gate",
+                gate: gateId,
+                title: w.title.replace("（演示）", "").replace("（演示）", ""),
+                reason: w.detail,
+                status: "pass"
+              }
+            )
+          ]
+        }));
+        set((state) => ({ ui: { ...state.ui, gateDialog: null } }));
+        notify(`${gateId} 决策已应用（演示预览 · 页面内存）`);
       },
       previewDemoClaim: () => {
         if (!__STATIC_ONLY__) {
