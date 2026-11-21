@@ -58,7 +58,7 @@
 | 166 | 研究方法/流程的变与不变：主张-证据-效力三元组 + 十方法效力矩阵 | b489f67 | ✅ |
 | 167 | 效力模型落地：注册表 0.6（validity_focus / iteration_rule / rationale / not_research / method_diff）+ 前端效力表 | 6f9d0a7 | ✅ |
 | 168 | 研究内容→方法→编排：选择信号（0.7）+ recommend 三态拒答 + pipeline auto + 前端推荐卡 | 4a0e31e | ✅ |
-| 169 | 执行流程对应研究方法：RESEARCH FLOW 三轨道（方法编排 / 治理固定 / 计划外）+ 计划-会话顺序分歧提示 + task.methodId | 待提交 | — |
+| 169 | 执行流程对应研究方法：RESEARCH FLOW 三轨道（方法编排 / 治理固定 / 计划外）+ 计划-会话顺序分歧提示 + task.methodId | 870780b | — |
 
 ---
 
