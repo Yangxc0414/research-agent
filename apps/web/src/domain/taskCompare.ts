@@ -39,6 +39,9 @@ export interface TaskCompareRow {
   firstStageQuote: string | null;
   /** Gates that still need a human or are blocked. */
   openGates: string[];
+  /** design/161: tags unique to this task's method among the compared tasks —
+   * the essential-difference markers, computed not curated. */
+  uniqueTags: string[];
 }
 
 function firstLine(text: string): string {
@@ -70,6 +73,7 @@ export function compareEmpiricalTasks(
       taskId: task.id,
       name: task.name,
       method: methodForSession(task.id, registry),
+      uniqueTags: [],
       dataset: task.run?.dataset ?? null,
       metric: task.run?.metric ?? task.protocol?.metric ?? null,
       seeds: task.run
@@ -97,6 +101,21 @@ export function compareEmpiricalTasks(
       openGates
     });
   }
+  // design/161: tags held by this method but by NO other compared method —
+  // the essential-difference markers made computable.
+  const tagOwners = new Map<string, Set<number>>();
+  rows.forEach((row, rowIndex) => {
+    for (const tag of row.method?.tags ?? []) {
+      const owners = tagOwners.get(tag) ?? new Set<number>();
+      owners.add(rowIndex);
+      tagOwners.set(tag, owners);
+    }
+  });
+  rows.forEach((row) => {
+    row.uniqueTags = [...(row.method?.tags ?? [])].filter(
+      (tag) => (tagOwners.get(tag)?.size ?? 0) === 1
+    );
+  });
   return rows;
 }
 

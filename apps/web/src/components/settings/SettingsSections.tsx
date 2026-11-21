@@ -1294,6 +1294,18 @@ export function MethodModelSettingsPage() {
                 <span key={row.taskId}>{row.openGates.length ? row.openGates.join(" / ") : "无"}</span>
               ))}
             </div>
+            <div className="task-compare-row">
+              <span>标签差异（单方法独有）</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>
+                  {row.uniqueTags.length ? (
+                    row.uniqueTags.map((tag) => <code key={tag}>{tag}</code>)
+                  ) : (
+                    "—"
+                  )}
+                </span>
+              ))}
+            </div>
           </div>
           <p className="method-contrast-note">
             对比派生自各任务自身字段与转录；运行时任务应由任务元数据携带 method_id 后进入同一张表。

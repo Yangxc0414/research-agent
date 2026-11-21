@@ -162,3 +162,20 @@ test("method profile comparison exposes the protocol-field contrast", () => {
   // Without a registry the method comparison is empty but the task rows still work.
   assert.deepEqual(compareMethodProfiles(null), []);
 });
+
+test("unique tag differences are computed against the compared set", () => {
+  // Two methods with deliberately overlapping + unique tags (as registered).
+  const methodA = { id: "repository-mining", name_zh: "甲", tags: ["消融实验", "随机化"] };
+  const methodB = { id: "controlled-experiment", name_zh: "乙", tags: ["消融实验", "三角验证"] };
+  const registry = {
+    schema: "ese-method-registry-0.4",
+    boundary: "",
+    stages: [{ id: "S1", name: "x" }],
+    methods: [methodA, methodB]
+  } as Parameters<typeof compareEmpiricalTasks>[1];
+  const a = task("ese-ms-20261118-03", { name: "甲任务" });
+  const b = task("e2e-closed-loop", { name: "乙任务" });
+  const rows = compareEmpiricalTasks([a, b], registry);
+  assert.deepEqual(rows[0].uniqueTags, ["随机化"]);
+  assert.deepEqual(rows[1].uniqueTags, ["三角验证"]);
+});
