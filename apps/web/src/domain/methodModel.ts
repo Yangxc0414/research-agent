@@ -43,6 +43,8 @@ export interface MethodRegistryMethod {
   artifacts: string[];
   cannot_support: string[];
   checks: Array<{ id: string; severity: string; requires?: string[] }>;
+  /** design/162: which composition wiring this method instantiates. */
+  composition_id?: string;
   /** design/153: the three reference-model dimensions. */
   inputs?: string[];
   evidence_sources?: string[];
@@ -73,6 +75,8 @@ export interface MethodRegistryData {
     label: string;
     sub: string;
     wiring: Array<{ element: string; consumes: string | null }>;
+    /** design/162: element id -> governance slots it walks. */
+    slot_map?: Record<string, string[]>;
   }>;
 }
 
@@ -86,7 +90,7 @@ export async function loadMethodRegistry(): Promise<MethodRegistryData | null> {
     const response = await fetch("./method-registry.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
     const data = (await response.json()) as MethodRegistryData;
-    cache = data.schema === "ese-method-registry-0.4" ? data : null;
+    cache = data.schema === "ese-method-registry-0.5" ? data : null;
   } catch {
     cache = null;
   }
@@ -238,4 +242,41 @@ export function tagAnalysis(registry: MethodRegistryData): TagAnalysisRow[] {
     });
   }
   return rows.sort((a, b) => b.methods.length - a.methods.length || a.tag.localeCompare(b.tag));
+}
+
+/**
+ * 解析后的阶段计划（design/162）：mirror of method_registry.stage_plan —
+ * the method's composition wiring walked in order, filtered to the method's
+ * fit slots, per-slot task card attached; fit slots not covered by the
+ * composition are appended with an uncovered marker.
+ */
+export interface MethodStagePlanStep {
+  slot: string;
+  task: string;
+  uncovered?: boolean;
+}
+
+export function stagePlanFor(
+  method: MethodRegistryMethod,
+  registry: MethodRegistryData
+): { compositionId: string; label: string; stages: MethodStagePlanStep[] } | null {
+  const composition = (registry.compositions ?? []).find((item) => item.id === method.composition_id);
+  if (!composition) return null;
+  const slotMap = composition.slot_map ?? {};
+  const fit = new Set(method.fit_stages);
+  const stages: MethodStagePlanStep[] = [];
+  const seen = new Set<string>();
+  for (const step of composition.wiring) {
+    for (const slot of slotMap[step.element] ?? []) {
+      if (fit.has(slot) && !seen.has(slot)) {
+        seen.add(slot);
+        stages.push({ slot, task: method.stage_tasks?.[slot] ?? "" });
+      }
+    }
+  }
+  const uncovered = method.fit_stages.filter((slot) => !seen.has(slot));
+  for (const slot of uncovered) {
+    stages.push({ slot, task: method.stage_tasks?.[slot] ?? "", uncovered: true });
+  }
+  return { compositionId: composition.id, label: composition.label, stages };
 }

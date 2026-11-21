@@ -1,5 +1,5 @@
 {
-  "schema": "ese-method-registry-0.4",
+  "schema": "ese-method-registry-0.5",
   "boundary": "方法注册表是数据不是门禁：它给出阶段×方法的任务卡、必填字段与检查项，检查结果只作 advisory，不改变任何 gate/claim/signature 语义。",
   "stages": [
     {
@@ -181,7 +181,8 @@
         "筛选标准",
         "质量评估",
         "综合矩阵"
-      ]
+      ],
+      "composition_id": "confirmatory"
     },
     {
       "id": "repository-mining",
@@ -333,7 +334,8 @@
         "标签启发式声明",
         "许可核对",
         "快照哈希"
-      ]
+      ],
+      "composition_id": "exploratory"
     },
     {
       "id": "controlled-experiment",
@@ -490,7 +492,8 @@
         "区组",
         "功效分析",
         "停止规则"
-      ]
+      ],
+      "composition_id": "confirmatory"
     },
     {
       "id": "quasi-experiment",
@@ -601,7 +604,8 @@
         "识别策略",
         "混杂清单",
         "敏感性分析"
-      ]
+      ],
+      "composition_id": "confirmatory"
     },
     {
       "id": "benchmark-evaluation",
@@ -741,7 +745,8 @@
         "污染控制",
         "饱和分析",
         "多重比较策略"
-      ]
+      ],
+      "composition_id": "confirmatory"
     },
     {
       "id": "case-study",
@@ -881,7 +886,8 @@
         "编码本",
         "成员核查",
         "伦理审查"
-      ]
+      ],
+      "composition_id": "exploratory"
     },
     {
       "id": "survey",
@@ -1002,7 +1008,8 @@
         "抽样框",
         "预试记录",
         "伦理审查"
-      ]
+      ],
+      "composition_id": "confirmatory"
     },
     {
       "id": "design-science",
@@ -1118,7 +1125,8 @@
       "tags": [
         "贡献声明",
         "边界条件"
-      ]
+      ],
+      "composition_id": "exploratory"
     },
     {
       "id": "action-research",
@@ -1229,7 +1237,8 @@
         "介入循环",
         "研究者角色声明",
         "伦理审查"
-      ]
+      ],
+      "composition_id": "exploratory"
     },
     {
       "id": "ml-iterative-experiment",
@@ -1388,7 +1397,8 @@
         "SOTA 对比",
         "种子披露",
         "toy 实验"
-      ]
+      ],
+      "composition_id": "exploratory"
     }
   ],
   "tag_vocabulary": [
@@ -1778,7 +1788,35 @@
           "element": "经验",
           "consumes": "closure + 导出"
         }
-      ]
+      ],
+      "slot_map": {
+        "问题": [
+          "S0"
+        ],
+        "假设": [
+          "S2-S3"
+        ],
+        "方案": [
+          "S4"
+        ],
+        "证据": [
+          "S1",
+          "S1b",
+          "S5"
+        ],
+        "判定": [
+          "S5b"
+        ],
+        "图表": [
+          "S6"
+        ],
+        "写作": [
+          "S8-S12"
+        ],
+        "闭包": [
+          "S13-S16"
+        ]
+      }
     },
     {
       "id": "exploratory",
@@ -1806,6 +1844,10 @@
           "consumes": "RunCapsule + EA"
         },
         {
+          "element": "图表",
+          "consumes": "RunCapsule + EA"
+        },
+        {
           "element": "写作",
           "consumes": "ClaimRecord"
         },
@@ -1817,7 +1859,36 @@
           "element": "经验",
           "consumes": "closure + 导出"
         }
-      ]
+      ],
+      "slot_map": {
+        "问题": [
+          "S0"
+        ],
+        "方案": [
+          "S4"
+        ],
+        "证据": [
+          "S1",
+          "S1b",
+          "S5"
+        ],
+        "假设": [
+          "S2-S3"
+        ],
+        "判定": [
+          "S5b"
+        ],
+        "图表": [
+          "S6"
+        ],
+        "写作": [
+          "S8-S12"
+        ],
+        "闭包": [
+          "S13-S16"
+        ]
+      }
     }
-  ]
+  ],
+  "composition_slot_maps_note": "slot_map 桥接组合要素与治理槽位；证据要素跨 S1（收集）与 S5（执行）。"
 }

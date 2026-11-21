@@ -24,7 +24,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-SCHEMA = "ese-method-registry-0.4"
+SCHEMA = "ese-method-registry-0.5"
 SEVERITIES = ("blocker", "warn")
 
 # The closed port-type vocabulary for the element/composition layer (design/156).
@@ -65,12 +65,12 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
     _require(isinstance(stages, list) and stages, "registry needs a non-empty stages list")
     _require(isinstance(methods, list) and methods, "registry needs a non-empty methods list")
 
-    stage_ids = []
+    known_stage_ids = []
     for stage in stages:
         stage_id = str(stage.get("id") or "")
         _require(bool(stage_id), "stage id cannot be empty")
-        _require(stage_id not in stage_ids, "duplicate stage id: " + stage_id)
-        stage_ids.append(stage_id)
+        _require(stage_id not in known_stage_ids, "duplicate stage id: " + stage_id)
+        known_stage_ids.append(stage_id)
 
     method_ids = []
     for method in methods:
@@ -82,7 +82,7 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
         _require(bool(str(method.get("name_en") or "")), method_id + ": name_en required")
         fit = method.get("fit_stages")
         _require(isinstance(fit, list) and fit, method_id + ": fit_stages must be non-empty")
-        unknown = [stage for stage in fit if stage not in stage_ids]
+        unknown = [stage for stage in fit if stage not in known_stage_ids]
         _require(not unknown, method_id + ": unknown stages " + ", ".join(unknown))
         for key in ("guidelines", "protocol_fields", "artifacts", "cannot_support", "checks",
                     "inputs", "evidence_sources", "evaluation_dimensions"):
@@ -167,6 +167,7 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
 
     compositions = registry.get("compositions")
     _require(isinstance(compositions, list) and compositions, "registry needs compositions")
+    composition_slot_maps = {}
     composition_ids = []
     for composition in compositions:
         composition_id = str(composition.get("id") or "")
@@ -175,6 +176,14 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
         composition_ids.append(composition_id)
         wiring = composition.get("wiring")
         _require(isinstance(wiring, list) and wiring, composition_id + ": wiring must be non-empty")
+        slot_map = composition.get("slot_map")
+        _require(isinstance(slot_map, dict) and slot_map, composition_id + ": slot_map required")
+        for element_id, slots in slot_map.items():
+            _require(element_id in elements, composition_id + ": slot_map for unknown element " + element_id)
+            _require(isinstance(slots, list) and slots, composition_id + ": slot_map slots must be non-empty")
+            for slot in slots:
+                _require(slot in known_stage_ids, composition_id + ": slot_map has unknown stage " + str(slot))
+        composition_slot_maps[composition_id] = slot_map
         available = ["研究问题"]
         for index, step in enumerate(wiring):
             element_id = str(step.get("element") or "")
@@ -198,6 +207,14 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
             _require(rule is not None, composition_id + ": no output rule for " + str(consumed))
             if rule["produces"] not in available:
                 available.append(rule["produces"])
+    for method in methods:
+        binding = method.get("composition_id")
+        _require(binding in composition_slot_maps, method_id + ": composition_id must reference a composition")
+        for slot in method["fit_stages"]:
+            _require(
+                any(slot in slots for element, slots in composition_slot_maps[binding].items()),
+                method_id + ": fit stage " + str(slot) + " not walked by composition " + str(binding),
+            )
     return registry
 
 
@@ -211,6 +228,41 @@ def load_registry(path: Optional[Any] = None) -> Dict[str, Any]:
     except (OSError, ValueError) as exc:
         raise MethodRegistryError("cannot read method registry: " + str(exc))
     return validate(data)
+
+
+def stage_plan(method_id: str, registry: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Resolve a method's composition wiring into its ordered stage plan
+    (design/162): per slot, the methodology-constrained task card. Fit slots
+    not walked by the composition are appended in canonical order with an
+    uncovered marker — the honest extension seam."""
+    data = registry or load_registry()
+    method = get_method(method_id, data)
+    composition = next(
+        (item for item in data.get("compositions", []) if item["id"] == method.get("composition_id")),
+        None,
+    )
+    if composition is None:
+        raise MethodRegistryError("method has no composition binding: " + method_id)
+    slot_map = composition.get("slot_map", {})
+    fit = list(method["fit_stages"])
+    tasks = method.get("stage_tasks", {})
+    stages = []
+    seen = set()
+    for step in composition["wiring"]:
+        for slot in slot_map.get(step["element"], []):
+            if slot in fit and slot not in seen:
+                seen.add(slot)
+                stages.append({"slot": slot, "task": tasks.get(slot, "")})
+    uncovered = [slot for slot in fit if slot not in seen]
+    for slot in uncovered:
+        stages.append({"slot": slot, "task": tasks.get(slot, ""), "uncovered": True})
+    return {
+        "method": method_id,
+        "composition": composition["id"],
+        "label": composition["label"],
+        "stages": stages,
+        "uncovered": uncovered,
+    }
 
 
 def stage_ids(registry: Optional[Dict[str, Any]] = None) -> List[str]:

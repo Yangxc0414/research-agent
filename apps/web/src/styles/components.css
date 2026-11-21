@@ -8182,3 +8182,42 @@ select.control {
   color: var(--accent-deep);
   margin-right: 6px;
 }
+
+/* Resolved stage plan (design/162): the per-method ordered plan derived from
+   its composition wiring — different methods, different orders. */
+.method-plan {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.method-plan-step {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 9px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.method-plan-step b {
+  flex: none;
+  font-family: var(--mono);
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.method-plan-step span {
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+}
+.method-plan-step.is-uncovered {
+  border-style: dashed;
+  opacity: 0.75;
+}
+.method-plan-step.is-uncovered small {
+  margin-left: auto;
+  font-size: calc(8px * var(--font-scale, 1));
+  color: var(--amber);
+}

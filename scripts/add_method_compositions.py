@@ -69,6 +69,7 @@ COMPOSITIONS = [
             {"element": "证据", "consumes": "数据收集协议"},
             {"element": "假设", "consumes": "RunCapsule + EA"},
             {"element": "判定", "consumes": "RunCapsule + EA"},
+            {"element": "图表", "consumes": "RunCapsule + EA"},
             {"element": "写作", "consumes": "ClaimRecord"},
             {"element": "闭包", "consumes": "ClaimRecord"},
             {"element": "经验", "consumes": "closure + 导出"}

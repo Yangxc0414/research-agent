@@ -18,6 +18,7 @@ import {
   evidenceProfileFor,
   fitMap,
   loadMethodRegistry,
+  stagePlanFor,
   tagAnalysis,
   type MethodRegistryData
 } from "../../domain/methodModel";
@@ -1203,6 +1204,32 @@ export function MethodModelSettingsPage() {
           </div>
         </div>
       )}
+
+      {selected && (() => {
+        const activeMethod = registry.methods.find((method) => method.id === selected);
+        const plan = activeMethod ? stagePlanFor(activeMethod, registry) : null;
+        if (!plan) return null;
+        return (
+          <div className="settings-card">
+            <div className="settings-card-title">解析后的阶段计划 · {plan.label}</div>
+            <p className="method-contrast-note" style={{ margin: "0 0 8px" }}>
+              该方法实例化的组合接线，按治理槽位展开——<b>不同方法的计划顺序不同</b>，这就是「不是固定流程」的数据形态。
+            </p>
+            <ol className="method-plan">
+              {plan.stages.map((step) => (
+                <li key={step.slot} className={`method-plan-step${step.uncovered ? " is-uncovered" : ""}`}>
+                  <b>{step.slot}</b>
+                  <span>{step.task || "（无任务卡）"}</span>
+                  {step.uncovered && <small>组合未编排 · 规范序补入</small>}
+                </li>
+              ))}
+            </ol>
+            <small className="method-contrast-note">
+              执行器消费此计划仍为 roadmap（design/156 §4）；当前计划已通过端口校验。
+            </small>
+          </div>
+        );
+      })()}
 
       {methodContrast.length > 0 && (
         <div className="settings-card">
