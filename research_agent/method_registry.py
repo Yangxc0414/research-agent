@@ -412,3 +412,35 @@ def check(method_id: str, payload: Dict[str, Any], registry: Optional[Dict[str, 
         "findings": findings,
         "boundary": "advisory only; missing fields are not a gate failure and do not create or modify any Claim",
     }
+
+
+def pipeline_stage_plan(method_id: str, registry: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Resolve a method's composition into pipeline stage names (design/164).
+
+    Maps governance slots to the pipeline's stage names. Advisory only: the
+    runner records the covered set and emits stage_skip events; it does not
+    actually skip code blocks yet (that migration is SPEC-first roadmap).
+    """
+    plan = stage_plan(method_id, registry)
+    slot_to_stage = {
+        "S1": "literature",
+        "S1b": "literature",
+        "S2-S3": "idea",
+        "S4": "experiment",
+        "S5": "run",
+        "S5b": "run",
+        "S6": "figure",
+        "S8-S12": "paper",
+    }
+    covered = set()
+    for step in plan["stages"]:
+        stage = slot_to_stage.get(step["slot"])
+        if stage:
+            covered.add(stage)
+    return {
+        "method": method_id,
+        "composition": plan["composition"],
+        "label": plan["label"],
+        "covered_stages": sorted(covered),
+        "plan": plan["stages"],
+    }

@@ -282,5 +282,53 @@ class CliTest(unittest.TestCase):
         self.assertEqual(code, 2)
 
 
+class PipelineStagePlanTest(unittest.TestCase):
+    """The advisory projection from a method's composition to pipeline stages."""
+
+    def setUp(self):
+        self.registry = method_registry.load_registry()
+
+    def test_confirmatory_slr_does_not_cover_experiment_stages(self):
+        plan = method_registry.pipeline_stage_plan("systematic-literature-review", self.registry)
+        self.assertEqual(plan["composition"], "confirmatory")
+        self.assertIn("literature", plan["covered_stages"])
+        self.assertIn("paper", plan["covered_stages"])
+        self.assertNotIn("experiment", plan["covered_stages"])
+        self.assertNotIn("run", plan["covered_stages"])
+
+    def test_exploratory_mining_covers_execution_but_not_writing(self):
+        plan = method_registry.pipeline_stage_plan("repository-mining", self.registry)
+        self.assertEqual(plan["composition"], "exploratory")
+        self.assertIn("literature", plan["covered_stages"])
+        self.assertIn("run", plan["covered_stages"])
+        self.assertNotIn("paper", plan["covered_stages"])
+
+    def test_plan_walks_each_slot_once(self):
+        plan = method_registry.pipeline_stage_plan("repository-mining", self.registry)
+        self.assertTrue(plan["plan"])
+        slots = [step["slot"] for step in plan["plan"]]
+        self.assertEqual(len(slots), len(set(slots)), "a slot must not be walked twice")
+
+    def test_uncovered_fit_slot_is_marked_not_dropped(self):
+        # No current method leaves a fit slot outside its composition; verify the
+        # extension seam with a synthetic wiring that drops one slot.
+        import copy
+        registry = copy.deepcopy(self.registry)
+        method = next(m for m in registry["methods"] if m["id"] == "repository-mining")
+        dropped = method["fit_stages"][-1]
+        for composition in registry["compositions"]:
+            if composition["id"] == method["composition_id"]:
+                for slots in composition["slot_map"].values():
+                    if dropped in slots:
+                        slots.remove(dropped)
+        plan = method_registry.stage_plan("repository-mining", registry)
+        marked = [step["slot"] for step in plan["stages"] if step.get("uncovered")]
+        self.assertIn(dropped, marked, "fit slots outside the wiring must be marked, not dropped")
+
+    def test_unknown_method_is_rejected(self):
+        with self.assertRaises(method_registry.MethodRegistryError):
+            method_registry.pipeline_stage_plan("no-such-method", self.registry)
+
+
 if __name__ == "__main__":
     unittest.main()

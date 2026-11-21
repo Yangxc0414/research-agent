@@ -15,9 +15,9 @@
 
 | 层 | 不变/可变 | 内容 | 控制者 |
 |---|---|---|---|
-| **元模型**（不变） | 治理语义：九槽位、五道人签门、证据三元组、EA 不可变、closure/lineage | 代码 + SPEC 强制（L3） |
-| **方法模型**（半可变，数据） | 方法注册表：10 方法 × fit_stages / 协议字段 / 检查 / 标签 / 组合绑定 / 证据类型与基线策略 / 三维（输入/证据源/评估维度） | 注册表数据（schema 0.5），fail-closed 校验（L2） |
-| **实例**（可变） | 每个研究任务会话：SESSION PATH、run/claim/断言范围、实验记录 | runtime 产生（L1 只读投影） |
+| **元模型**（不变） | 不变（L3） | 治理语义：九槽位、五道门（四项人工）、证据三元组、EA 不可变、closure/lineage | 代码 + SPEC 强制 |
+| **方法模型**（半可变，数据） | 随方法变（L2） | 方法注册表：10 方法 × fit_stages / 协议字段 / 检查 / 标签 / 组合绑定 / 证据类型与基线策略 / 三维（输入/证据源/评估维度） | 注册表数据（schema 0.5），fail-closed 校验 |
+| **实例**（可变） | 随内容变（L1） | 每个研究任务会话：SESSION PATH、run/claim/断言范围、实验记录 | runtime 产生，只读投影 |
 
 **控制表**（方法模型页顶部）五维三列，每格写明由谁控制、能变到什么程度——详见 design/163。
 
@@ -53,6 +53,8 @@
 | 161 | 对比表补标签差异行（单方法独有标签计算化呈现） | fb92d51 | ✅ |
 | 162 | 组合驱动计划（每方法解析出自己的流程顺序；python stage_plan + web stagePlanFor 双实现） | ed29c22 | ✅ |
 | 163 | 变与不变控制表（五维三列 + 控制层级 L3/L2/L1） | 74931d8 | ✅ |
+| 164 | 组合解析 advisory 层：`PipelineRequest.method_id` + `pipeline_stage_plan` + `stage_skip` 事件（**阶段块仍全部执行，非真实跳过**） | 本轮 | ✅ |
+| 165 | 执行层反思：计划可变不等于流程可变；给出可证伪判据 A/B | 本轮 | ✅ |
 
 ---
 
@@ -82,7 +84,7 @@
 | typecheck | ✅ |
 | web test:unit | ✅ 59/59（10 个测试文件） |
 | build + build:site | ✅ |
-| python pinned 门（method_registry/workspace/docs_audit/repo_hygiene/release） | ✅ 56/56 |
+| python pinned 门（method_registry/workspace/docs_audit/repo_hygiene/release/evolution/rsi/plugin/policy） | ✅ 119/119（本轮新增 5 例 `PipelineStagePlanTest`） |
 | readiness（check_task_readiness） | ✅ 7/7 会话可演示 |
 | 发行副本（build_release --prune + test_release_integrity） | ✅ |
 | CI（ci + Pages） | ✅ 全绿 |
@@ -93,7 +95,7 @@
 
 | # | 差距 | 依赖 | 出处 |
 |---|---|---|---|
-| 1 | 组合驱动执行器：pipeline.py 消费 stage_plan 替代硬编码链 | 后端 SPEC 先行 | 156 §4 |
+| 1 | 组合驱动执行器：pipeline.py 消费 stage_plan 替代硬编码链。**advisory 层已做**（164：`method_id` → 计划投影 → `stage_skip` 事件 + `composition_plan` 记录），阶段块仍全部执行；真跳过需证据形态多态与门依赖显式化 | 后端 SPEC 先行 | 156 §4 / 164 / 165 |
 | 2 | 组合提案租约化：agent 提出新接线 → 端口校验 + 治理门 + 历史回放 + 人签 | 依赖 #1 | 154 §4 |
 | 3 | G1 判别力：S4 协议增 discriminating_for 一等字段 | 后端 SPEC 先行 | 152 §2 |
 | 4 | G2 知识增量：claim 增 knowledge_delta 声明 | 后端 SPEC 先行 | 152 §2 |
@@ -112,4 +114,4 @@
 2. **变与不变是切分点问题**：治理语义不变（L3），方法数据可变（L2），实例内容可变（L1）——切错位置（如要求所有方法产出 RunCapsule）就会把合法方法挤出系统（163 证据形态教训）；
 3. **元模型不含顺序**：顺序属于组合接线——"为何这个顺序"由端口拓扑校验回答（154/162）；
 4. **遮蔽是潜伏 bug 温床**：stage_ids 局部遮蔽、S5b 的 nameZh 错位——都是测试逼出来的（151/157/162 排障记录）；
-5. **一次改动一篇反思文档**：每轮的设计决策、排障过程、可证伪主张全部落 design/NNN，下次引用可查。
+5. **一次改动一篇反思文档**：每轮的设计决策、排障过程、可证伪主张全部落 design/NNN，下次引用可查；编号唯一性与计数必须送 `docs_audit`，中断现场尤其容易留下重号草稿。
