@@ -7684,3 +7684,73 @@ select.control {
   background: rgba(124, 58, 237, 0.08);
   border-color: rgba(124, 58, 237, 0.3);
 }
+
+/* Cross-task comparison (design/150): same governance skeleton, different
+   empirical instantiations. Transposed table: dims as rows, tasks as columns. */
+.task-compare {
+  margin-top: 7px;
+  display: grid;
+  gap: 3px;
+}
+.task-compare-row {
+  display: grid;
+  grid-template-columns: minmax(84px, 0.7fr) repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 9px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.task-compare-row.task-compare-head {
+  background: var(--surface-2);
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.task-compare-row > span {
+  min-width: 0;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+}
+.task-compare-row.task-compare-head > span {
+  font-weight: 600;
+  color: var(--accent-deep);
+}
+.task-compare-row > span > b {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+}
+.task-compare-row > span > small {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.method-contrast {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.method-contrast-col {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.method-contrast-col b {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text);
+}
+.method-contrast-col small {
+  display: block;
+  margin-top: 4px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.method-contrast-note {
+  margin: 7px 0 0;
+  font-size: calc(9px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--faint);
+}

@@ -12,6 +12,7 @@ import {
   modelProfile,
   thinkingLabel
 } from "../../domain/catalog";
+import { compareEmpiricalTasks, compareMethodProfiles } from "../../domain/taskCompare";
 import {
   blockerCount,
   fitMap,
@@ -752,6 +753,7 @@ export function GuideSettingsPage() {
  * protocol fields it must freeze, and what it cannot support.
  */
 export function MethodModelSettingsPage() {
+  const tasks = useWorkspaceStore((state) => state.tasks);
   const [registry, setRegistry] = useState<MethodRegistryData | null>(null);
   const [missing, setMissing] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -792,6 +794,10 @@ export function MethodModelSettingsPage() {
   }
 
   const active = registry.methods.find((method) => method.id === selected) ?? registry.methods[0];
+  // Cross-task comparison: the same governance slots instantiated by different
+  // empirical tasks (design/150). Derived from each task's own fields.
+  const compareRows = compareEmpiricalTasks(tasks, registry);
+  const methodContrast = compareMethodProfiles(registry);
 
   return (
     <div className="settings-section-body">
@@ -906,6 +912,103 @@ export function MethodModelSettingsPage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {methodContrast.length > 0 && (
+        <div className="settings-card">
+          <div className="settings-card-title">协议字段对比 · 两种实证方法</div>
+          <div className="method-contrast">
+            {methodContrast.map((method) => (
+              <div className="method-contrast-col" key={method.id}>
+                <b>{method.nameZh}</b>
+                <div className="method-chips">
+                  {method.protocolFields.map((field) => (
+                    <code key={field}>{field}</code>
+                  ))}
+                </div>
+                <small>blocker 检查：{method.blockers.join(" · ")}</small>
+              </div>
+            ))}
+          </div>
+          <p className="method-contrast-note">
+            同一治理骨架：两边的差异只在「冻结什么、怎么检验」——执行、判定、签署的槽位与门完全复用。
+          </p>
+        </div>
+      )}
+
+      {compareRows.length > 0 && (
+        <div className="settings-card">
+          <div className="settings-card-title">实证任务对比 · 同一治理骨架，不同实例化</div>
+          <div className="task-compare" role="table" aria-label="实证任务对比">
+            <div className="task-compare-row task-compare-head">
+              <span>维度</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.name}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>方法 profile</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.method?.name_zh ?? "—"}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>证据源</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.dataset ?? "—"}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>主指标</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.metric ?? "—"}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>seeds</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.seeds ?? "—"}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>基线策略</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.baseline ?? "—"}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>断言（claim）</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>
+                  {row.claim ? (
+                    <>
+                      <b>{row.claim.id} · {row.claim.badge}</b>
+                      <small>{row.claim.text}</small>
+                      <small>范围：{row.claim.scope}</small>
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>已走槽位</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.stagesWalked.join(" → ")}</span>
+              ))}
+            </div>
+            <div className="task-compare-row">
+              <span>开着的人工门</span>
+              {compareRows.map((row) => (
+                <span key={row.taskId}>{row.openGates.length ? row.openGates.join(" / ") : "无"}</span>
+              ))}
+            </div>
+          </div>
+          <p className="method-contrast-note">
+            对比派生自各任务自身字段与转录；运行时任务应由任务元数据携带 method_id 后进入同一张表。
+          </p>
         </div>
       )}
     </div>
