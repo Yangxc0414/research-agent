@@ -145,58 +145,61 @@ export interface EvidenceProfile {
   /** design/157：该方法下智能体的基线对比策略——由证据类型推导，
    * 与 run contract 语义一致（如无配对基线则只报差值，不宣称超过基线）。 */
   baselinePolicy: string;
+  /** design/162：S5 执行槽位产出的具体证据形态——随方法变；
+   * 但治理对证据的抽象要求（可固定 / 可复算 / 可核查）不变。 */
+  artifactForm: string;
 }
 
 export const EVIDENCE_PROFILES: Record<string, EvidenceProfile> = {
   "controlled-experiment": {
     kind: "一手受控测量（受控 + 随机）",
     basis: "Wohlin 2014；实验的内部效度来自控制与随机化",
-    baselinePolicy: "配对基线比较：效应量 + 功效分析 + 预注册主比较；宣称「超过基线」必须有预注册的主对照"
+    baselinePolicy: "配对基线比较：效应量 + 功效分析 + 预注册主比较；宣称「超过基线」必须有预注册的主对照",    artifactForm: "RunCapsule + EA（受控测量记录）",
   },
   "quasi-experiment": {
     kind: "一手分组观察（有对照，无随机）",
     basis: "因果主张受识别策略限制",
-    baselinePolicy: "对照组比较：效应估计限定于识别策略；须附敏感性分析"
+    baselinePolicy: "对照组比较：效应估计限定于识别策略；须附敏感性分析",    artifactForm: "分组测量数据集（可哈希固定）",
   },
   "benchmark-evaluation": {
     kind: "标准化任务测量",
     basis: "可复现，但受污染与饱和威胁",
-    baselinePolicy: "基准分数对比：污染检查 + 预算匹配 + 多重比较校正；跨基准排名不可宣称"
+    baselinePolicy: "基准分数对比：污染检查 + 预算匹配 + 多重比较校正；跨基准排名不可宣称",    artifactForm: "基准评分 + 污染检查记录（可哈希固定）",
   },
   "repository-mining": {
     kind: "回顾性观察挖掘",
     basis: "生态效度好；标签为启发式，因果机制不可支持",
-    baselinePolicy: "无配对基线读数——只报差值/相关与检验，不宣称超过基线（E2E/ESE 实测口径）"
+    baselinePolicy: "无配对基线读数——只报差值/相关与检验，不宣称超过基线（E2E/ESE 实测口径）",    artifactForm: "语料快照 + metrics.json（sha 固定）",
   },
   "systematic-literature-review": {
     kind: "二手综合（证据 = 已发表研究）",
     basis: "Kitchenham 2007 / PRISMA 2020；效力取决于检索与筛选的可复现性",
-    baselinePolicy: "无一手基线——综合产出证据地图与共识/分歧；不与单一系统做排名对比"
+    baselinePolicy: "无一手基线——综合产出证据地图与共识/分歧；不与单一系统做排名对比",    artifactForm: "检索协议 + 筛选清单 + 综合矩阵（可复现重放）",
   },
   "case-study": {
     kind: "个案深描与三角验证",
     basis: "Runeson & Höst 2009；深度与机制，不可统计泛化",
-    baselinePolicy: "无对照——结论是机制性理解与可转移性判断，不报效应量"
+    baselinePolicy: "无对照——结论是机制性理解与可转移性判断，不报效应量",    artifactForm: "访谈/文档/制品证据包（链式可溯）",
   },
   survey: {
     kind: "自报测量（问卷/访谈）",
     basis: "主观体验可测，行为因果不可支持",
-    baselinePolicy: "自报分布与相关——不宣称行为因果；组间差异须答抽样框与无应答偏倚"
+    baselinePolicy: "自报分布与相关——不宣称行为因果；组间差异须答抽样框与无应答偏倚",    artifactForm: "应答数据集 + 提纲（可哈希固定）",
   },
   "design-science": {
     kind: "设计制品评估",
     basis: "效用主张限于评估策略所及",
-    baselinePolicy: "制品效用对比按评估策略执行；贡献类型决定对比形式"
+    baselinePolicy: "制品效用对比按评估策略执行；贡献类型决定对比形式",    artifactForm: "制品 + 评估记录（可核查）",
   },
   "action-research": {
     kind: "介入循环反思",
     basis: "情境性知识；无介入则不可归因",
-    baselinePolicy: "介入前后对照受情境限制——结论是情境性知识，不做统计归因"
+    baselinePolicy: "介入前后对照受情境限制——结论是情境性知识，不做统计归因",    artifactForm: "循环日志 + 反思记录（可追溯）",
   },
   "ml-iterative-experiment": {
     kind: "一手迭代测量（多种子 + 消融）",
     basis: "pengsida learning_research；Agarwal et al. 2021（statistical precipice）",
-    baselinePolicy: "与已发表 SOTA 的可复现对比 + 消融；多种子区间报告；toy→real 迁移差距如实声明"
+    baselinePolicy: "与已发表 SOTA 的可复现对比 + 消融；多种子区间报告；toy→real 迁移差距如实声明",    artifactForm: "实验日志 + 多种子结果 + 消融表（可复算）",
   }
 };
 

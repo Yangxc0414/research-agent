@@ -826,6 +826,56 @@ export function MethodModelSettingsPage() {
         <p>{registry.boundary}</p>
       </div>
 
+      <div className="settings-card variance-card">
+        <div className="settings-card-title">变与不变控制表</div>
+        <p className="method-contrast-note" style={{ margin: "0 0 8px" }}>
+          框架不是固定的，也不是无界的——每个维度由谁控制、能变到什么程度，都在这张表上。
+          控制层级：治理语义（代码+SPEC，L3）→ 方法数据（注册表+租约，L2）→ 任务实例（runtime）。
+        </p>
+        <div className="variance-table">
+          <div className="variance-head">
+            <span>维度</span>
+            <span className="is-fixed">不变（治理语义）</span>
+            <span className="is-method">随方法变（注册表数据）</span>
+            <span className="is-content">随内容变（任务实例）</span>
+          </div>
+          <div className="variance-row">
+            <b>治理槽位与门</b>
+            <span>槽位语义与门位置固定</span>
+            <span>方法声明核心槽位（fit）</span>
+            <span>实际走过的槽位</span>
+          </div>
+          <div className="variance-row">
+            <b>证据形态</b>
+            <span>可固定 / 可复算 / 可核查（抽象要求）</span>
+            <span>RunCapsule、应答集、语料快照…（具体形态）</span>
+            <span>本次执行的产物</span>
+          </div>
+          <div className="variance-row">
+            <b>流程顺序</b>
+            <span>端口依赖推导（拓扑）</span>
+            <span>组合接线（验证式 / 探索式）</span>
+            <span>实际执行记录</span>
+          </div>
+          <div className="variance-row">
+            <b>主张</b>
+            <span>claim 三元组（主张+依据+范围）</span>
+            <span>cannot_support 能力边界</span>
+            <span>本次的 statement 与范围</span>
+          </div>
+          <div className="variance-row">
+            <b>自改进</b>
+            <span>租约 + 门 + 人签（治理不变）</span>
+            <span>方法/矩阵/组合的修订提案</span>
+            <span>过程经验与教训</span>
+          </div>
+        </div>
+        <small className="method-contrast-note">
+          每格的控制者不同：治理语义由代码与 SPEC 强制（不可经前端修改）；
+          方法数据经组合提案租约修订（L2）；任务实例由 runtime 产生（L1 只读投影）。
+        </small>
+      </div>
+
       <div className="settings-card essence-card">
         <div className="settings-card-title">研究的本质 · 原模型</div>
         <p className="essence-def">
@@ -1142,6 +1192,9 @@ export function MethodModelSettingsPage() {
             <div>
               <b>证据类型与效力</b>
               <p className="method-evidence-kind">{evidenceProfileFor(active.id)?.kind ?? "—"}</p>
+              <p className="method-artifact-form">
+                <i>S5 证据形态：</i>{evidenceProfileFor(active.id)?.artifactForm ?? "—"}
+              </p>
               <small className="method-evidence-basis">{evidenceProfileFor(active.id)?.basis ?? ""}</small>
             </div>
             <div>

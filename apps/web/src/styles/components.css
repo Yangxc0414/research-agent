@@ -8221,3 +8221,55 @@ select.control {
   font-size: calc(8px * var(--font-scale, 1));
   color: var(--amber);
 }
+
+/* Variance control table (design/162): what is fixed, what varies by method,
+   what varies by content — and WHO controls each cell. */
+.variance-card {
+  border-left: 3px solid var(--accent);
+}
+.variance-table {
+  margin-top: 7px;
+  display: grid;
+  gap: 3px;
+}
+.variance-row,
+.variance-head {
+  display: grid;
+  grid-template-columns: minmax(70px, 0.8fr) repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 9px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.variance-head {
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.variance-head .is-fixed { color: var(--accent-deep); }
+.variance-head .is-method { color: var(--teal); }
+.variance-head .is-content { color: var(--amber); }
+.variance-row b {
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text);
+}
+.variance-row span,
+.variance-head span {
+  font-size: calc(9px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--muted);
+}
+.method-artifact-form {
+  margin: 4px 0 0;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text);
+  line-height: 1.5;
+}
+.method-artifact-form i {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--teal);
+  margin-right: 5px;
+}
