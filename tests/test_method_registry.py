@@ -27,6 +27,24 @@ class RegistryIntegrityTest(unittest.TestCase):
             self.assertTrue(method["checks"], method["id"])
             self.assertTrue(method.get("reporting_sections"), method["id"])
 
+    def test_every_method_declares_the_three_model_dimensions(self):
+        # design/153: inputs / evidence_sources / evaluation_dimensions must be
+        # declared per method and each evaluation dimension carries a literature
+        # basis — the reference model is theory-grounded, not intuition.
+        for method in self.registry["methods"]:
+            self.assertGreaterEqual(len(method["inputs"]), 2, method["id"])
+            self.assertTrue(method["evidence_sources"], method["id"])
+            self.assertGreaterEqual(len(method["evaluation_dimensions"]), 3, method["id"])
+            for dim in method["evaluation_dimensions"]:
+                self.assertTrue(dim["dimension"], method["id"])
+                self.assertTrue(dim["basis"], method["id"] + ": dimension needs a basis")
+
+    def test_registry_rejects_method_without_dimensions(self):
+        payload = json.loads(json.dumps(self.registry))
+        del payload["methods"][0]["evaluation_dimensions"]
+        with self.assertRaises(method_registry.MethodRegistryError):
+            method_registry.validate(payload)
+
     def test_every_method_stage_task_is_inside_fit_stages(self):
         for method in self.registry["methods"]:
             for stage in method["stage_tasks"]:

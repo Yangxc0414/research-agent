@@ -956,6 +956,33 @@ export function MethodModelSettingsPage() {
           </div>
           <div className="method-detail-grid">
             <div>
+              <b>输入（该方法消费什么）</b>
+              <div className="method-chips">
+                {(active.inputs ?? []).map((input) => (
+                  <code key={input}>{input}</code>
+                ))}
+              </div>
+            </div>
+            <div>
+              <b>证据源（证据从哪里来）</b>
+              <div className="method-chips">
+                {(active.evidence_sources ?? []).map((source) => (
+                  <code key={source}>{source}</code>
+                ))}
+              </div>
+            </div>
+            <div>
+              <b>评估维度（维度 + 文献依据）</b>
+              <div className="method-dims">
+                {(active.evaluation_dimensions ?? []).map((dim) => (
+                  <div className="method-dim" key={dim.dimension}>
+                    <span>{dim.dimension}</span>
+                    <small>{dim.basis}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
               <b>须冻结的协议字段</b>
               <div className="method-chips">
                 {active.protocol_fields.map((field) => (
@@ -1002,6 +1029,19 @@ export function MethodModelSettingsPage() {
                     <li key={guideline.key}>{guideline.citation}</li>
                   ))}
                 </ul>
+              </div>
+            )}
+            {active.stage_tasks && Object.keys(active.stage_tasks).length > 0 && (
+              <div>
+                <b>槽位任务卡（每槽位该做什么）</b>
+                <div className="method-stage-tasks">
+                  {Object.entries(active.stage_tasks).map(([slot, text]) => (
+                    <div className="method-stage-task" key={slot}>
+                      <b>{slot}</b>
+                      <span>{text}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

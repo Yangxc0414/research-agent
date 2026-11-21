@@ -24,7 +24,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-SCHEMA = "ese-method-registry-0.1"
+SCHEMA = "ese-method-registry-0.2"
 SEVERITIES = ("blocker", "warn")
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,8 +68,20 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
         _require(isinstance(fit, list) and fit, method_id + ": fit_stages must be non-empty")
         unknown = [stage for stage in fit if stage not in stage_ids]
         _require(not unknown, method_id + ": unknown stages " + ", ".join(unknown))
-        for key in ("guidelines", "protocol_fields", "artifacts", "cannot_support", "checks"):
+        for key in ("guidelines", "protocol_fields", "artifacts", "cannot_support", "checks",
+                    "inputs", "evidence_sources", "evaluation_dimensions"):
             _require(isinstance(method.get(key), list), method_id + ": " + key + " must be a list")
+        _require(bool(method.get("inputs")), method_id + ": inputs is required (design/153)")
+        _require(bool(method.get("evidence_sources")), method_id + ": evidence_sources is required (design/153)")
+        _require(
+            bool(method.get("evaluation_dimensions")),
+            method_id + ": evaluation_dimensions is required (design/153)",
+        )
+        for dim in method["evaluation_dimensions"]:
+            _require(
+                bool(str(dim.get("dimension") or "")) and bool(str(dim.get("basis") or "")),
+                method_id + ": evaluation dimension needs dimension/basis",
+            )
         _require(isinstance(method.get("stage_tasks"), dict), method_id + ": stage_tasks must be an object")
         _require(bool(method.get("guidelines")), method_id + ": at least one guideline is required")
         _require(bool(method.get("cannot_support")), method_id + ": cannot_support is required")

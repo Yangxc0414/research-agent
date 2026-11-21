@@ -7925,3 +7925,50 @@ select.control {
   font-size: calc(9px * var(--font-scale, 1));
   color: var(--faint);
 }
+
+/* Method detail: the three reference-model dimensions + per-slot task cards. */
+.method-dims {
+  margin-top: 4px;
+  display: grid;
+  gap: 3px;
+}
+.method-dim {
+  border-left: 2px solid rgba(37, 99, 235, 0.3);
+  padding: 2px 0 2px 8px;
+}
+.method-dim span {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+}
+.method-dim small {
+  display: block;
+  font-size: calc(8px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.method-stage-tasks {
+  margin-top: 5px;
+  display: grid;
+  gap: 4px;
+}
+.method-stage-task {
+  display: flex;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 8px;
+  background: var(--surface-2);
+}
+.method-stage-task b {
+  flex: none;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--accent-deep);
+  padding-top: 2px;
+}
+.method-stage-task span {
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+}

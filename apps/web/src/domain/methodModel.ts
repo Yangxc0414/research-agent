@@ -21,6 +21,11 @@ export interface MethodGuideline {
   mandates: string;
 }
 
+export interface MethodDimension {
+  dimension: string;
+  basis: string;
+}
+
 export interface MethodRegistryMethod {
   id: string;
   name_zh: string;
@@ -32,6 +37,12 @@ export interface MethodRegistryMethod {
   artifacts: string[];
   cannot_support: string[];
   checks: Array<{ id: string; severity: string; requires?: string[] }>;
+  /** design/153: the three reference-model dimensions. */
+  inputs?: string[];
+  evidence_sources?: string[];
+  evaluation_dimensions?: MethodDimension[];
+  /** Per-slot task cards from the registry (stage id -> task text). */
+  stage_tasks?: Record<string, string>;
 }
 
 export interface MethodRegistryData {
@@ -51,7 +62,7 @@ export async function loadMethodRegistry(): Promise<MethodRegistryData | null> {
     const response = await fetch("./method-registry.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
     const data = (await response.json()) as MethodRegistryData;
-    cache = data.schema === "ese-method-registry-0.1" ? data : null;
+    cache = data.schema === "ese-method-registry-0.2" ? data : null;
   } catch {
     cache = null;
   }
