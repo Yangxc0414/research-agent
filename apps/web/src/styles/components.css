@@ -7754,3 +7754,91 @@ select.control {
   line-height: 1.5;
   color: var(--faint);
 }
+
+/* Element composition view (design/151): governance elements with declared
+   consumes/produces — the stage order is the topological order of THIS graph. */
+.element-chain {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.element-node {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.66);
+}
+.element-node.is-human {
+  border-left: 3px solid var(--amber);
+}
+.element-node-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.element-node-head b {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.element-node.is-human .element-node-head b {
+  color: var(--amber);
+}
+.element-name {
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--text);
+}
+.element-human-tag {
+  border: 1px solid rgba(154, 107, 30, 0.4);
+  background: var(--amber-dim);
+  color: var(--amber);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: calc(9px * var(--font-scale, 1));
+}
+.element-consumes {
+  margin-top: 6px;
+  display: grid;
+  gap: 3px;
+}
+.element-edge {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  border-left: 2px solid rgba(37, 99, 235, 0.3);
+  padding: 2px 0 2px 8px;
+  flex-wrap: wrap;
+}
+.element-edge i {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--accent-deep);
+  white-space: nowrap;
+}
+.element-edge span {
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--text);
+  flex: 1;
+  min-width: 180px;
+}
+.element-edge small {
+  font-size: calc(8px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.element-produces {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.element-produces code {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--teal);
+  background: var(--teal-dim);
+  border-radius: 4px;
+  padding: 2px 6px;
+}

@@ -19,6 +19,7 @@ import {
   loadMethodRegistry,
   type MethodRegistryData
 } from "../../domain/methodModel";
+import { ELEMENTS, isHumanElement } from "../../domain/elementGraph";
 import { siteHref } from "../../domain/links";
 import { folderStorage, folderStorageFileName } from "../../adapters/folderStorage";
 import type { ModelProfile } from "../../domain/types";
@@ -822,6 +823,49 @@ export function MethodModelSettingsPage() {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="settings-card">
+        <div className="settings-card-title">要素组合视图 · 顺序由依赖推导</div>
+        <p className="method-contrast-note" style={{ margin: "0 0 8px" }}>
+          流程顺序不是经验预设：每个治理要素声明它<b>消费</b>什么、<b>产出</b>什么，顺序是这张依赖图的拓扑序。
+          调换两个要素（如「问题与假设」与「研究方案」）会改变输入输出关系——所以顺序是被推导的，也是可按方法组合的。
+        </p>
+        <ol className="element-chain">
+          {ELEMENTS.map((node) => (
+            <li
+              key={node.id}
+              className={`element-node${isHumanElement(node) ? " is-human" : ""}`}
+              id={`element-${node.id}`}
+            >
+              <div className="element-node-head">
+                <b>{node.id}</b>
+                <span className="element-name">{node.element}</span>
+                {isHumanElement(node) && <span className="element-human-tag">人</span>}
+              </div>
+              {node.consumes.length > 0 && (
+                <div className="element-consumes">
+                  {node.consumes.map((edge) => (
+                    <div className="element-edge" key={`${edge.from}-${edge.what}`}>
+                      <i>← {edge.from}</i>
+                      <span>{edge.what}</span>
+                      <small>{edge.source}</small>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="element-produces">
+                {node.produces.map((product) => (
+                  <code key={product}>{product}</code>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="method-contrast-note">
+          边上的每条输入都标注后端出处（SPEC / 模块不变式）；要素的粒度与组合方式即「变与不变」中的不变层——
+          治理语义不变，方法组合可变。
+        </p>
       </div>
 
       <div className="settings-card">
