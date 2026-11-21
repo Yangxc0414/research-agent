@@ -8157,3 +8157,28 @@ select.control {
   color: var(--accent-deep);
   background: var(--accent-dim);
 }
+
+/* Stage goals (design/160): the WHY of each governance slot. */
+.method-slot {
+  align-items: flex-start;
+  text-align: left;
+}
+.method-slot-goal {
+  display: block;
+  font-size: calc(8px * var(--font-scale, 1));
+  line-height: 1.45;
+  color: var(--faint);
+}
+.element-node .element-goal {
+  display: block;
+  margin-top: 3px;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+}
+.element-node .element-goal i {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent-deep);
+  margin-right: 6px;
+}

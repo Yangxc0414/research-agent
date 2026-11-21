@@ -871,12 +871,16 @@ export function MethodModelSettingsPage() {
       <div className="settings-card">
         <div className="settings-card-title">共性槽位（治理不变）</div>
         <div className="method-slots">
-          {registry.stages.map((slot) => (
-            <span className="method-slot" key={slot.id} title={slot.name}>
-              <b>{slot.id}</b>
-              <span>{slot.name}</span>
-            </span>
-          ))}
+          {registry.stages.map((slot) => {
+            const node = ELEMENTS.find((item) => item.id === slot.id);
+            return (
+              <span className="method-slot" key={slot.id} title={node?.goal ?? slot.name}>
+                <b>{slot.id}</b>
+                <span>{slot.name}</span>
+                {node?.goal && <small className="method-slot-goal">{node.goal}</small>}
+              </span>
+            );
+          })}
         </div>
       </div>
 
@@ -945,6 +949,7 @@ export function MethodModelSettingsPage() {
                 <span className="element-name">{node.element}</span>
                 {isHumanElement(node) && <span className="element-human-tag">人</span>}
               </div>
+              <span className="element-goal"><i>目标</i>{node.goal}</span>
               {node.consumes.length > 0 && (
                 <div className="element-consumes">
                   {node.consumes.map((edge) => (

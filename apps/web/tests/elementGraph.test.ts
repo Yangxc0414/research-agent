@@ -58,3 +58,22 @@ test("every edge carries its provenance (SPEC/module source)", () => {
   const protocolEdge = s5?.consumes.find((edge) => edge.from === "S4");
   assert.match(protocolEdge?.what ?? "", /protocol_sha256/);
 });
+
+test("every element declares a goal anchored in the research essence", () => {
+  // design/160: goals are the WHY of each element, anchored in the four
+  // movements of the essence definition (提出问题 / 证据 / 主张 / 积累).
+  const movementOf: Record<string, string[]> = {
+    提出问题: ["S0", "S2–S3"],
+    证据: ["S1", "S1b", "S5"],
+    主张: ["S5b", "S6", "S8–S12"],
+    积累: ["S13–S16", "META"]
+  };
+  for (const [movement, ids] of Object.entries(movementOf)) {
+    for (const id of ids) {
+      const node = elementById(id);
+      assert.ok(node, `${id} exists`);
+      assert.ok(node.goal.length > 8, `${id} has a substantive goal`);
+      assert.ok(node.goal.includes(movement), `${id} goal anchors to ${movement}`);
+    }
+  }
+});
