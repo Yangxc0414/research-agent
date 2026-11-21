@@ -611,7 +611,7 @@ export function seedEseStudy(): ResearchTask {
         id: "CLM-ESE-01",
         kind: "claim",
         status: "unsigned",
-        text: "在 click / requests / httpx 合并样本上，缺陷修复提交触碰测试的比例比其它提交高 0.0464（0.4136 vs 0.3672，置换 p=0.015）；但 click 内方向反转（−0.0067），因此不能外推到单个项目。",
+        text: "在 click / requests / httpx 合并样本上，缺陷修复提交触碰测试的比例比其它提交高 0.0464（0.4136 vs 0.3672，置换 p=0.015；分层调整后 +0.0681，Mantel-Haenszel）；但 click 内方向反转（−0.0067），因此不能外推到单个项目。",
         scope: "三仓库便利样本 · 启发式标签 · 不可外推",
         refs: ["EA-65d32e114229", "ESE-MS-20261118-03"],
         note: "待人工签署：statement 与 human_reason 需在本地 CLI 定稿，网页不代签。"
@@ -667,6 +667,15 @@ export function seedEseStudy(): ResearchTask {
         ),
         "S1"
       ),
+      user("标签用 path+message 启发式，会不会把标签打错？", "22:41:38"),
+      withStage(
+        agent(
+          "会，所以它被写进了边界而不是藏起来：capsule 的 warning 里明记「labels are path/message heuristics」——test/bug 标签是启发式，不是人工标注。这限制所有结论的口径：比的是「启发式标签下的提交群体」，不是人工核验过的缺陷修复。",
+          undefined,
+          "22:41:44"
+        ),
+        "S1"
+      ),
       withStage(
         agent(
           "**S2–S3 · G1 收敛**：四条 RQ 收敛为一条可检验断言——合并样本差值 + 分层检验（按项目 / 提交规模 / 生产代码共变）。\n\n> 候选不是 claim；收敛由人确认后写入 G1，断言本身仍需 S5b 人签。",
@@ -683,7 +692,32 @@ export function seedEseStudy(): ResearchTask {
       ),
       withStage(
         agent(
-          "**S4 · G2 冻结**：跑数之前把协议定死——分层与置换计划、固定种子（seed 42）、置换 1000 次；run-capsule 绑定 protocol sha256，执行器只做提取与统计。",
+          "**S4 · 分析计划**：假设、基线、主指标、分层与置换计划在此定死——\n\n- 假设：缺陷修复提交触碰测试的比例高于其它提交，且经分层调整后方向一致\n- 基线：其它提交（non-bugfix）｜主指标：test_cochange_rate｜seeds：[42]\n- 分层维度：project · commit_size_bucket · production_cochange\n- 置换检验：1000 次双侧（固定种子）",
+          {
+            type: "protocol",
+            hypothesis: "缺陷修复提交触碰测试的比例高于其它提交，且经分层调整后方向一致。",
+            baseline: "其它提交（non-bugfix）",
+            metric: "test_cochange_rate",
+            seeds: 1,
+            controls: ["project", "commit_size_bucket", "production_cochange"],
+            status: "G2 待冻结"
+          },
+          "22:42:05"
+        ),
+        "S4"
+      ),
+      user("分层和置换的细节也一起冻进去吗？", "22:42:12"),
+      withStage(
+        agent(
+          "是。分层维度、置换次数与种子全部写进 protocol；run-capsule 会绑定它的 sha256（254d1d10…），跑数之后执行器只能按冻结的计划提取与统计，改分析 = 重新走 G2。",
+          undefined,
+          "22:42:18"
+        ),
+        "S4"
+      ),
+      withStage(
+        agent(
+          "**S4 · G2 冻结**：协议已冻结，run-capsule 绑定 protocol sha256；执行器只做提取与统计。",
           {
             type: "gate",
             gate: "G2",
@@ -691,7 +725,7 @@ export function seedEseStudy(): ResearchTask {
             reason: "协议先于数据；run-capsule 绑定 protocol sha256",
             status: "pass"
           },
-          "22:42:10"
+          "22:42:30"
         ),
         "S4"
       ),
@@ -713,16 +747,33 @@ export function seedEseStudy(): ResearchTask {
       ),
       withStage(
         agent(
-          "**合并读数**\n\n- 触碰测试：1924 / 5132 = **0.3749**，95% CI [0.3618, 0.3882]\n- 缺陷修复：352 / 851 = 0.4136；其它：1572 / 4281 = 0.3672\n- 差 **+0.0464**，置换检验双侧 p = **0.015**\n- 时间切分：早期 0.3091 → 晚期 0.4410，差 +0.1319（p = 0.001）\n\n> 合并样本上差异为正。是否每个项目都成立，要分层才知道。",
+          "**合并读数**\n\n- 触碰测试：1924 / 5132 = **0.3749**，95% CI [0.3618, 0.3882]\n- 缺陷修复：352 / 851 = 0.4136；其它：1572 / 4281 = 0.3672\n- 差 **+0.0464**，置换检验双侧 p = **0.015**\n- 分层调整后（Mantel-Haenszel）：**+0.0681**\n- 时间切分：早期 0.3091 → 晚期 0.4410，差 +0.1319（p = 0.001）\n\n> 合并样本上差异为正。是否每个项目都成立，要分层才知道。",
           undefined,
           "22:43:20"
+        ),
+        "S5a"
+      ),
+      withStage(
+        agent(
+          "**RunCapsule 与 run contract**\n\n- capsule：dataset `msr-corpus:click,httpx,requests`（sha256 435713f0…）· code sha256 29d53e3e… · protocol sha256 254d1d10… · seeds [42] · environment python 3.8.7\n- run contract 核对 10 项：capsule.completed / identity.protocol / identity.dataset / identity.seeds / identity.metric / metrics.finite / evidence.present / evidence.hash / artifacts.required 全部 **pass**\n- **min_delta → fail（not_verifiable）**：没有配对基线指标\n\n整体 status = **attention**。",
+          undefined,
+          "22:43:32"
+        ),
+        "S5a"
+      ),
+      user("min_delta fail 会不会把这条 run 判废？", "22:43:40"),
+      withStage(
+        agent(
+          "不会——它把能宣称的范围写死：没有与基线配对的读数，就只能报合并差值 +0.0464 与置换 p=0.015，不能说「超过基线」。run contract 的作用不是判死刑，是画边界：attention 状态如实跟着这条 run 走，面板与 BRIEF 都能看到它。",
+          undefined,
+          "22:43:46"
         ),
         "S5a"
       ),
       user("分层之后呢？我担心是某个项目把总体拉高了。", "22:44:01"),
       withStage(
         agent(
-          "**S5b · 分层结果：差异不是每个项目都成立**\n\n- click：0.4375 vs 0.4442 → **-0.0067（方向反转）**\n- httpx：0.6264 vs 0.5838 → +0.0426\n- requests：0.3581 vs 0.2513 → +0.1068\n- 提交规模 >5：0.5909 vs 0.6700 → -0.0791\n\n所以能写的只有：“在三仓库合并样本上高 0.046，但 click 内方向反转，因此不适用于单项目。” 不能写“缺陷修复提交更常改测试”。",
+          "**S5b · 分层结果：差异不是每个项目都成立**\n\n- click：0.4375 vs 0.4442 → **-0.0067（方向反转）**\n- httpx：0.6264 vs 0.5838 → +0.0426\n- requests：0.3581 vs 0.2513 → +0.1068\n- 提交规模 1-2：+0.0708｜3-5：+0.1530｜>5：**-0.0791**\n- 生产代码共变：无 +0.0000｜有 +0.0591\n\n所以能写的只有：“在三仓库合并样本上高 0.046，但 click 内方向反转，因此不适用于单项目。” 不能写“缺陷修复提交更常改测试”。",
           undefined,
           "22:44:18"
         ),
@@ -731,12 +782,12 @@ export function seedEseStudy(): ResearchTask {
       user("这条现在能签吗？", "22:45:02"),
       withStage(
         agent(
-          "claim 已起草（CLM-ESE-01），但还不能由我签：statement 只能写三仓库合并样本口径，分层反转必须同引。\n\n- EA ✓ immutable（EA-65d32e114229，source=ese-exec）\n- statement / human_reason · 待人工定稿\n\n签名只在本地 CLI，网页不代签。",
+          "**EA 已封存**：EA-65d32e114229 · kind=metric · source=ese-exec · scope=S5/ESE-MS-20261118-03 · **immutable**；evidence hash 41149c82… 钉住 metrics.json，任何改动都会被发现。\n\nclaim 已起草（CLM-ESE-01），但还不能由我签：statement 只能写三仓库合并样本口径，分层反转必须同引，human_reason 由人定稿——签名只在本地 CLI，网页不代签。",
           {
             type: "gate",
             gate: "S5b",
             title: "判定已产出，claim 待人签",
-            reason: "EA sealed；statement 只能写分层口径；human_reason 由人填",
+            reason: "EA sealed（EA-65d32e114229）；statement 只能写分层口径；human_reason 由人填",
             status: "needs_human"
           },
           "22:45:10"

@@ -185,15 +185,16 @@ function ensureSeedLiteratureLedger(snapshot: PersistedWorkspace): PersistedWork
 }
 
 /**
- * Refresh the ESE replay to the closed-loop version once. Older persisted
- * snapshots hold the fragmented pre-stage-tag transcript (9 untagged messages
- * stopping at G5); the extended replay narrates S1→META with stage tags. The
- * detector is structural — no message carries a stage tag — so a user who has
- * genuinely edited the session is not clobbered unless it predates the tags.
+ * Refresh the ESE replay to the current closed-loop version once. Older
+ * persisted snapshots hold earlier cuts of the transcript (the untagged 9-message
+ * fragment, then the 17-message tagged cut); the enriched replay quotes the full
+ * artifact set (capsule hashes, run-contract checks, adjusted difference). The
+ * detector is structural — the persisted transcript is shorter than the current
+ * seed — so a longer, genuinely user-extended session is never clobbered.
  */
 function ensureEseClosedLoop(snapshot: PersistedWorkspace): PersistedWorkspace {
   const stale = snapshot.tasks.find(
-    (task) => task.id === ESE_REPLAY_TASK_ID && !task.messages.some((message) => message.stage)
+    (task) => task.id === ESE_REPLAY_TASK_ID && task.messages.length < seedEseStudy().messages.length
   );
   if (!stale) return snapshot;
   const next: PersistedWorkspace = {
