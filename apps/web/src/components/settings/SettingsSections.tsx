@@ -1102,6 +1102,22 @@ export function MethodModelSettingsPage() {
               <small className="method-evidence-basis">{evidenceProfileFor(active.id)?.basis ?? ""}</small>
             </div>
             <div>
+              <b>对智能体设计的含义（Prompt 与基线）</b>
+              <p className="method-design-baseline">
+                <i>基线策略：</i>{evidenceProfileFor(active.id)?.baselinePolicy ?? "—"}
+              </p>
+              <p className="method-design-prompt">
+                <i>Prompt 纪律：</i>不得宣称——
+                {active.cannot_support.map((limit) => (
+                  <code key={limit}>{limit}</code>
+                ))}
+              </p>
+              <small>
+                推导自该方法的证据类型与能力边界（cannot_support 逐字）；方法差异直接指导
+                智能体 Prompt 与基线对比（研讨纪要）。
+              </small>
+            </div>
+            <div>
               <b>不能支持（能力边界）</b>
               <ul className="method-limits">
                 {active.cannot_support.map((limit) => (

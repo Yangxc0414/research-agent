@@ -8090,3 +8090,30 @@ select.control {
   font-size: calc(8px * var(--font-scale, 1));
   color: var(--faint);
 }
+
+/* Per-method implications for agent design (design/157): baseline policy and
+   prompt discipline derived from the evidence kind + cannot_support. */
+.method-design-baseline,
+.method-design-prompt {
+  margin: 4px 0 0;
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.55;
+  color: var(--text);
+}
+.method-design-baseline i,
+.method-design-prompt i {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--teal);
+}
+.method-design-prompt i {
+  color: var(--coral);
+}
+.method-design-prompt code {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--coral);
+  background: rgba(217, 45, 85, 0.07);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-right: 4px;
+}
