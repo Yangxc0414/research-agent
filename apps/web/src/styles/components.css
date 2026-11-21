@@ -7842,3 +7842,86 @@ select.control {
   border-radius: 4px;
   padding: 2px 6px;
 }
+
+/* Essence card (design/152): the research-essence reference model that the
+   governance slots were derived from — definition, triad, element mapping. */
+.essence-card {
+  border-left: 3px solid var(--accent);
+}
+.essence-def {
+  margin: 6px 0 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.7;
+  color: var(--text);
+}
+.essence-def b {
+  color: var(--accent-deep);
+}
+.essence-triad {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.essence-layer {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 7px 9px;
+  background: var(--surface-2);
+}
+.essence-layer b {
+  display: block;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.essence-layer span {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--muted);
+}
+.essence-map {
+  margin-top: 9px;
+  width: 100%;
+  border-collapse: collapse;
+}
+.essence-map th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+  padding: 3px 8px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.essence-map td {
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5;
+  color: var(--text);
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.essence-map td:first-child {
+  color: var(--accent-deep);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.essence-basis {
+  display: block;
+  margin-top: 8px;
+  font-size: calc(9px * var(--font-scale, 1));
+  line-height: 1.6;
+  color: var(--faint);
+}
+.method-evidence-kind {
+  margin: 4px 0 0;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--teal);
+}
+.method-evidence-basis {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+}

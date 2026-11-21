@@ -15,6 +15,7 @@ import {
 import { compareEmpiricalTasks, compareMethodProfiles } from "../../domain/taskCompare";
 import {
   blockerCount,
+  evidenceProfileFor,
   fitMap,
   loadMethodRegistry,
   type MethodRegistryData
@@ -813,6 +814,49 @@ export function MethodModelSettingsPage() {
         <p>{registry.boundary}</p>
       </div>
 
+      <div className="settings-card essence-card">
+        <div className="settings-card-title">研究的本质 · 原模型</div>
+        <p className="essence-def">
+          <b>研究是在公共可核查的约束下，把一个问题转成能判别候选答案的证据，再把证据转成经审查、带范围的主张，并积累进公共知识的循环。</b>
+          方法的差异不在步骤多少，而在三个变量：证据<b>类型</b>、证据的<b>判别力</b>、主张的<b>有效范围</b>。
+        </p>
+        <div className="essence-triad">
+          <div className="essence-layer">
+            <b>主张层</b>
+            <span>ClaimRecord：可检验的话 + 依据 + 范围</span>
+          </div>
+          <div className="essence-layer">
+            <b>证据层</b>
+            <span>RunCapsule + EA：受控条件下按方案生产、可复算的制品</span>
+          </div>
+          <div className="essence-layer">
+            <b>审查层</b>
+            <span>人工门 + 评审 + closure + lineage：组织化怀疑的制度化</span>
+          </div>
+        </div>
+        <table className="essence-map">
+          <thead>
+            <tr><th>原模型要素</th><th>系统对象</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>问题</td><td>S0 研究问题 · S1 子查询 · coverage gap</td></tr>
+            <tr><td>已知（文献）</td><td>文献台账 · 跨来源综合矩阵</td></tr>
+            <tr><td>猜想（假设）</td><td>候选假设 CAND/IDEA —— 不是 claim</td></tr>
+            <tr><td>方案（判别设计）</td><td>冻结协议 protocol sha256 · 设计审计</td></tr>
+            <tr><td>证据</td><td>RunCapsule · EA（immutable）</td></tr>
+            <tr><td>推断</td><td>判定/统计（分层、置换） · run contract 边界</td></tr>
+            <tr><td>主张</td><td>ClaimRecord（statement + scope + refs）</td></tr>
+            <tr><td>审查</td><td>人工门 · 评审包 · closure · lineage</td></tr>
+            <tr><td>积累</td><td>记忆/经验 · 自改进候选（知识增量 roadmap）</td></tr>
+          </tbody>
+        </table>
+        <small className="essence-basis">
+          依据：Popper《科学发现的逻辑》（可否证性）；Merton 1942（organized skepticism）；
+          Longino 1990《Science as Social Knowledge》（客观性 = 批判性 discourse）；
+          Creswell《Research Design》（研究设计要素框架）；Easterbrook et al. 2008（按问题选择实证方法，证据类型差异）。
+        </small>
+      </div>
+
       <div className="settings-card">
         <div className="settings-card-title">共性槽位（治理不变）</div>
         <div className="method-slots">
@@ -936,6 +980,11 @@ export function MethodModelSettingsPage() {
                   </code>
                 ))}
               </div>
+            </div>
+            <div>
+              <b>证据类型与效力</b>
+              <p className="method-evidence-kind">{evidenceProfileFor(active.id)?.kind ?? "—"}</p>
+              <small className="method-evidence-basis">{evidenceProfileFor(active.id)?.basis ?? ""}</small>
             </div>
             <div>
               <b>不能支持（能力边界）</b>

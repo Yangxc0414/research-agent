@@ -88,3 +88,62 @@ export function fitMap(method: MethodRegistryMethod): Record<string, boolean> {
 export function blockerCount(method: MethodRegistryMethod): number {
   return method.checks.filter((check) => check.severity === "blocker").length;
 }
+
+/**
+ * 证据类型与效力边界 per method (design/152).
+ *
+ * The classification is the standard empirical-methodology one (Easterbrook et
+ * al. 2008, "Selecting Empirical Methods for Software Engineering Research";
+ * Creswell, Research Design): each method produces a DIFFERENT KIND of
+ * evidence, which is exactly why their inputs/outputs/validity differ. Every
+ * validity limit below is verbatim from the registry's own cannot_support /
+ * threat_focus fields — the kind label is the display-level classification.
+ */
+export interface EvidenceProfile {
+  kind: string;
+  /** 依据（文献） */
+  basis: string;
+}
+
+export const EVIDENCE_PROFILES: Record<string, EvidenceProfile> = {
+  "controlled-experiment": {
+    kind: "一手受控测量（受控 + 随机）",
+    basis: "Wohlin 2014；实验的内部效度来自控制与随机化"
+  },
+  "quasi-experiment": {
+    kind: "一手分组观察（有对照，无随机）",
+    basis: "因果主张受识别策略限制"
+  },
+  "benchmark-evaluation": {
+    kind: "标准化任务测量",
+    basis: "可复现，但受污染与饱和威胁"
+  },
+  "repository-mining": {
+    kind: "回顾性观察挖掘",
+    basis: "生态效度好；标签为启发式，因果机制不可支持"
+  },
+  "systematic-literature-review": {
+    kind: "二手综合（证据 = 已发表研究）",
+    basis: "Kitchenham 2007 / PRISMA 2020；效力取决于检索与筛选的可复现性"
+  },
+  "case-study": {
+    kind: "个案深描与三角验证",
+    basis: "Runeson & Höst 2009；深度与机制，不可统计泛化"
+  },
+  survey: {
+    kind: "自报测量（问卷/访谈）",
+    basis: "主观体验可测，行为因果不可支持"
+  },
+  "design-science": {
+    kind: "设计制品评估",
+    basis: "效用主张限于评估策略所及"
+  },
+  "action-research": {
+    kind: "介入循环反思",
+    basis: "情境性知识；无介入则不可归因"
+  }
+};
+
+export function evidenceProfileFor(methodId: string): EvidenceProfile | null {
+  return EVIDENCE_PROFILES[methodId] ?? null;
+}
