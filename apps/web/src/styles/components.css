@@ -8043,3 +8043,50 @@ select.control {
 .composition-valid.is-bad {
   color: var(--coral);
 }
+
+/* Tag layer (design/155): the reproducible 标签化梳理 — commonality vs
+   essential difference extracted from per-method tags. */
+.tag-group {
+  margin-top: 9px;
+}
+.tag-group-title {
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  color: var(--accent-deep);
+  margin-bottom: 5px;
+}
+.tag-row {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  margin-bottom: 5px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.tag-row b {
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text);
+}
+.tag-row-def {
+  display: block;
+  margin: 2px 0 4px;
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.tag-row-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag-row-methods code {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--teal);
+  background: var(--teal-dim);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+.tag-row small {
+  display: block;
+  margin-top: 3px;
+  font-size: calc(8px * var(--font-scale, 1));
+  color: var(--faint);
+}

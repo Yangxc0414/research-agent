@@ -18,6 +18,7 @@ import {
   evidenceProfileFor,
   fitMap,
   loadMethodRegistry,
+  tagAnalysis,
   type MethodRegistryData
 } from "../../domain/methodModel";
 import {
@@ -805,6 +806,8 @@ export function MethodModelSettingsPage() {
   // empirical tasks (design/150). Derived from each task's own fields.
   const compareRows = compareEmpiricalTasks(tasks, registry);
   const methodContrast = compareMethodProfiles(registry);
+  // 标签化梳理 (design/155): the reproducible commonality/difference extraction.
+  const tags = tagAnalysis(registry);
 
   return (
     <div className="settings-section-body">
@@ -1001,6 +1004,39 @@ export function MethodModelSettingsPage() {
         </div>
       </div>
 
+      {tags.length > 0 && (
+        <div className="settings-card">
+          <div className="settings-card-title">标签 × 方法（共性与差异的可复现提取）</div>
+          {[{ group: "common" as const, label: "共性（≥3 方法）" }, { group: "partial" as const, label: "部分共性（2 方法）" }, { group: "difference" as const, label: "本质差异（单方法独有）" }].map(
+            ({ group, label }) => {
+              const rows = tags.filter((row) => row.group === group);
+              if (!rows.length) return null;
+              return (
+                <div className="tag-group" key={group}>
+                  <div className="tag-group-title">{label}</div>
+                  {rows.map((row) => (
+                    <div className="tag-row" key={row.tag}>
+                      <b>{row.tag}</b>
+                      <span className="tag-row-def">{row.definition}</span>
+                      <div className="tag-row-methods">
+                        {row.methods.map((methodId) => {
+                          const method = registry.methods.find((item) => item.id === methodId);
+                          return <code key={methodId}>{method?.name_zh ?? methodId}</code>;
+                        })}
+                      </div>
+                      <small>依据：{row.basis}</small>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+          )}
+          <p className="method-contrast-note">
+            标签来自各方法已注册的协议字段、检查项与任务卡——共性/差异的提取是数据计算，不再凭直觉。
+          </p>
+        </div>
+      )}
+
       {active && (
         <div className="settings-card">
           <div className="settings-card-title">
@@ -1081,6 +1117,16 @@ export function MethodModelSettingsPage() {
                     <li key={guideline.key}>{guideline.citation}</li>
                   ))}
                 </ul>
+              </div>
+            )}
+            {(active.tags ?? []).length > 0 && (
+              <div>
+                <b>标签（来自标签化梳理）</b>
+                <div className="method-chips">
+                  {(active.tags ?? []).map((tag) => (
+                    <code key={tag}>{tag}</code>
+                  ))}
+                </div>
               </div>
             )}
             {active.stage_tasks && Object.keys(active.stage_tasks).length > 0 && (

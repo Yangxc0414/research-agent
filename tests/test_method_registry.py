@@ -45,6 +45,44 @@ class RegistryIntegrityTest(unittest.TestCase):
         with self.assertRaises(method_registry.MethodRegistryError):
             method_registry.validate(payload)
 
+    def test_every_method_declares_vocabulary_tags(self):
+        # design/155: the 标签化梳理 todo — tags are the reproducible form of
+        # "提炼共性与差异", so they must come from the shared vocabulary.
+        vocabulary = {entry["tag"] for entry in self.registry["tag_vocabulary"]}
+        for method in self.registry["methods"]:
+            self.assertTrue(method["tags"], method["id"])
+            unknown = [tag for tag in method["tags"] if tag not in vocabulary]
+            self.assertEqual(unknown, [], method["id"])
+
+    def test_vocabulary_entries_carry_definition_and_basis(self):
+        for entry in self.registry["tag_vocabulary"]:
+            self.assertTrue(entry["definition"], entry["tag"])
+            self.assertTrue(entry["basis"], entry["tag"])
+
+    def test_tag_layer_extracts_commonality_and_difference(self):
+        # The advisor's extraction, made reproducible: tags held by >=3 methods
+        # are commonalities; single-method tags are the essential differences.
+        from collections import Counter
+
+        counter = Counter()
+        for method in self.registry["methods"]:
+            counter.update(method["tags"])
+        common = sorted(tag for tag, count in counter.items() if count >= 3)
+        difference = sorted(tag for tag, count in counter.items() if count == 1)
+        # 预注册协议 / 伦理审查 cross methods (governance commonalities);
+        # 随机化 (experiment) and 三角验证 (case study) are essential
+        # differences — the two examples the advisor gave verbatim.
+        self.assertIn("预注册协议", common)
+        self.assertIn("伦理审查", common)
+        self.assertIn("随机化", difference)
+        self.assertIn("三角验证", difference)
+
+    def test_registry_rejects_tag_outside_vocabulary(self):
+        payload = json.loads(json.dumps(self.registry))
+        payload["methods"][0]["tags"].append("不存在于词表的标签")
+        with self.assertRaises(method_registry.MethodRegistryError):
+            method_registry.validate(payload)
+
     def test_every_method_stage_task_is_inside_fit_stages(self):
         for method in self.registry["methods"]:
             for stage in method["stage_tasks"]:

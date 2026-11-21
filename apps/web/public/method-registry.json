@@ -1,5 +1,5 @@
 {
-  "schema": "ese-method-registry-0.2",
+  "schema": "ese-method-registry-0.3",
   "boundary": "方法注册表是数据不是门禁：它给出阶段×方法的任务卡、必填字段与检查项，检查结果只作 advisory，不改变任何 gate/claim/signature 语义。",
   "stages": [
     {
@@ -175,6 +175,12 @@
           "dimension": "外部效度受原始研究集合限制",
           "basis": "Wohlin 2014（滚雪球与数据库合并）"
         }
+      ],
+      "tags": [
+        "预注册协议",
+        "筛选标准",
+        "质量评估",
+        "综合矩阵"
       ]
     },
     {
@@ -318,6 +324,15 @@
           "dimension": "内部因果效度不可支持（观察性）",
           "basis": "cannot_support：因果机制"
         }
+      ],
+      "tags": [
+        "预注册协议",
+        "抽样框",
+        "时间切分",
+        "去重策略",
+        "标签启发式声明",
+        "许可核对",
+        "快照哈希"
       ]
     },
     {
@@ -467,6 +482,14 @@
           "dimension": "外部效度：单元与情境的推广范围",
           "basis": "threat_focus=external"
         }
+      ],
+      "tags": [
+        "预注册协议",
+        "随机化",
+        "对照组",
+        "区组",
+        "功效分析",
+        "停止规则"
       ]
     },
     {
@@ -572,6 +595,12 @@
           "dimension": "敏感性分析",
           "basis": "quasi.sensitivity 检查"
         }
+      ],
+      "tags": [
+        "对照组",
+        "识别策略",
+        "混杂清单",
+        "敏感性分析"
       ]
     },
     {
@@ -707,6 +736,11 @@
           "dimension": "跨基准的无条件排名不可支持",
           "basis": "cannot_support"
         }
+      ],
+      "tags": [
+        "污染控制",
+        "饱和分析",
+        "多重比较策略"
       ]
     },
     {
@@ -839,6 +873,14 @@
           "dimension": "成员核查（member checking）",
           "basis": "case.member_checking 检查"
         }
+      ],
+      "tags": [
+        "案例选择协议",
+        "三角验证",
+        "链式证据",
+        "编码本",
+        "成员核查",
+        "伦理审查"
       ]
     },
     {
@@ -955,6 +997,11 @@
           "dimension": "行为因果不可支持（自报局限）",
           "basis": "cannot_support：行为因果"
         }
+      ],
+      "tags": [
+        "抽样框",
+        "预试记录",
+        "伦理审查"
       ]
     },
     {
@@ -1067,6 +1114,10 @@
           "dimension": "边界条件声明",
           "basis": "protocol_fields：boundary_conditions"
         }
+      ],
+      "tags": [
+        "贡献声明",
+        "边界条件"
       ]
     },
     {
@@ -1173,7 +1224,174 @@
           "dimension": "无介入的因果归因不可支持",
           "basis": "cannot_support"
         }
+      ],
+      "tags": [
+        "介入循环",
+        "研究者角色声明",
+        "伦理审查"
       ]
+    }
+  ],
+  "tag_vocabulary": [
+    {
+      "tag": "预注册协议",
+      "definition": "分析计划先于数据收集/筛选冻结",
+      "basis": "Wohlin 2014（实验预注册）；Kitchenham 2007（SLR 协议）"
+    },
+    {
+      "tag": "随机化",
+      "definition": "单元到条件的分配由随机机制决定",
+      "basis": "实验两要素之一（受控+随机）；Wohlin 2014"
+    },
+    {
+      "tag": "对照组",
+      "definition": "存在明确的对照条件",
+      "basis": "受控/准实验协议字段（comparison_group）"
+    },
+    {
+      "tag": "区组",
+      "definition": "按已知干扰因素分组分配",
+      "basis": "受控实验协议字段（blocking）"
+    },
+    {
+      "tag": "功效分析",
+      "definition": "样本量与统计功效的事前计算",
+      "basis": "受控实验检查 experiment.power"
+    },
+    {
+      "tag": "停止规则",
+      "definition": "数据收集/实验终止的事前条件",
+      "basis": "受控实验协议字段（stopping_rule）"
+    },
+    {
+      "tag": "抽样框",
+      "definition": "明确的总体与抽样单位清单",
+      "basis": "survey/mining 协议字段（sampling_frame）"
+    },
+    {
+      "tag": "时间切分",
+      "definition": "按时间划分观察窗口",
+      "basis": "mining 协议字段（time_split）"
+    },
+    {
+      "tag": "去重策略",
+      "definition": "记录去重规则的事前声明",
+      "basis": "mining 协议字段（dedup_policy）"
+    },
+    {
+      "tag": "标签启发式声明",
+      "definition": "标签来源与局限的显式声明",
+      "basis": "mining 协议字段（label_source）；capsule warning"
+    },
+    {
+      "tag": "许可核对",
+      "definition": "数据许可合规检查",
+      "basis": "mining 协议字段（license_check）"
+    },
+    {
+      "tag": "快照哈希",
+      "definition": "数据/脚本快照以哈希固定",
+      "basis": "mining stage_tasks S5；run contract evidence.hash"
+    },
+    {
+      "tag": "污染控制",
+      "definition": "评测数据污染检查",
+      "basis": "benchmark 检查 benchmark.contamination"
+    },
+    {
+      "tag": "饱和分析",
+      "definition": "基准 headroom（剩余提升空间）分析",
+      "basis": "benchmark 协议字段（saturation_note）"
+    },
+    {
+      "tag": "多重比较策略",
+      "definition": "多次比较的校正策略",
+      "basis": "benchmark 协议字段（multiple_comparison_policy）"
+    },
+    {
+      "tag": "质量评估",
+      "definition": "纳入研究的质量评估",
+      "basis": "SLR 协议字段（quality_assessment）"
+    },
+    {
+      "tag": "筛选标准",
+      "definition": "纳入/排除标准的事前声明",
+      "basis": "SLR 协议字段（inclusion/exclusion_criteria）"
+    },
+    {
+      "tag": "综合矩阵",
+      "definition": "证据抽取与综合的结构化载体",
+      "basis": "SLR 产物（综合矩阵/synthesis_method）"
+    },
+    {
+      "tag": "三角验证",
+      "definition": "多源证据交叉印证",
+      "basis": "案例研究协议字段（triangulation）"
+    },
+    {
+      "tag": "链式证据",
+      "definition": "从原始数据到结论的可追溯链",
+      "basis": "案例研究协议字段（chain_of_evidence）"
+    },
+    {
+      "tag": "编码本",
+      "definition": "定性编码规则",
+      "basis": "案例研究产物（编码本）"
+    },
+    {
+      "tag": "成员核查",
+      "definition": "由被研究者核查结论",
+      "basis": "案例研究检查 case.member_checking"
+    },
+    {
+      "tag": "案例选择协议",
+      "definition": "案例选择理由与标准的事前声明",
+      "basis": "案例研究协议字段（case_selection）"
+    },
+    {
+      "tag": "伦理审查",
+      "definition": "伦理 / 知情同意核查",
+      "basis": "case/ethics、survey/consent、action/ethics 检查"
+    },
+    {
+      "tag": "识别策略",
+      "definition": "观察数据中的因果识别方法",
+      "basis": "准实验协议字段（identification_strategy）"
+    },
+    {
+      "tag": "混杂清单",
+      "definition": "混杂变量显式登记",
+      "basis": "准实验协议字段（confounders）"
+    },
+    {
+      "tag": "敏感性分析",
+      "definition": "结论对假设的敏感度检验",
+      "basis": "准实验检查 quasi.sensitivity"
+    },
+    {
+      "tag": "贡献声明",
+      "definition": "制品贡献类型的显式声明",
+      "basis": "DSR 协议字段（contribution_type）"
+    },
+    {
+      "tag": "边界条件",
+      "definition": "制品有效边界的声明",
+      "basis": "DSR 协议字段（boundary_conditions）"
+    },
+    {
+      "tag": "介入循环",
+      "definition": "诊断→行动→评估→反思的循环结构",
+      "basis": "行动研究协议字段（cycles）；Susman & Evered 1978"
+    },
+    {
+      "tag": "研究者角色声明",
+      "definition": "研究者在介入中的角色披露",
+      "basis": "行动研究协议字段（researcher_role）"
+    },
+    {
+      "tag": "预试记录",
+      "definition": "测量工具的试测记录",
+      "basis": "survey 协议字段（pilot）"
     }
   ]
 }

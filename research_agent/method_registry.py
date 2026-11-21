@@ -24,7 +24,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-SCHEMA = "ese-method-registry-0.2"
+SCHEMA = "ese-method-registry-0.3"
 SEVERITIES = ("blocker", "warn")
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -102,6 +102,23 @@ def validate(registry: Dict[str, Any]) -> Dict[str, Any]:
         for stage_id, task in method["stage_tasks"].items():
             _require(stage_id in fit, method_id + ": stage_tasks for stage outside fit_stages: " + stage_id)
             _require(bool(str(task or "")), method_id + ": empty stage task for " + stage_id)
+    # design/155: the tag layer — a shared vocabulary plus per-method tags, so
+    # commonality/difference extraction is reproducible data, not intuition.
+    vocabulary = registry.get("tag_vocabulary")
+    _require(isinstance(vocabulary, list) and vocabulary, "registry needs a tag_vocabulary list")
+    vocab_tags = []
+    for entry in vocabulary:
+        tag = str(entry.get("tag") or "")
+        _require(bool(tag), "vocabulary tag cannot be empty")
+        _require(bool(str(entry.get("definition") or "")), tag + ": definition required")
+        _require(bool(str(entry.get("basis") or "")), tag + ": basis required")
+        _require(tag not in vocab_tags, "duplicate vocabulary tag: " + tag)
+        vocab_tags.append(tag)
+    for method in methods:
+        tags = method.get("tags")
+        _require(isinstance(tags, list) and tags, method_id + ": tags must be a non-empty list")
+        unknown = [tag for tag in tags if tag not in vocab_tags]
+        _require(not unknown, method_id + ": tags missing from vocabulary: " + ", ".join(unknown))
     return registry
 
 

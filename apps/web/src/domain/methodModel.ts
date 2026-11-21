@@ -26,6 +26,12 @@ export interface MethodDimension {
   basis: string;
 }
 
+export interface TagVocabularyEntry {
+  tag: string;
+  definition: string;
+  basis: string;
+}
+
 export interface MethodRegistryMethod {
   id: string;
   name_zh: string;
@@ -43,6 +49,8 @@ export interface MethodRegistryMethod {
   evaluation_dimensions?: MethodDimension[];
   /** Per-slot task cards from the registry (stage id -> task text). */
   stage_tasks?: Record<string, string>;
+  /** design/155: vocabulary tags from the 标签化梳理 todo. */
+  tags?: string[];
 }
 
 export interface MethodRegistryData {
@@ -50,6 +58,8 @@ export interface MethodRegistryData {
   boundary: string;
   stages: MethodStageSlot[];
   methods: MethodRegistryMethod[];
+  /** design/155: shared tag vocabulary (tag -> definition + basis). */
+  tag_vocabulary?: TagVocabularyEntry[];
 }
 
 let cache: MethodRegistryData | null | undefined;
@@ -62,7 +72,7 @@ export async function loadMethodRegistry(): Promise<MethodRegistryData | null> {
     const response = await fetch("./method-registry.json", { cache: "no-cache" });
     if (!response.ok) throw new Error(String(response.status));
     const data = (await response.json()) as MethodRegistryData;
-    cache = data.schema === "ese-method-registry-0.2" ? data : null;
+    cache = data.schema === "ese-method-registry-0.3" ? data : null;
   } catch {
     cache = null;
   }
@@ -157,4 +167,44 @@ export const EVIDENCE_PROFILES: Record<string, EvidenceProfile> = {
 
 export function evidenceProfileFor(methodId: string): EvidenceProfile | null {
   return EVIDENCE_PROFILES[methodId] ?? null;
+}
+
+/**
+ * 标签化梳理的提取结果（design/155）：tags held by >=3 methods are
+ * commonalities, ==2 partial, ==1 essential differences — the advisor's
+ * "提炼共性、识别本质差异" as reproducible data.
+ */
+export type TagGroup = "common" | "partial" | "difference";
+
+export interface TagAnalysisRow {
+  tag: string;
+  definition: string;
+  basis: string;
+  methods: string[];
+  group: TagGroup;
+}
+
+export function tagAnalysis(registry: MethodRegistryData): TagAnalysisRow[] {
+  const defs = new Map((registry.tag_vocabulary ?? []).map((entry) => [entry.tag, entry]));
+  const counter = new Map<string, string[]>();
+  for (const method of registry.methods) {
+    for (const tag of method.tags ?? []) {
+      const list = counter.get(tag) ?? [];
+      list.push(method.id);
+      counter.set(tag, list);
+    }
+  }
+  const rows: TagAnalysisRow[] = [];
+  for (const [tag, methods] of counter) {
+    const group: TagGroup = methods.length >= 3 ? "common" : methods.length === 2 ? "partial" : "difference";
+    const def = defs.get(tag);
+    rows.push({
+      tag,
+      definition: def?.definition ?? "",
+      basis: def?.basis ?? "",
+      methods: [...methods].sort(),
+      group
+    });
+  }
+  return rows.sort((a, b) => b.methods.length - a.methods.length || a.tag.localeCompare(b.tag));
 }
