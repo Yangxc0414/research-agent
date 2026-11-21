@@ -20,6 +20,11 @@ import {
   loadMethodRegistry,
   type MethodRegistryData
 } from "../../domain/methodModel";
+import {
+  COMPOSITIONS,
+  COMPOSITION_ORDER,
+  validateComposition
+} from "../../domain/composition";
 import { ELEMENTS, isHumanElement } from "../../domain/elementGraph";
 import { siteHref } from "../../domain/links";
 import { folderStorage, folderStorageFileName } from "../../adapters/folderStorage";
@@ -867,6 +872,53 @@ export function MethodModelSettingsPage() {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="settings-card">
+        <div className="settings-card-title">要素组合 · 端口与接线（变与不变的呈现）</div>
+        <p className="method-contrast-note" style={{ margin: "0 0 8px" }}>
+          元模型是<b>要素与端口</b>（每个要素消费什么、产出什么），方法是<b>接线方式</b>。
+          验证式与探索式共享同一组治理要素与门；差异只在接线——方案的输入端口不同，
+          产出也随之不同（判别式协议 vs 数据收集协议），假设的位置随接线移动。
+          非法接线（如探索式里让方案消费尚不存在的假设）会被端口校验拒绝。
+        </p>
+        <div className="composition-grid">
+          {COMPOSITION_ORDER.map((id) => {
+            const composition = COMPOSITIONS[id];
+            const violations = validateComposition(composition);
+            return (
+              <div className="composition-col" key={id}>
+                <div className="composition-head">
+                  <b>{composition.label}</b>
+                  <span>{composition.sub}</span>
+                </div>
+                <ol className="composition-wiring">
+                  {composition.wiring.map((step, index) => {
+                    const isPlan = step.element === "方案";
+                    return (
+                      <li
+                        key={`${composition.id}-${step.element}-${index}`}
+                        className={`composition-step${isPlan ? " is-diverge" : ""}`}
+                      >
+                        <b>{step.element}</b>
+                        <small>{step.consumes ? `消费 ${step.consumes}` : "入口"}</small>
+                      </li>
+                    );
+                  })}
+                </ol>
+                <small className={`composition-valid${violations.length ? " is-bad" : ""}`}>
+                  {violations.length
+                    ? `非法接线：${violations[0].message}`
+                    : "✓ 端口校验通过：每步的输入都被上游产出满足"}
+                </small>
+              </div>
+            );
+          })}
+        </div>
+        <p className="method-contrast-note">
+          自改进的组合化方向：智能体可提出新的接线（组合提案），必须通过同样的端口校验与治理门，租约由人授予——
+          内部编排可变，用户面与治理语义不变。
+        </p>
       </div>
 
       <div className="settings-card">

@@ -7972,3 +7972,74 @@ select.control {
   line-height: 1.5;
   color: var(--text);
 }
+
+/* Composition wirings (design/154): elements with typed ports; two reference
+   compositions side by side; the divergence at 方案 highlighted. */
+.composition-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.composition-col {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  background: rgba(255, 255, 255, 0.66);
+}
+.composition-head b {
+  display: block;
+  font-size: calc(11px * var(--font-scale, 1));
+  color: var(--text);
+}
+.composition-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--faint);
+}
+.composition-wiring {
+  list-style: none;
+  margin: 7px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.composition-step {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.6);
+}
+.composition-step b {
+  font-family: var(--mono);
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--accent-deep);
+}
+.composition-step small {
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--muted);
+}
+.composition-step.is-diverge {
+  border-color: rgba(217, 45, 85, 0.35);
+  background: rgba(217, 45, 85, 0.05);
+}
+.composition-step.is-diverge b {
+  color: var(--coral);
+}
+.composition-step.is-diverge small {
+  color: var(--coral);
+  font-weight: 600;
+}
+.composition-valid {
+  display: block;
+  margin-top: 6px;
+  font-size: calc(9px * var(--font-scale, 1));
+  color: var(--teal);
+}
+.composition-valid.is-bad {
+  color: var(--coral);
+}
