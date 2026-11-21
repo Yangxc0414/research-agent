@@ -27,7 +27,7 @@
 
 | 纪要要求 | 实现状态 | 设计文档 | 验证方式 |
 |---|---|---|---|
-| **研究方法细粒度建模** | ✅ 注册表 0.5：10 方法 × fit_stages / 协议字段 / 检查项 / 标签（32 词表）/ 三维（输入/证据源/评估维度）/ 组合绑定 / 槽位任务卡 | 149/153/155/158 | python 40/40 + web 57/57；方法模型页渲染 |
+| **研究方法细粒度建模** | ✅ 注册表 0.6：10 方法 × fit_stages / 协议字段 / 检查项 / 标签（40 词表）/ 三维 / 组合绑定 / 槽位任务卡 / **效力主类型（封闭词表 9 项）/ 停止规则（4 类）/ 每步接线理由 / 非研究负例** | 149/153/155/158/166/167 | python 130/130 + web 63/63；方法模型页"研究方法 × 效力类型"表渲染 |
 | **过程可信与证据链** | ✅ 核心已有（span-only/capsule/EA/closure/lineage）；新增：要素组合视图、阶段目标、断言指向、S1 文献台账 | 151/160/147 | 静态实测截图 |
 | **产物版本控制** | ✅ 已有 lineage build/verify/impact（stale 传播、阻断导出）；**自动修改**未实现（诚实：定位+标记+人签，非自动改写） | design/152 §2 | python 门 |
 | **智能体自改进** | ✅ 已有 RSI 租约（propose→dry-run→regression→lease）；**组合提案租约**（L2 流程级）形式定义已精确化（154 §4），执行器迁移 SPEC 先行 | 154/156/162 §4 | 形式定义 + 端口校验负例 |
@@ -55,6 +55,8 @@
 | 163 | 变与不变控制表（五维三列 + 控制层级 L3/L2/L1） | 74931d8 | ✅ |
 | 164 | 组合解析 advisory 层：`PipelineRequest.method_id` + `pipeline_stage_plan` + `stage_skip` 事件（**阶段块仍全部执行，非真实跳过**） | 7a0d5f3 | ✅ |
 | 165 | 执行层反思：计划可变不等于流程可变；给出可证伪判据 A/B | 7a0d5f3 | ✅ |
+| 166 | 研究方法/流程的变与不变：主张-证据-效力三元组 + 十方法效力矩阵 | b489f67 | ✅ |
+| 167 | 效力模型落地：注册表 0.6（validity_focus / iteration_rule / rationale / not_research / method_diff）+ 前端效力表 | 本轮 | ✅ |
 
 ---
 
@@ -68,7 +70,8 @@
 | 共性槽位 | 10 个治理槽位 + 阶段目标 | elementGraph.ts（逐要素 goal） |
 | 方法 × 槽位矩阵 | 适配点阵 / 任务卡 双视图 | registry fit_stages + stage_tasks |
 | 标签 × 方法 | 共性(≥3)/部分共性(2)/本质差异(1) 分组 | registry tag_vocabulary + tags |
-| 要素组合 · 端口与接线 | 验证式/探索式两种合法接线，端口校验 | composition.ts PORT_ELEMENTS + COMPOSITIONS |
+| 研究方法 × 效力类型 | 10 方法 × 效力主类型/证据形态/停止规则/组合 + 词表 + 非研究边界 | registry.validity_focus / iteration_rule / not_research |
+| 要素组合 · 端口与接线 | 验证式/探索式两种合法接线 + 每步顺序理由 + 首个分歧位置 | composition.ts + registry.wiring.rationale |
 | 要素组合视图 · 依赖链 | 11 要素的消费/产出边（带 SPEC 出处）+ 阶段目标 | elementGraph.ts ELEMENTS |
 | 解析后的阶段计划 | 该方法的组合接线按槽位展开（顺序随组合不同） | stagePlanFor(method, registry) |
 | 方法 × 槽位详情卡 | 三维（输入/证据源/评估维度）+ 协议字段 + 产物 + 检查 + 证据类型与基线策略 + 智能体含义 + 标签 + 槽位任务卡 + 方法学依据 | registry 方法对象全量 |
@@ -82,9 +85,9 @@
 | 检查 | 结果 |
 |---|---|
 | typecheck | ✅ |
-| web test:unit | ✅ 59/59（10 个测试文件） |
+| web test:unit | ✅ 63/63（11 个测试文件，新增 methodValidity） |
 | build + build:site | ✅ |
-| python pinned 门（method_registry/workspace/docs_audit/repo_hygiene/release/evolution/rsi/plugin/policy） | ✅ 119/119（本轮新增 5 例 `PipelineStagePlanTest`） |
+| python pinned 门（method_registry/workspace/docs_audit/repo_hygiene/release/evolution/rsi/plugin/policy） | ✅ 130/130（新增 11 例：效力词表/停止规则/理由/负例/`method_diff`/CLI） |
 | readiness（check_task_readiness） | ✅ 7/7 会话可演示 |
 | 发行副本（build_release --prune + test_release_integrity） | ✅ |
 | CI（ci + Pages） | ✅ 全绿 |
@@ -105,6 +108,8 @@
 | 8 | 证据形态绑定产物 schema（runtime 接入后 SPEC 收口） | runtime 接入 | 163 §6 |
 | 9 | 方法×槽位活动文本逐格补全（90 格按"逐字有据"随真实会话积累） | 真实多方法任务 | 158 §6 |
 | 10 | task-compare 联动评估维度差异行 | 前端增量 | 153 §6 |
+| 11 | `method_diff` 的前端并排对比入口（目前只有 CLI + 效力表） | 前端增量 | 167 §5 |
+| 12 | 停止规则的实际消费：`saturation` / `convergence` 如何判定尚未接到执行器 | 执行器迁移 | 167 §5 / 165 |
 
 ---
 
