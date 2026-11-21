@@ -188,6 +188,11 @@ export const EVIDENCE_PROFILES: Record<string, EvidenceProfile> = {
     kind: "介入循环反思",
     basis: "情境性知识；无介入则不可归因",
     baselinePolicy: "介入前后对照受情境限制——结论是情境性知识，不做统计归因"
+  },
+  "ml-iterative-experiment": {
+    kind: "一手迭代测量（多种子 + 消融）",
+    basis: "pengsida learning_research；Agarwal et al. 2021（statistical precipice）",
+    baselinePolicy: "与已发表 SOTA 的可复现对比 + 消融；多种子区间报告；toy→real 迁移差距如实声明"
   }
 };
 

@@ -17,7 +17,8 @@ test("every registry method has an evidence profile", () => {
     "case-study",
     "survey",
     "design-science",
-    "action-research"
+    "action-research",
+    "ml-iterative-experiment"
   ];
   for (const id of ids) {
     const profile = evidenceProfileFor(id);
