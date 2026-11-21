@@ -56,7 +56,7 @@
 | 164 | 组合解析 advisory 层：`PipelineRequest.method_id` + `pipeline_stage_plan` + `stage_skip` 事件（**阶段块仍全部执行，非真实跳过**） | 7a0d5f3 | ✅ |
 | 165 | 执行层反思：计划可变不等于流程可变；给出可证伪判据 A/B | 7a0d5f3 | ✅ |
 | 166 | 研究方法/流程的变与不变：主张-证据-效力三元组 + 十方法效力矩阵 | b489f67 | ✅ |
-| 167 | 效力模型落地：注册表 0.6（validity_focus / iteration_rule / rationale / not_research / method_diff）+ 前端效力表 | 本轮 | ✅ |
+| 167 | 效力模型落地：注册表 0.6（validity_focus / iteration_rule / rationale / not_research / method_diff）+ 前端效力表 | 6f9d0a7 | ✅ |
 
 ---
 
