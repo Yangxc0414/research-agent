@@ -60,6 +60,7 @@
 | 168 | 研究内容→方法→编排：选择信号（0.7）+ recommend 三态拒答 + pipeline auto + 前端推荐卡 | 4a0e31e | ✅ |
 | 169 | 执行流程对应研究方法：RESEARCH FLOW 三轨道（方法编排 / 治理固定 / 计划外）+ 计划-会话顺序分歧提示 + task.methodId | 870780b | — |
 | 170 | 对 169 的独立反思：推翻三处事实错误（数据缺口≠方法事实 / UI 未验证因果 / advisory 口径丢失），给出最小修正清单（**只改判断，未改代码**） | 560bc42 | — |
+| 171 | 研究方法/研究过程文献调研：Crotty/Creswell/Gravetter/Wallace/Cooper/预注册四层模型 + 六项设计裁决（**撤销 170 的补数据建议，数据不动**） | 待提交 | — |
 
 ---
 
@@ -116,7 +117,7 @@
 | 11 | `method_diff` 的前端并排对比入口（目前只有 CLI + 效力表） | 前端增量 | 167 §5 |
 | 12 | 停止规则的实际消费：`saturation` / `convergence` 如何判定尚未接到执行器 | 执行器迁移 | 167 §5 / 165 |
 | 13 | ESE 会话的叙事顺序（S1→S2-S3→S4，验证式形状）与 `repository-mining` 绑定的探索式组合不一致；面板已显式报分歧（169 §1.1），**判定权在人**：改绑定 or 改叙事 | 人判定 | 169 §1.1 / 170 §2 |
-| 14 | 注册表数据缺口：`repository-mining.fit_stages` 不含 S8-S12（但它自己的 reporting_sections 声明了报告章节）、`controlled-experiment` 不含 S1；面板把缺口说成"本方法未声明"，且测试固化了缺口（170 §1） | 数据裁决 + SPEC Changelog | 170 §1 / §9 |
+| 14 | 注册表数据缺口：`repository-mining.fit_stages` 不含 S8-S12（但它自己的 reporting_sections 声明了报告章节）、`controlled-experiment` 不含 S1；面板把缺口说成"本方法未声明"，且测试固化了缺口（170 §1）→ **171 §3.1 裁决：当前数据正确，不是缺口；`fit_stages` 是方法特异约束点而非阶段全集，改措辞不改数据** | 措辞修正（无需改 SPEC） | 170 §1 / 171 §3.1 |
 | 15 | advisory 口径在展示层丢失：`runtimeSnapshot` 丢 `method_selection.status/needs_human`，auto 推荐被 UI 说成"任务声明"；三态不足时方法信息反而完全消失（170 §3） | 前端增量 | 170 §3 / §9 |
 
 ---
