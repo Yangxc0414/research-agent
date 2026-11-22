@@ -67,7 +67,7 @@
 | 175 | 研究方法形式化建模：护栏（checks/LOCKED_SCOPES）vs 可优化策略空间（choice_points）；4 方法首批建模，fail-closed 校验 9 例，方法详情卡上屏 | bc57759 | — |
 | 176 | 元模型三层对齐审计：三层职责已分（数据/校验/执行），缺三态路由；落 researchVerdict advisory 投影（三态→四分支），web 82/82 | 9db0480 | — |
 | 177 | 元模型驱动编排：端口依赖拓扑推导顺序 + 阶段执行契约（requires/produces/human/gate/tasks/checks），10 例测试；前端「编排契约」块上屏 | b055141 | — |
-| 178 | 阶段智能体角色化：`stage-roles.json` 声明 role/executor/module/human_sign/interface，S5b 纯人签 fail-closed；统一 `run` 适配器；14 例测试 | 待提交 | — |
+| 178 | 阶段智能体角色化：`stage-roles.json` 声明 role/executor/module/human_sign/interface，S5b 纯人签 fail-closed；统一 `run` 适配器；14 例测试 | a5dfc98 | — |
 
 ---
 
