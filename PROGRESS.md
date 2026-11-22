@@ -65,6 +65,7 @@
 | 173 | 对连续四轮反省的反省：169 后**零产品代码改动**、执行器仍全阶段执行；把 165 判据 A 提升为完成门槛，提议先写一条必然红的测试 | 669d24f | — |
 | 174 | **判据 A 变绿**：方法组合真正驱动阶段执行（4 方法实测序列不同），跳过阶段用 not_applicable 空产物 + 门不升格；run SPEC v0.10.0；5 例判据测试 | 405d37b | — |
 | 175 | 研究方法形式化建模：护栏（checks/LOCKED_SCOPES）vs 可优化策略空间（choice_points）；4 方法首批建模，fail-closed 校验 9 例，方法详情卡上屏 | bc57759 | — |
+| 176 | 元模型三层对齐审计：三层职责已分（数据/校验/执行），缺三态路由；落 researchVerdict advisory 投影（三态→四分支），web 82/82 | 待提交 | — |
 
 ---
 
@@ -88,6 +89,7 @@
 | 护栏 / 可优化空间 | 每方法硬性约束（checks/LOCKED_SCOPES）+ choice_points（可选项/guard/判定标准）；护栏 AI 不可改，策略点才是自改进对象 | method-strategy-space.json（只读投影） |
 | 实证任务对比 | 三任务并排九维（方法/证据源/指标/seeds/基线策略/断言/标签差异/已走槽位/开着门） | taskCompare.ts（派生） |
 | S1 文献台账 | 来源构成/六面向覆盖/gap 登记/检索计划 | literatureLedger.ts（派生） |
+| 三态决策分支（advisory） | StudyComparison 四态 → 继续分析/修正假设/补证据/人签；不驱动执行器 | researchVerdict.ts（纯函数） |
 
 ---
 
