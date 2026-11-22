@@ -68,7 +68,7 @@
 | 176 | 元模型三层对齐审计：三层职责已分（数据/校验/执行），缺三态路由；落 researchVerdict advisory 投影（三态→四分支），web 82/82 | 9db0480 | — |
 | 177 | 元模型驱动编排：端口依赖拓扑推导顺序 + 阶段执行契约（requires/produces/human/gate/tasks/checks），10 例测试；前端「编排契约」块上屏 | b055141 | — |
 | 178 | 阶段智能体角色化：`stage-roles.json` 声明 role/executor/module/human_sign/interface，S5b 纯人签 fail-closed；统一 `run` 适配器；14 例测试 | a5dfc98 | — |
-| 179 | 认识论一号：10 方法声明 evidence_form/inference_rule/带 citation 约束；5 种推论规则可判定；case-study 两案例可支撑、单案例被拒；16 例测试 + CLI | 待提交 | — |
+| 179 | 认识论一号：10 方法声明 evidence_form/inference_rule/带 citation 约束；5 种推论规则可判定；case-study 两案例可支撑、单案例被拒；16 例测试 + CLI | a83640d | — |
 
 ---
 
