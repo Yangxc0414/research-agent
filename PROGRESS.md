@@ -66,6 +66,7 @@
 | 174 | **判据 A 变绿**：方法组合真正驱动阶段执行（4 方法实测序列不同），跳过阶段用 not_applicable 空产物 + 门不升格；run SPEC v0.10.0；5 例判据测试 | 405d37b | — |
 | 175 | 研究方法形式化建模：护栏（checks/LOCKED_SCOPES）vs 可优化策略空间（choice_points）；4 方法首批建模，fail-closed 校验 9 例，方法详情卡上屏 | bc57759 | — |
 | 176 | 元模型三层对齐审计：三层职责已分（数据/校验/执行），缺三态路由；落 researchVerdict advisory 投影（三态→四分支），web 82/82 | 9db0480 | — |
+| 177 | 元模型驱动编排：端口依赖拓扑推导顺序 + 阶段执行契约（requires/produces/human/gate/tasks/checks），10 例测试；前端「编排契约」块上屏 | 待提交 | — |
 
 ---
 
@@ -90,6 +91,7 @@
 | 实证任务对比 | 三任务并排九维（方法/证据源/指标/seeds/基线策略/断言/标签差异/已走槽位/开着门） | taskCompare.ts（派生） |
 | S1 文献台账 | 来源构成/六面向覆盖/gap 登记/检索计划 | literatureLedger.ts（派生） |
 | 三态决策分支（advisory） | StudyComparison 四态 → 继续分析/修正假设/补证据/人签；不驱动执行器 | researchVerdict.ts（纯函数） |
+| 编排契约（元模型推导） | 每阶段 requires/produces/人签/门禁/任务/检查；顺序由端口依赖拓扑推导 | orchestration-plans.json（CLI 导出） |
 
 ---
 
