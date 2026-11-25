@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-24T11:00:04.842Z",
+  "generated_at": "2026-11-25T09:53:34.132Z",
   "source": "OpenAlex /works",
   "mode": "CACHED",
   "license": "OpenAlex metadata; respect source licenses and attribution",
@@ -9,7 +9,7 @@
       "label": "钙钛矿太阳能电池稳定性",
       "query": "perovskite solar cell stability",
       "from_year": 2020,
-      "total_hits": 16809,
+      "total_hits": 16819,
       "returned": 6,
       "works": [
         {
@@ -17,7 +17,7 @@
           "doi": "https://doi.org/10.1038/s41586-021-03406-5",
           "title": "Pseudo-halide anion engineering for α-FAPbI3 perovskite solar cells",
           "year": 2021,
-          "cited_by": 3246,
+          "cited_by": 3252,
           "venue": "Nature",
           "authors": [
             "Jaeki Jeong",
@@ -32,7 +32,7 @@
           "doi": "https://doi.org/10.1038/s41560-019-0529-5",
           "title": "Consensus statement for stability assessment and reporting for perovskite photovoltaics based on ISOS procedures",
           "year": 2020,
-          "cited_by": 2103,
+          "cited_by": 2113,
           "venue": "Nature Energy",
           "authors": [
             "Mark Khenkin",
@@ -47,7 +47,7 @@
           "doi": "https://doi.org/10.1126/science.abb7167",
           "title": "Stable perovskite solar cells with efficiency exceeding 24.8% and 0.3-V voltage loss",
           "year": 2020,
-          "cited_by": 1590,
+          "cited_by": 1591,
           "venue": "Science",
           "authors": [
             "Mingyu Jeong",
@@ -62,7 +62,7 @@
           "doi": "https://doi.org/10.1126/science.abp8873",
           "title": "Inactive (PbI 2 ) 2 RbCl stabilizes perovskite films for efficient solar cells",
           "year": 2022,
-          "cited_by": 1494,
+          "cited_by": 1495,
           "venue": "Science",
           "authors": [
             "Yang Zhao",
@@ -92,7 +92,7 @@
           "doi": "https://doi.org/10.1126/science.abh1885",
           "title": "Conformal quantum dot–SnO 2 layers as electron transporters for efficient perovskite solar cells",
           "year": 2022,
-          "cited_by": 1387,
+          "cited_by": 1391,
           "venue": "Science",
           "authors": [
             "Minjin Kim",
@@ -109,7 +109,7 @@
       "label": "固态电池界面",
       "query": "solid-state battery interface",
       "from_year": 2020,
-      "total_hits": 6913,
+      "total_hits": 6912,
       "returned": 4,
       "works": [
         {
@@ -117,7 +117,7 @@
           "doi": "https://doi.org/10.1002/aenm.202203307",
           "title": "Lithium Batteries and the Solid Electrolyte Interphase (SEI)—Progress and Outlook",
           "year": 2023,
-          "cited_by": 929,
+          "cited_by": 932,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Henry Adenusi",
@@ -132,7 +132,7 @@
           "doi": "https://doi.org/10.1002/aenm.202002689",
           "title": "Solid‐State Li–Metal Batteries: Challenges and Horizons of Oxide and Sulfide Solid Electrolytes and Their Interfaces",
           "year": 2020,
-          "cited_by": 911,
+          "cited_by": 913,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Kun Joong Kim",
@@ -147,7 +147,7 @@
           "doi": "https://doi.org/10.1038/s41586-021-03486-3",
           "title": "A dynamic stability design strategy for lithium metal solid state batteries",
           "year": 2021,
-          "cited_by": 805,
+          "cited_by": 802,
           "venue": "Nature",
           "authors": [
             "Luhan Ye",
@@ -161,7 +161,7 @@
           "doi": "https://doi.org/10.1016/j.ensm.2022.01.042",
           "title": "Recent progress and future perspective on practical silicon anode-based lithium ion batteries",
           "year": 2022,
-          "cited_by": 787,
+          "cited_by": 789,
           "venue": "Energy storage materials",
           "authors": [
             "Lin Ning Sun",
