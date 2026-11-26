@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T09:53:34.132Z",
+  "generated_at": "2026-11-26T09:36:17.700Z",
   "source": "OpenAlex /works",
   "mode": "CACHED",
   "license": "OpenAlex metadata; respect source licenses and attribution",
@@ -9,7 +9,7 @@
       "label": "钙钛矿太阳能电池稳定性",
       "query": "perovskite solar cell stability",
       "from_year": 2020,
-      "total_hits": 16819,
+      "total_hits": 17050,
       "returned": 6,
       "works": [
         {
@@ -17,7 +17,7 @@
           "doi": "https://doi.org/10.1038/s41586-021-03406-5",
           "title": "Pseudo-halide anion engineering for α-FAPbI3 perovskite solar cells",
           "year": 2021,
-          "cited_by": 3252,
+          "cited_by": 3259,
           "venue": "Nature",
           "authors": [
             "Jaeki Jeong",
@@ -32,7 +32,7 @@
           "doi": "https://doi.org/10.1038/s41560-019-0529-5",
           "title": "Consensus statement for stability assessment and reporting for perovskite photovoltaics based on ISOS procedures",
           "year": 2020,
-          "cited_by": 2113,
+          "cited_by": 2114,
           "venue": "Nature Energy",
           "authors": [
             "Mark Khenkin",
@@ -47,7 +47,7 @@
           "doi": "https://doi.org/10.1126/science.abb7167",
           "title": "Stable perovskite solar cells with efficiency exceeding 24.8% and 0.3-V voltage loss",
           "year": 2020,
-          "cited_by": 1591,
+          "cited_by": 1593,
           "venue": "Science",
           "authors": [
             "Mingyu Jeong",
@@ -60,7 +60,7 @@
         {
           "openalex_id": "https://openalex.org/W4288425348",
           "doi": "https://doi.org/10.1126/science.abp8873",
-          "title": "Inactive (PbI 2 ) 2 RbCl stabilizes perovskite films for efficient solar cells",
+          "title": "Inactive (PbI 2) 2 RbCl stabilizes perovskite films for efficient solar cells",
           "year": 2022,
           "cited_by": 1495,
           "venue": "Science",
@@ -70,14 +70,14 @@
             "Zihan Qu"
           ],
           "open_access": false,
-          "abstract": "In halide perovskite solar cells the formation of secondary-phase excess lead iodide (PbI 2 ) has some positive effects on power conversion efficiency (PCE) but can be detrimental to device stability and lead to large hysteresis effects in voltage sweeps. We converted PbI 2 into an inactive (PbI 2 ) 2 RbCl compound by RbCl doping, which effectively stabilizes the perovskite phase. We obtained a certified PCE of 25.6% for FAPbI 3 (FA, formamidinium) perovskite solar cells on the basis of this strategy. Devices retained 96% of their original PCE values after 1000 hours of shelf storage and 80% a"
+          "abstract": "In halide perovskite solar cells the formation of secondary-phase excess lead iodide (PbI2) has some positive effects on power conversion efficiency (PCE) but can be detrimental to device stability and lead to large hysteresis effects in voltage sweeps. We converted PbI2 into an inactive (PbI2)2RbCl compound by RbCl doping, which effectively stabilizes the perovskite phase. We obtained a certified PCE of 25.6% for FAPbI3 (FA, formamidinium) perovskite solar cells on the basis of this strategy. Devices retained 96% of their original PCE values after 1000 hours of shelf storage and 80% after 500"
         },
         {
           "openalex_id": "https://openalex.org/W4394728226",
           "doi": "https://doi.org/10.1126/science.adm9474",
           "title": "Improved charge extraction in inverted perovskite solar cells with dual-site-binding ligands",
           "year": 2024,
-          "cited_by": 1490,
+          "cited_by": 1492,
           "venue": "Science",
           "authors": [
             "Hao Chen",
@@ -88,19 +88,19 @@
           "abstract": "Inverted (pin) perovskite solar cells (PSCs) afford improved operating stability in comparison to their nip counterparts but have lagged in power conversion efficiency (PCE). The energetic losses responsible for this PCE deficit in pin PSCs occur primarily at the interfaces between the perovskite and the charge-transport layers. Additive and surface treatments that use passivating ligands usually bind to a single active binding site: This dense packing of electrically resistive passivants perpendicular to the surface may limit the fill factor in pin PSCs. We identified ligands that bind two ne"
         },
         {
-          "openalex_id": "https://openalex.org/W4206188804",
-          "doi": "https://doi.org/10.1126/science.abh1885",
-          "title": "Conformal quantum dot–SnO 2 layers as electron transporters for efficient perovskite solar cells",
-          "year": 2022,
-          "cited_by": 1391,
+          "openalex_id": "https://openalex.org/W3089650593",
+          "doi": "https://doi.org/10.1126/science.abc4417",
+          "title": "Impact of strain relaxation on performance of α-formamidinium lead iodide perovskite solar cells",
+          "year": 2020,
+          "cited_by": 1395,
           "venue": "Science",
           "authors": [
-            "Minjin Kim",
-            "Jaeki Jeong",
-            "Haizhou Lu"
+            "Gwisu Kim",
+            "Hanul Min",
+            "Kyoung Su Lee"
           ],
-          "open_access": true,
-          "abstract": "Improvements to perovskite solar cells (PSCs) have focused on increasing their power conversion efficiency (PCE) and operational stability and maintaining high performance upon scale-up to module sizes. We report that replacing the commonly used mesoporous–titanium dioxide electron transport layer (ETL) with a thin layer of polyacrylic acid–stabilized tin(IV) oxide quantum dots (paa-QD-SnO 2 ) on the compact–titanium dioxide enhanced light capture and largely suppressed nonradiative recombination at the ETL–perovskite interface. The use of paa-QD-SnO 2 as electron-selective contact enabled PSC"
+          "open_access": false,
+          "abstract": "High-efficiency lead halide perovskite solar cells (PSCs) have been fabricated with α-phase formamidinium lead iodide (FAPbI3) stabilized with multiple cations. The alloyed cations greatly affect the bandgap, carrier dynamics, and stability, as well as lattice strain that creates unwanted carrier trap sites. We substituted cesium (Cs) and methylenediammonium (MDA) cations in FA sites of FAPbI3 and found that 0.03 mol fraction of both MDA and Cs cations lowered lattice strain, which increased carrier lifetime and reduced Urbach energy and defect concentration. The best-performing PSC exhibited "
         }
       ]
     },
@@ -109,7 +109,7 @@
       "label": "固态电池界面",
       "query": "solid-state battery interface",
       "from_year": 2020,
-      "total_hits": 6912,
+      "total_hits": 6988,
       "returned": 4,
       "works": [
         {
@@ -117,7 +117,7 @@
           "doi": "https://doi.org/10.1002/aenm.202203307",
           "title": "Lithium Batteries and the Solid Electrolyte Interphase (SEI)—Progress and Outlook",
           "year": 2023,
-          "cited_by": 932,
+          "cited_by": 931,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Henry Adenusi",
@@ -132,7 +132,7 @@
           "doi": "https://doi.org/10.1002/aenm.202002689",
           "title": "Solid‐State Li–Metal Batteries: Challenges and Horizons of Oxide and Sulfide Solid Electrolytes and Their Interfaces",
           "year": 2020,
-          "cited_by": 913,
+          "cited_by": 910,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Kun Joong Kim",
@@ -147,7 +147,7 @@
           "doi": "https://doi.org/10.1038/s41586-021-03486-3",
           "title": "A dynamic stability design strategy for lithium metal solid state batteries",
           "year": 2021,
-          "cited_by": 802,
+          "cited_by": 803,
           "venue": "Nature",
           "authors": [
             "Luhan Ye",
@@ -161,7 +161,7 @@
           "doi": "https://doi.org/10.1016/j.ensm.2022.01.042",
           "title": "Recent progress and future perspective on practical silicon anode-based lithium ion batteries",
           "year": 2022,
-          "cited_by": 789,
+          "cited_by": 790,
           "venue": "Energy storage materials",
           "authors": [
             "Lin Ning Sun",
