@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26T09:36:17.700Z",
+  "generated_at": "2026-11-27T09:42:53.302Z",
   "source": "OpenAlex /works",
   "mode": "CACHED",
   "license": "OpenAlex metadata; respect source licenses and attribution",
@@ -9,7 +9,7 @@
       "label": "钙钛矿太阳能电池稳定性",
       "query": "perovskite solar cell stability",
       "from_year": 2020,
-      "total_hits": 17050,
+      "total_hits": 17062,
       "returned": 6,
       "works": [
         {
@@ -17,7 +17,7 @@
           "doi": "https://doi.org/10.1038/s41586-021-03406-5",
           "title": "Pseudo-halide anion engineering for α-FAPbI3 perovskite solar cells",
           "year": 2021,
-          "cited_by": 3259,
+          "cited_by": 3261,
           "venue": "Nature",
           "authors": [
             "Jaeki Jeong",
@@ -32,7 +32,7 @@
           "doi": "https://doi.org/10.1038/s41560-019-0529-5",
           "title": "Consensus statement for stability assessment and reporting for perovskite photovoltaics based on ISOS procedures",
           "year": 2020,
-          "cited_by": 2114,
+          "cited_by": 2117,
           "venue": "Nature Energy",
           "authors": [
             "Mark Khenkin",
@@ -47,7 +47,7 @@
           "doi": "https://doi.org/10.1126/science.abb7167",
           "title": "Stable perovskite solar cells with efficiency exceeding 24.8% and 0.3-V voltage loss",
           "year": 2020,
-          "cited_by": 1593,
+          "cited_by": 1596,
           "venue": "Science",
           "authors": [
             "Mingyu Jeong",
@@ -92,7 +92,7 @@
           "doi": "https://doi.org/10.1126/science.abc4417",
           "title": "Impact of strain relaxation on performance of α-formamidinium lead iodide perovskite solar cells",
           "year": 2020,
-          "cited_by": 1395,
+          "cited_by": 1396,
           "venue": "Science",
           "authors": [
             "Gwisu Kim",
@@ -109,7 +109,7 @@
       "label": "固态电池界面",
       "query": "solid-state battery interface",
       "from_year": 2020,
-      "total_hits": 6988,
+      "total_hits": 6991,
       "returned": 4,
       "works": [
         {
@@ -117,7 +117,7 @@
           "doi": "https://doi.org/10.1002/aenm.202203307",
           "title": "Lithium Batteries and the Solid Electrolyte Interphase (SEI)—Progress and Outlook",
           "year": 2023,
-          "cited_by": 931,
+          "cited_by": 933,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Henry Adenusi",
@@ -132,7 +132,7 @@
           "doi": "https://doi.org/10.1002/aenm.202002689",
           "title": "Solid‐State Li–Metal Batteries: Challenges and Horizons of Oxide and Sulfide Solid Electrolytes and Their Interfaces",
           "year": 2020,
-          "cited_by": 910,
+          "cited_by": 911,
           "venue": "Advanced Energy Materials",
           "authors": [
             "Kun Joong Kim",
@@ -161,7 +161,7 @@
           "doi": "https://doi.org/10.1016/j.ensm.2022.01.042",
           "title": "Recent progress and future perspective on practical silicon anode-based lithium ion batteries",
           "year": 2022,
-          "cited_by": 790,
+          "cited_by": 793,
           "venue": "Energy storage materials",
           "authors": [
             "Lin Ning Sun",
